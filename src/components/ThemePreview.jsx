@@ -1,5 +1,5 @@
-import { useRef, useEffect, useMemo } from 'react'
-import { THEMES, STRIP_W, PHOTO_DIMS, stripTotalHeight } from '../lib/themes'
+import { useRef, useEffect, useMemo, useCallback } from 'react'
+import { THEMES, STRIP_W, PHOTO_DIMS, stripTotalHeight, logoImg } from '../lib/themes'
 import styles from './ThemePreview.module.css'
 
 function makePlaceholders(count) {
@@ -32,13 +32,23 @@ export default function ThemePreview({ theme, displayWidth = 148, numPhotos = 2 
   const fullH    = stripTotalHeight(numPhotos)
   const displayH = Math.round(fullH * scale)
 
-  useEffect(() => {
+  const renderCanvas = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     canvas.width  = STRIP_W
     canvas.height = fullH
     themeObj.draw(canvas.getContext('2d'), placeholders, '')
-  }, [theme, themeObj, fullH, placeholders])
+  }, [themeObj, fullH, placeholders])
+
+  useEffect(() => {
+    renderCanvas()
+    // If the logo PNG hasn't finished loading yet, redraw once it does so
+    // the footer (which contains the logo) appears correctly.
+    if (!logoImg.complete) {
+      logoImg.addEventListener('load', renderCanvas)
+      return () => logoImg.removeEventListener('load', renderCanvas)
+    }
+  }, [renderCanvas])
 
   return (
     <div className={styles.wrap}>
