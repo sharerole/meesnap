@@ -166,7 +166,7 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
 
           {/* Live frame preview — updates as you pick a theme */}
           <div className={styles.previewWrap}>
-            <ThemePreview theme={theme} displayWidth={116} numPhotos={1} />
+            <ThemePreview theme={theme} displayWidth={140} numPhotos={2} />
           </div>
 
           <p className={styles.optSection}>Frame</p>
