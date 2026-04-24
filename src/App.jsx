@@ -9,6 +9,7 @@ export default function App() {
   const [photos, setPhotos]       = useState([])
   const [theme, setTheme]         = useState('classic')
   const [shotCount, setShotCount] = useState(4)
+  const [filter, setFilter]       = useState('natural')
 
   function handleEnter()           { setPhase('entering') }
   function handleCurtainsOpen()    { setPhase('inside') }
@@ -37,6 +38,8 @@ export default function App() {
           setTheme={setTheme}
           shotCount={shotCount}
           setShotCount={setShotCount}
+          filter={filter}
+          setFilter={setFilter}
           onPhotosReady={handlePhotosReady}
         />
       )}
