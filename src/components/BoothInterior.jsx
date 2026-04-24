@@ -180,7 +180,7 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
 
           {/* Live frame preview — updates as you pick a theme */}
           <div className={styles.previewWrap}>
-            <ThemePreview theme={theme} displayWidth={140} numPhotos={2} />
+            <ThemePreview theme={theme} displayWidth={140} numPhotos={shotCount} />
           </div>
 
           <p className={styles.optSection}>Frame</p>
@@ -234,7 +234,7 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
             ) : (
               <p className={styles.camWait}>Setting up camera…</p>
             )}
-            <p className={styles.startNote}>{shotCount} shots · {COUNTDOWN_SEC}s each</p>
+            <p className={styles.startNote}>{shotCount} shots · {COUNTDOWN_SEC} sec each</p>
           </div>
         </div>
       )}
