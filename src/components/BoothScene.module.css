@@ -13,7 +13,6 @@
   overflow: hidden;
 }
 
-/* Subtle floor plane */
 .scene::after {
   content: '';
   position: absolute;
@@ -99,18 +98,60 @@
   min-height: 420px;
 }
 
-/* Brand box at top of machine panel */
+/* Brand box — lens replaces duplicate logo */
 .brandBox {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.35);
-  border: 1.5px solid rgba(193,0,90,0.4);
+  background: rgba(0,0,0,0.5);
+  border: 1.5px solid rgba(255,255,255,0.08);
   border-radius: 6px;
-  padding: 8px 10px;
+  padding: 12px 10px;
+  box-shadow: inset 0 0 12px rgba(0,0,0,0.6);
+}
+
+/* CSS camera lens */
+.lens {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #2a2a3a 0%, #0c0c18 55%, #060610 100%);
+  border: 3px solid #606070;
   box-shadow:
-    0 0 10px rgba(193,0,90,0.2),
-    inset 0 0 8px rgba(193,0,90,0.05);
+    0 0 0 2px #3a3a4a,
+    0 0 14px rgba(0,0,0,0.95),
+    inset 0 1px 0 rgba(255,255,255,0.12);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lensRing {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.08);
+  position: absolute;
+}
+
+.lensCore {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #181828 0%, #04040c 100%);
+  border: 1.5px solid #333;
+  position: absolute;
+}
+
+.lensGlint {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  position: absolute;
+  top: 10px;
+  left: 13px;
 }
 
 /* Filler */
@@ -135,7 +176,6 @@
   font-family: monospace;
 }
 
-/* Horizontal slot opening */
 .outputSlot {
   width: 76px;
   height: 9px;
@@ -154,7 +194,6 @@
   border-color: rgba(193,0,90,0.5);
 }
 
-/* Tray */
 .outputTray {
   width: 76px;
   height: 72px;
@@ -167,7 +206,6 @@
   box-shadow: inset 0 2px 6px rgba(0,0,0,0.8);
 }
 
-/* Strip printing into the tray */
 .stripInTray {
   position: absolute;
   top: 0;
@@ -209,7 +247,6 @@
   overflow: hidden;
 }
 
-/* Curtain rod */
 .curtainRod {
   position: absolute;
   top: 0;
@@ -225,7 +262,6 @@
     inset 0 1px 0 rgba(255,255,255,0.4);
 }
 
-/* Interior */
 .interiorPreview {
   position: absolute;
   inset: 0;
@@ -251,7 +287,6 @@
   background-color: #D4D4D4;
 }
 
-/* CSS stool */
 .stool {
   position: absolute;
   bottom: 80px;
@@ -326,6 +361,77 @@
   transform: translateX(58%);
 }
 
+/* ── Sample strips (lobby decoration) ── */
+.sampleStrips {
+  display: flex;
+  align-items: flex-end;
+  gap: 0;
+  margin-left: -8px;
+}
+
+.sampleStrip {
+  width: 58px;
+  border-radius: 3px;
+  padding: 6px 5px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.65), 0 2px 6px rgba(0,0,0,0.4);
+}
+
+.sampleStrips > .sampleStrip:nth-child(1) {
+  transform: rotate(-7deg) translateY(-12px);
+  z-index: 1;
+  height: 158px;
+  margin-right: -10px;
+}
+
+.sampleStrips > .sampleStrip:nth-child(2) {
+  transform: rotate(4deg);
+  z-index: 3;
+  height: 192px;
+}
+
+.sampleStrips > .sampleStrip:nth-child(3) {
+  transform: rotate(-3deg) translateY(-8px);
+  z-index: 2;
+  height: 158px;
+  margin-left: -10px;
+}
+
+.samplePhoto {
+  flex: 1;
+  border-radius: 2px;
+  min-height: 28px;
+  background: rgba(128,128,128,0.22);
+}
+
+.stripClassic {
+  background: #FFFFFF;
+  border: 3px solid #C1005A;
+}
+.stripClassic .samplePhoto {
+  background: rgba(193,0,90,0.08);
+}
+
+.stripYearBook {
+  background: #F4EFE4;
+  border: 3px solid #1C1C1C;
+}
+.stripYearBook .samplePhoto {
+  background: rgba(28,28,28,0.1);
+}
+
+.stripSquad {
+  background: linear-gradient(180deg, #FFF0F8 0%, #EEE0FF 100%);
+  border: 3px solid #C1005A;
+  border-radius: 5px;
+}
+.stripSquad .samplePhoto {
+  background: rgba(193,0,90,0.1);
+  border-radius: 2px;
+}
+
 /* ── Enter button ── */
 .actions {
   display: flex;
@@ -376,19 +482,18 @@
   50%       { opacity: 1; }
 }
 
-/* ── Reveal area ── */
-.revealArea {
-  margin-top: 20px;
-  min-height: 72px;
+/* ── Tray reveal view ── */
+.trayReveal {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 20px;
   position: relative;
   z-index: 2;
+  margin-top: 8px;
 }
 
-/* Film-frame progress strip */
+/* Film-frame progress */
 .filmStrip {
   display: flex;
   gap: 4px;
@@ -410,18 +515,80 @@
   box-shadow: 0 0 8px rgba(201,146,10,0.5), inset 0 0 4px rgba(255,200,50,0.2);
 }
 
-.darkroomMsg {
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: rgba(201,146,10,0.75);
-  font-family: monospace;
+/* Output tray unit */
+.trayUnit {
+  background: #111;
+  border: 5px solid #888;
+  border-image: linear-gradient(180deg, #D0D0D0 0%, #909090 40%, #C0C0C0 60%, #787878 100%) 1;
+  box-shadow:
+    inset 2px 2px 0 rgba(255,255,255,0.1),
+    inset -2px -2px 0 rgba(0,0,0,0.5),
+    0 16px 48px rgba(0,0,0,0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 24px;
+  gap: 0;
+  width: 160px;
 }
 
+/* Slot the strip feeds through */
+.traySlot {
+  width: 88px;
+  height: 11px;
+  background: #040404;
+  border: 2px solid #888;
+  border-radius: 3px 3px 0 0;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.95);
+  transition: box-shadow 0.6s, border-color 0.6s;
+  flex-shrink: 0;
+}
+
+.traySlotGlow {
+  box-shadow:
+    inset 0 2px 8px rgba(0,0,0,0.95),
+    0 0 14px rgba(193,0,90,0.9),
+    0 0 36px rgba(193,0,90,0.3);
+  border-color: rgba(193,0,90,0.65);
+}
+
+/* Viewing window */
+.trayWindow {
+  width: 88px;
+  height: 270px;
+  background: linear-gradient(180deg, #0a0a0a 0%, #141414 100%);
+  border: 2px solid #555;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 4px 12px rgba(0,0,0,0.8);
+}
+
+/* Strip image inside the window */
+.trayStrip {
+  position: absolute;
+  width: 82px;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%) translateY(-110%);
+  border-radius: 1px;
+}
+
+.trayStripOut {
+  animation: stripSlideIn 2.5s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+
+@keyframes stripSlideIn {
+  from { transform: translateX(-50%) translateY(-110%); }
+  to   { transform: translateX(-50%) translateY(0); }
+}
+
+/* Pick up button */
 .pickupBtn {
   background: linear-gradient(135deg, #C1005A, #8C003E);
   color: #fff;
+  font-family: var(--font-main);
   font-size: 1.05rem;
   font-weight: 900;
   padding: 15px 44px;
