@@ -6,11 +6,11 @@ const _logo = new Image()
 _logo.src = logoUrl
 
 const W        = 360
-const PHOTO_W  = 318
-const PHOTO_H  = 238
-const PAD_X    = (W - PHOTO_W) / 2   // 21
-const PAD_TOP  = 20
-const GAP      = 10
+const PHOTO_W  = 278
+const PHOTO_H  = 208
+const PAD_X    = (W - PHOTO_W) / 2   // 41
+const PAD_TOP  = 40
+const GAP      = 14
 const FOOTER_H = 64
 
 export function stripTotalHeight(numPhotos) {
@@ -119,7 +119,7 @@ function drawClassic(ctx, images, label) {
 }
 
 // ── Milestone ─────────────────────────────────────────────────────────────────
-// Navy background, gold border, achievement stars.
+// Navy background, amber-gold border, achievement stars.
 // Footer: deep navy → red logo reads well on dark.
 
 function drawMilestone(ctx, images, label) {
@@ -128,16 +128,16 @@ function drawMilestone(ctx, images, label) {
   ctx.fillStyle = '#1A1A2E'
   ctx.fillRect(0, 0, W, h)
 
-  ctx.strokeStyle = '#F5C518'
+  ctx.strokeStyle = '#C9920A'
   ctx.lineWidth = 8
   ctx.strokeRect(4, 4, W - 8, h - 8)
 
-  ctx.strokeStyle = 'rgba(245,197,24,0.35)'
+  ctx.strokeStyle = 'rgba(201,146,10,0.35)'
   ctx.lineWidth = 1.5
   ctx.strokeRect(14, 14, W - 28, h - 28)
 
-  // Gold dots in photo gaps
-  ctx.fillStyle = 'rgba(245,197,24,0.45)'
+  // Amber-gold dots in photo gaps
+  ctx.fillStyle = 'rgba(201,146,10,0.45)'
   images.forEach((_, i) => {
     if (i === images.length - 1) return
     const gy = PAD_TOP + (i + 1) * PHOTO_H + i * GAP + GAP / 2
@@ -146,15 +146,15 @@ function drawMilestone(ctx, images, label) {
     }
   })
 
-  ctx.fillStyle = '#F5C518'
-  ;[[26, 26], [W - 26, 26], [26, h - 26], [W - 26, h - 26]].forEach(([cx, cy]) =>
+  ctx.fillStyle = '#C9920A'
+  ;[[28, 28], [W - 28, 28], [28, h - 28], [W - 28, h - 28]].forEach(([cx, cy]) =>
     drawEightPointStar(ctx, cx, cy, 9, 4)
   )
 
   drawWatermarks(ctx, images, 0.05)
   drawPhotos(ctx, images, { clipRadius: 2 })
 
-  ctx.strokeStyle = 'rgba(245,197,24,0.4)'
+  ctx.strokeStyle = 'rgba(201,146,10,0.4)'
   ctx.lineWidth = 1.5
   images.forEach((_, i) => {
     ctx.strokeRect(PAD_X, PAD_TOP + i * (PHOTO_H + GAP), PHOTO_W, PHOTO_H)
@@ -164,7 +164,7 @@ function drawMilestone(ctx, images, label) {
   const fy = h - FOOTER_H
   ctx.fillStyle = '#0E0C1E'
   ctx.fillRect(0, fy, W, FOOTER_H)
-  ctx.strokeStyle = '#F5C518'
+  ctx.strokeStyle = '#C9920A'
   ctx.lineWidth = 2
   ctx.beginPath(); ctx.moveTo(0, fy); ctx.lineTo(W, fy); ctx.stroke()
 
@@ -173,7 +173,7 @@ function drawMilestone(ctx, images, label) {
   drawLogo(ctx, W / 2, logoY, logoH)
 
   if (label) {
-    ctx.fillStyle = 'rgba(245,197,24,0.8)'
+    ctx.fillStyle = 'rgba(201,146,10,0.8)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
     ctx.fillText(label, W / 2, fy + FOOTER_H - 10)
@@ -181,21 +181,26 @@ function drawMilestone(ctx, images, label) {
 }
 
 // ── Graduation Day ────────────────────────────────────────────────────────────
-// Deep navy background, confetti, mortarboard corners.
+// Deep navy background, academic confetti, mortarboard corners.
+// Palette: amber-gold (#C9920A), navy blues — no hot pink.
 // Footer: very dark navy → red logo pops on dark.
 
 function drawMortarboard(ctx, cx, cy, size) {
   const s = size
-  ctx.fillStyle = '#C1005A'
+  // Cap — navy blue
+  ctx.fillStyle = '#1A2E5A'
   ctx.save()
   ctx.translate(cx, cy - s * 0.3)
   ctx.rotate(Math.PI / 4)
   ctx.fillRect(-s * 0.65, -s * 0.65, s * 1.3, s * 1.3)
   ctx.restore()
+  // Brim — navy blue ellipse
+  ctx.fillStyle = '#1A2E5A'
   ctx.beginPath()
   ctx.ellipse(cx, cy, s * 0.85, s * 0.28, 0, 0, Math.PI * 2)
   ctx.fill()
-  ctx.strokeStyle = '#F5C518'
+  // Tassel — amber gold
+  ctx.strokeStyle = '#C9920A'
   ctx.lineWidth = 1.5
   ctx.beginPath()
   ctx.moveTo(cx + s * 0.9, cy - s * 0.3)
@@ -203,11 +208,11 @@ function drawMortarboard(ctx, cx, cy, size) {
   ctx.stroke()
   ctx.beginPath()
   ctx.arc(cx + s * 0.9, cy + s * 0.85, s * 0.14, 0, Math.PI * 2)
-  ctx.fillStyle = '#F5C518'
+  ctx.fillStyle = '#C9920A'
   ctx.fill()
 }
 
-const CONFETTI_COLORS = ['#C1005A', '#F5C518', '#FFFFFF', '#4A9FFF', '#FF6BAD', '#A8E6CF']
+const CONFETTI_COLORS = ['#C9920A', '#FFFFFF', '#E8D5A3', '#1B3A6B', '#4A7FB5', '#8BA7C5']
 
 function drawGraduation(ctx, images, label) {
   const h = stripTotalHeight(images.length)
@@ -229,22 +234,24 @@ function drawGraduation(ctx, images, label) {
     ctx.restore()
   }
 
-  ctx.strokeStyle = '#C1005A'
+  // Gold border
+  ctx.strokeStyle = '#C9920A'
   ctx.lineWidth = 8
   ctx.strokeRect(4, 4, W - 8, h - 8)
 
-  ctx.strokeStyle = 'rgba(193,0,90,0.3)'
+  ctx.strokeStyle = 'rgba(201,146,10,0.35)'
   ctx.lineWidth = 1.5
   ctx.strokeRect(14, 14, W - 28, h - 28)
 
-  ;[[26, 26], [W - 26, 26], [26, h - 26], [W - 26, h - 26]].forEach(([cx, cy]) =>
+  ;[[28, 28], [W - 28, 28], [28, h - 28], [W - 28, h - 28]].forEach(([cx, cy]) =>
     drawMortarboard(ctx, cx, cy, 10)
   )
 
   drawWatermarks(ctx, images, 0.05)
   drawPhotos(ctx, images, { clipRadius: 2 })
 
-  ctx.strokeStyle = 'rgba(193,0,90,0.35)'
+  // Gold photo outlines
+  ctx.strokeStyle = 'rgba(201,146,10,0.4)'
   ctx.lineWidth = 1.5
   images.forEach((_, i) => {
     ctx.strokeRect(PAD_X, PAD_TOP + i * (PHOTO_H + GAP), PHOTO_W, PHOTO_H)
@@ -257,7 +264,7 @@ function drawGraduation(ctx, images, label) {
   grad.addColorStop(1, '#0A0620')
   ctx.fillStyle = grad
   ctx.fillRect(0, fy, W, FOOTER_H)
-  ctx.strokeStyle = '#C1005A'
+  ctx.strokeStyle = '#C9920A'
   ctx.lineWidth = 2
   ctx.beginPath(); ctx.moveTo(0, fy); ctx.lineTo(W, fy); ctx.stroke()
 
@@ -266,7 +273,7 @@ function drawGraduation(ctx, images, label) {
   drawLogo(ctx, W / 2, logoY, logoH)
 
   if (label) {
-    ctx.fillStyle = 'rgba(245,197,24,0.82)'
+    ctx.fillStyle = 'rgba(201,146,10,0.85)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
     ctx.fillText(label, W / 2, fy + FOOTER_H - 10)
@@ -297,7 +304,7 @@ function drawSquadGoals(ctx, images, label) {
   ctx.setLineDash([])
 
   ctx.fillStyle = '#C1005A'
-  ;[[26, 26], [W - 26, 26], [26, h - 26], [W - 26, h - 26]].forEach(([cx, cy]) =>
+  ;[[28, 28], [W - 28, 28], [28, h - 28], [W - 28, h - 28]].forEach(([cx, cy]) =>
     drawHeart(ctx, cx, cy, 9)
   )
 
@@ -342,8 +349,8 @@ function drawSquadGoals(ctx, images, label) {
 
 export const THEMES = [
   { id: 'classic',    label: 'MeeOpp Classic',  colors: ['#C1005A', '#FFFFFF'],  draw: drawClassic    },
-  { id: 'milestone',  label: 'Milestone',        colors: ['#1A1A2E', '#F5C518'],  draw: drawMilestone  },
-  { id: 'graduation', label: 'Graduation Day',   colors: ['#08061A', '#C1005A'],  draw: drawGraduation },
+  { id: 'milestone',  label: 'Milestone',        colors: ['#1A1A2E', '#C9920A'],  draw: drawMilestone  },
+  { id: 'graduation', label: 'Graduation Day',   colors: ['#08061A', '#4A7FB5'],  draw: drawGraduation },
   { id: 'squad',      label: 'Squad Goals',      colors: ['#FFF0F8', '#C1005A'],  draw: drawSquadGoals },
 ]
 

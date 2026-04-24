@@ -5,7 +5,16 @@ import ThemePreview from './ThemePreview'
 
 const COUNTDOWN_SEC = 3
 
-export default function BoothInterior({ theme, setTheme, shotCount, setShotCount, onPhotosReady }) {
+const FILTERS = [
+  { id: 'natural', label: 'Natural',  css: 'none' },
+  { id: 'bw',      label: 'B & W',    css: 'grayscale(1)' },
+  { id: 'sepia',   label: 'Sepia',    css: 'sepia(0.85) contrast(1.05)' },
+  { id: 'faded',   label: 'Faded',    css: 'saturate(0.6) brightness(1.1) contrast(0.85)' },
+  { id: 'vivid',   label: 'Vivid',    css: 'saturate(1.6) contrast(1.1)' },
+  { id: 'warm',    label: 'Warm',     css: 'sepia(0.25) saturate(1.2) brightness(1.05)' },
+]
+
+export default function BoothInterior({ theme, setTheme, shotCount, setShotCount, filter, setFilter, onPhotosReady }) {
   const videoRef  = useRef(null)
   const canvasRef = useRef(null)
   const streamRef = useRef(null)
@@ -47,12 +56,14 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
     canvas.height = video.videoHeight || 480
     const ctx = canvas.getContext('2d')
     ctx.save()
+    const activeFilter = FILTERS.find(f => f.id === filter)?.css ?? 'none'
+    if (activeFilter !== 'none') ctx.filter = activeFilter
     ctx.translate(canvas.width, 0)
     ctx.scale(-1, 1)
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
     ctx.restore()
     return canvas.toDataURL('image/jpeg', 0.92)
-  }, [])
+  }, [filter])
 
   const runSession = useCallback(() => {
     if (running) return
@@ -117,7 +128,10 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
             playsInline
             muted
             className={styles.video}
-            style={{ transform: 'scaleX(-1)' }}
+            style={{
+              transform: 'scaleX(-1)',
+              filter: FILTERS.find(f => f.id === filter)?.css ?? 'none',
+            }}
           />
         )}
 
@@ -195,6 +209,19 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
                 onClick={() => setShotCount(n)}
               >
                 {n}
+              </button>
+            ))}
+          </div>
+
+          <p className={styles.optSection}>Filter</p>
+          <div className={styles.filterGrid}>
+            {FILTERS.map(f => (
+              <button
+                key={f.id}
+                className={`${styles.filterChip} ${filter === f.id ? styles.filterChipActive : ''}`}
+                onClick={() => setFilter(f.id)}
+              >
+                {f.label}
               </button>
             ))}
           </div>

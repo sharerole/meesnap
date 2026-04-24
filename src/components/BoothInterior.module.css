@@ -290,6 +290,36 @@
   color: #fff;
 }
 
+/* Filter chips */
+.filterGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.filterChip {
+  padding: 7px 4px;
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid rgba(255,255,255,0.09);
+  border-radius: 7px;
+  color: rgba(255,255,255,0.55);
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-family: var(--font-main);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+}
+.filterChip:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+.filterChipActive {
+  background: rgba(193,0,90,0.15);
+  border-color: rgba(193,0,90,0.55);
+  color: #fff;
+}
+
 /* Start area */
 .startWrap {
   display: flex;

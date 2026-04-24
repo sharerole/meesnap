@@ -110,12 +110,29 @@ export default function BoothScene({
         </div>
       )}
 
+      {isRevealing && <div className={styles.darkroomGlow} />}
+
       {isRevealing && (
         <div className={styles.revealArea}>
-          {stripStage === 'idle'     && <p className={styles.revealMsg}>Developing your photos…</p>}
-          {stripStage === 'glow'     && <p className={styles.revealMsg}>Almost ready…</p>}
-          {stripStage === 'printing' && <p className={styles.revealMsg}>Printing your strip…</p>}
-          {stripStage === 'ready'    && (
+          <div className={styles.filmStrip}>
+            {[...Array(8)].map((_, i) => {
+              const filled = { idle: 2, glow: 4, printing: 6, ready: 8 }[stripStage] ?? 0
+              return (
+                <div
+                  key={i}
+                  className={`${styles.filmFrame} ${i < filled ? styles.filmFrameFilled : ''}`}
+                />
+              )
+            })}
+          </div>
+          {stripStage !== 'ready' && (
+            <p className={styles.darkroomMsg}>
+              {stripStage === 'idle'     && 'Developing…'}
+              {stripStage === 'glow'     && 'Almost ready…'}
+              {stripStage === 'printing' && 'Printing…'}
+            </p>
+          )}
+          {stripStage === 'ready' && (
             <button className={styles.pickupBtn} onClick={onPickUp}>
               Pick Up Your Strip
             </button>
