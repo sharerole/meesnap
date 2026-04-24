@@ -98,6 +98,8 @@ export default function BoothScene({
               {/* LEFT: Machine panel */}
               <div className={styles.machinePanel}>
 
+                <div className={styles.machineFiller} />
+
                 {/* Display board — sample strips left by previous users */}
                 <div className={styles.displayBoard}>
                   <div className={`${styles.boardStrip} ${styles.boardStripClassic}`}>
