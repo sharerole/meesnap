@@ -3,172 +3,162 @@ import styles from './BoothScene.module.css'
 import MeeOppLogo from './MeeOppLogo'
 import { THEMES } from '../lib/themes'
 
-// Strip reveal stages after exiting the booth
-const STRIP_DELAY_GLOW   = 1400
-const STRIP_DELAY_PRINT  = 2200
-const STRIP_DELAY_READY  = 4800
+const STRIP_TIMINGS = { glow: 1200, print: 2000, ready: 4800 }
 
 export default function BoothScene({
   phase, theme, setTheme,
   onEnter, onCurtainsOpen, onCurtainsClosed, onPickUp,
 }) {
-  const [curtainsOpen, setCurtainsOpen] = useState(false)
-  const [stripStage, setStripStage] = useState('idle') // idle | glow | printing | ready
+  // Curtain starts open in lobby (bunched to one side)
+  const [curtainOpen, setCurtainOpen] = useState(true)
+  const [stripStage, setStripStage]   = useState('idle')
 
-  // Curtain open/close animation sequencing
+  // Curtain choreography
   useEffect(() => {
     if (phase === 'entering') {
-      setCurtainsOpen(false)
-      // Small delay so the closed state renders before the transition fires
-      const t1 = setTimeout(() => setCurtainsOpen(true), 80)
-      const t2 = setTimeout(onCurtainsOpen, 1300)
-      return () => { clearTimeout(t1); clearTimeout(t2) }
+      // Curtain sweeps closed as user steps in
+      setCurtainOpen(false)
+      const t = setTimeout(onCurtainsOpen, 950)
+      return () => clearTimeout(t)
     }
     if (phase === 'exiting') {
-      setCurtainsOpen(true)
-      const t1 = setTimeout(() => setCurtainsOpen(false), 80)
-      const t2 = setTimeout(onCurtainsClosed, 1200)
+      // Booth reappears with curtain closed, then it opens (user steps out)
+      setCurtainOpen(false)
+      const t1 = setTimeout(() => setCurtainOpen(true), 300)
+      const t2 = setTimeout(onCurtainsClosed, 1300)
       return () => { clearTimeout(t1); clearTimeout(t2) }
     }
-    if (phase !== 'revealing') {
-      setCurtainsOpen(false)
-    }
+    // lobby + revealing: curtain open (bunched to side)
+    setCurtainOpen(true)
   }, [phase, onCurtainsOpen, onCurtainsClosed])
 
   // Strip reveal sequence
   useEffect(() => {
     if (phase !== 'revealing') { setStripStage('idle'); return }
     setStripStage('idle')
-    const t1 = setTimeout(() => setStripStage('glow'),     STRIP_DELAY_GLOW)
-    const t2 = setTimeout(() => setStripStage('printing'), STRIP_DELAY_PRINT)
-    const t3 = setTimeout(() => setStripStage('ready'),    STRIP_DELAY_READY)
+    const t1 = setTimeout(() => setStripStage('glow'),     STRIP_TIMINGS.glow)
+    const t2 = setTimeout(() => setStripStage('printing'), STRIP_TIMINGS.print)
+    const t3 = setTimeout(() => setStripStage('ready'),    STRIP_TIMINGS.ready)
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
   }, [phase])
 
-  const isEntering  = phase === 'entering'
-  const isRevealing = phase === 'revealing'
   const isLobby     = phase === 'lobby'
+  const isRevealing = phase === 'revealing'
 
   return (
     <div className={styles.scene}>
-      {/* Ambient floor reflection */}
-      <div className={styles.floor} />
 
-      <div className={styles.layout}>
-        {/* ── Booth ── */}
-        <div className={styles.booth}>
-          {/* Neon sign */}
-          <div className={`${styles.sign} ${isEntering ? styles.signBright : ''}`}>
-            <MeeOppLogo size={24} />
-            <span className={styles.signText}>PHOTO BOOTH</span>
-          </div>
-
-          {/* Main body */}
-          <div className={styles.body}>
-            {/* Decorative corner rivets */}
-            <span className={styles.rivet} style={{ top: 10, left: 10 }} />
-            <span className={styles.rivet} style={{ top: 10, right: 10 }} />
-            <span className={styles.rivet} style={{ bottom: 10, left: 10 }} />
-            <span className={styles.rivet} style={{ bottom: 10, right: 10 }} />
-
-            {/* Curtained doorway */}
-            <div className={styles.doorwayWrap}>
-              {/* Rail rod */}
-              <div className={styles.curtainRod} />
-
-              <div className={styles.doorway}>
-                {/* Dark interior behind curtains */}
-                <div className={`${styles.interior} ${isEntering ? styles.interiorLit : ''}`} />
-
-                {/* Left curtain */}
-                <div className={`${styles.curtain} ${styles.curtainLeft} ${curtainsOpen ? styles.curtainLeftOpen : ''}`}>
-                  <div className={styles.curtainTieLeft} />
-                </div>
-
-                {/* Right curtain */}
-                <div className={`${styles.curtain} ${styles.curtainRight} ${curtainsOpen ? styles.curtainRightOpen : ''}`}>
-                  <div className={styles.curtainTieRight} />
-                </div>
-              </div>
-            </div>
-
-            {/* Indicator lights */}
-            <div className={styles.lights}>
-              {['#BE0055', '#F5C518', '#1B6FD4', '#E8621A'].map((c, i) => (
-                <span
-                  key={i}
-                  className={styles.light}
-                  style={{ background: c, animationDelay: `${i * 0.28}s` }}
-                />
-              ))}
-            </div>
-
-            {/* Strip output slot */}
-            <div className={styles.slotSection}>
-              <span className={styles.slotLabel}>PHOTO OUTPUT</span>
-              <div className={`${styles.slot} ${stripStage !== 'idle' ? styles.slotActive : ''}`}>
-                {/* Strip printing animation */}
-                {(stripStage === 'printing' || stripStage === 'ready') && (
-                  <div
-                    className={`${styles.stripPrint} ${stripStage === 'ready' ? styles.stripReady : ''}`}
-                    onClick={stripStage === 'ready' ? onPickUp : undefined}
-                    title={stripStage === 'ready' ? 'Pick up your photos!' : undefined}
-                  />
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Booth legs */}
-          <div className={styles.legs}>
-            <div className={styles.leg} />
-            <div className={styles.leg} />
-          </div>
-        </div>
-
-        {/* ── Theme picker (lobby only) ── */}
-        {isLobby && (
-          <div className={styles.themePicker}>
-            <p className={styles.themeHeading}>Choose frame</p>
-            {THEMES.map(t => (
-              <button
-                key={t.id}
-                className={`${styles.themeBtn} ${theme === t.id ? styles.themeBtnActive : ''}`}
-                onClick={() => setTheme(t.id)}
-              >
-                <span className={styles.themeSwatch}>
-                  <span style={{ background: t.colors[0] }} />
-                  <span style={{ background: t.colors[1] }} />
-                </span>
-                <span className={styles.themeLabel}>{t.label}</span>
-              </button>
-            ))}
-          </div>
-        )}
+      {/* ── Pill-shaped illuminated sign ── */}
+      <div className={styles.pillSign}>
+        <MeeOppLogo size={22} />
+        <span className={styles.pillText}>MeeOpp Photo Booth</span>
       </div>
 
-      {/* ── Bottom action area ── */}
+      {/* ── Main booth unit (chrome frame wraps both panels) ── */}
+      <div className={styles.boothUnit}>
+
+        {/* LEFT: Machine panel */}
+        <div className={styles.machinePanel}>
+
+          {/* MeeOpp brand box (top of panel — replaces the "PHOTOS" poster) */}
+          <div className={styles.brandBox}>
+            <MeeOppLogo size={20} />
+            <span className={styles.brandName}>MeeOpp</span>
+          </div>
+
+          {/* Theme picker in lobby, else a decorative filler */}
+          {isLobby ? (
+            <div className={styles.themeSection}>
+              <p className={styles.themeTitle}>Choose frame</p>
+              <div className={styles.themeList}>
+                {THEMES.map(t => (
+                  <button
+                    key={t.id}
+                    className={`${styles.themeOpt} ${theme === t.id ? styles.themeOptActive : ''}`}
+                    onClick={() => setTheme(t.id)}
+                  >
+                    <span className={styles.themeDots}>
+                      <span style={{ background: t.colors[0] }} />
+                      <span style={{ background: t.colors[1] }} />
+                    </span>
+                    <span className={styles.themeOptLabel}>{t.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className={styles.machineFiller} />
+          )}
+
+          {/* Output section — slot + tray */}
+          <div className={styles.outputSection}>
+            <span className={styles.collectLabel}>COLLECT PRINTS</span>
+            {/* Horizontal slot opening */}
+            <div className={`${styles.outputSlot} ${stripStage !== 'idle' ? styles.slotGlow : ''}`} />
+            {/* Tray: contains the strip so it can't fall */}
+            <div className={styles.outputTray}>
+              {(stripStage === 'printing' || stripStage === 'ready') && (
+                <div
+                  className={`${styles.stripInTray} ${stripStage === 'ready' ? styles.stripFull : ''}`}
+                />
+              )}
+            </div>
+          </div>
+
+        </div>
+
+        {/* Chrome divider between the two panels */}
+        <div className={styles.panelDivider} />
+
+        {/* RIGHT: Curtained sitting area */}
+        <div className={styles.curtainArea}>
+
+          {/* Curtain rod */}
+          <div className={styles.curtainRod} />
+
+          {/* Interior — visible through parted curtain */}
+          <div className={styles.interiorPreview}>
+            <div className={styles.interiorWall} />
+            {/* Simple CSS stool */}
+            <div className={styles.stool}>
+              <div className={styles.stoolSeat} />
+              <div className={styles.stoolStem} />
+              <div className={styles.stoolBase} />
+            </div>
+            {/* Checkered floor */}
+            <div className={styles.checkerFloor} />
+          </div>
+
+          {/* Single curtain panel — bunches to one side when open */}
+          <div className={`${styles.curtainPanel} ${curtainOpen ? styles.curtainOpen : ''}`} />
+
+        </div>
+
+      </div>
+
+      {/* ── Bottom actions ── */}
       {isLobby && (
         <div className={styles.actions}>
           <button className={styles.enterBtn} onClick={onEnter}>
             Step Inside
           </button>
-          <p className={styles.hint}>4 shots · automatic countdown · downloadable strip</p>
+          <p className={styles.hint}>4 shots · auto countdown · choose your frame above</p>
         </div>
       )}
 
       {isRevealing && (
-        <div className={styles.revealStatus}>
+        <div className={styles.revealArea}>
           {stripStage === 'idle'     && <p className={styles.revealMsg}>Developing your photos…</p>}
           {stripStage === 'glow'     && <p className={styles.revealMsg}>Almost ready…</p>}
           {stripStage === 'printing' && <p className={styles.revealMsg}>Printing your strip…</p>}
           {stripStage === 'ready'    && (
-            <p className={`${styles.revealMsg} ${styles.revealReady}`}>
-              ↑ Pick up your photos!
-            </p>
+            <button className={styles.pickupBtn} onClick={onPickUp}>
+              Pick Up Your Strip
+            </button>
           )}
         </div>
       )}
+
     </div>
   )
 }
