@@ -34,15 +34,12 @@ function drawPhotos(ctx, images, { clipRadius = 2 } = {}) {
   })
 }
 
-// Draw the real logo PNG — no filter tricks, callers design backgrounds
-// so the natural red logo always has contrast.
 function drawLogo(ctx, centerX, y, h) {
   if (!_logo.complete || !_logo.naturalWidth) return
   const w = h * (_logo.naturalWidth / _logo.naturalHeight)
   ctx.drawImage(_logo, centerX - w / 2, y, w, h)
 }
 
-// Faint watermark logo behind each photo
 function drawWatermarks(ctx, images, alpha = 0.06) {
   if (!_logo.complete || !_logo.naturalWidth) return
   const wh = 30
@@ -54,6 +51,14 @@ function drawWatermarks(ctx, images, alpha = 0.06) {
     ctx.drawImage(_logo, (W - ww) / 2, wy, ww, wh)
   })
   ctx.globalAlpha = prev
+}
+
+// Centered italic quote in the top padding area
+function drawQuote(ctx, text, color, italic = true) {
+  ctx.fillStyle = color
+  ctx.font = `${italic ? 'italic ' : ''}500 10px "DM Sans",Arial,sans-serif`
+  ctx.textAlign = 'center'
+  ctx.fillText(text, W / 2, PAD_TOP - 10)
 }
 
 function drawEightPointStar(ctx, cx, cy, r1, r2) {
@@ -80,7 +85,7 @@ function drawHeart(ctx, hx, hy, s) {
 
 // ── MeeOpp Classic ────────────────────────────────────────────────────────────
 // White strip, magenta border.
-// Footer: white background → red logo reads perfectly.
+// Quote: "Learning looks good on you."
 
 function drawClassic(ctx, images, label) {
   const h = stripTotalHeight(images.length)
@@ -95,10 +100,10 @@ function drawClassic(ctx, images, label) {
   ctx.lineWidth = 1
   ctx.strokeRect(13, 13, W - 26, h - 26)
 
+  drawQuote(ctx, 'Learning looks good on you.', 'rgba(193,0,90,0.55)')
   drawWatermarks(ctx, images, 0.05)
   drawPhotos(ctx, images, { clipRadius: 2 })
 
-  // Footer: white with magenta top rule — red logo on white = perfect contrast
   const fy = h - FOOTER_H
   ctx.fillStyle = '#FFFFFF'
   ctx.fillRect(0, fy, W, FOOTER_H)
@@ -120,7 +125,7 @@ function drawClassic(ctx, images, label) {
 
 // ── Milestone ─────────────────────────────────────────────────────────────────
 // Navy background, amber-gold border, achievement stars.
-// Footer: deep navy → red logo reads well on dark.
+// Quote: "Small steps. Big moments."
 
 function drawMilestone(ctx, images, label) {
   const h = stripTotalHeight(images.length)
@@ -136,7 +141,6 @@ function drawMilestone(ctx, images, label) {
   ctx.lineWidth = 1.5
   ctx.strokeRect(14, 14, W - 28, h - 28)
 
-  // Amber-gold dots in photo gaps
   ctx.fillStyle = 'rgba(201,146,10,0.45)'
   images.forEach((_, i) => {
     if (i === images.length - 1) return
@@ -151,6 +155,7 @@ function drawMilestone(ctx, images, label) {
     drawEightPointStar(ctx, cx, cy, 9, 4)
   )
 
+  drawQuote(ctx, 'Small steps. Big moments.', 'rgba(201,146,10,0.7)')
   drawWatermarks(ctx, images, 0.05)
   drawPhotos(ctx, images, { clipRadius: 2 })
 
@@ -160,7 +165,6 @@ function drawMilestone(ctx, images, label) {
     ctx.strokeRect(PAD_X, PAD_TOP + i * (PHOTO_H + GAP), PHOTO_W, PHOTO_H)
   })
 
-  // Footer: dark navy → red logo reads clearly against dark background
   const fy = h - FOOTER_H
   ctx.fillStyle = '#0E0C1E'
   ctx.fillRect(0, fy, W, FOOTER_H)
@@ -180,92 +184,81 @@ function drawMilestone(ctx, images, label) {
   }
 }
 
-// ── Graduation Day ────────────────────────────────────────────────────────────
-// Deep navy background, academic confetti, mortarboard corners.
-// Palette: amber-gold (#C9920A), navy blues — no hot pink.
-// Footer: very dark navy → red logo pops on dark.
+// ── Year Book ─────────────────────────────────────────────────────────────────
+// Cream background, thick black border, typographic corner brackets,
+// ruled dividers between photos, dark charcoal footer.
+// Quote: "These are the days."
 
-function drawMortarboard(ctx, cx, cy, size) {
-  const s = size
-  // Cap — navy blue
-  ctx.fillStyle = '#1A2E5A'
-  ctx.save()
-  ctx.translate(cx, cy - s * 0.3)
-  ctx.rotate(Math.PI / 4)
-  ctx.fillRect(-s * 0.65, -s * 0.65, s * 1.3, s * 1.3)
-  ctx.restore()
-  // Brim — navy blue ellipse
-  ctx.fillStyle = '#1A2E5A'
+function drawCornerBracket(ctx, x, y, armLen, flipX, flipY) {
+  const dx = flipX ? -1 : 1
+  const dy = flipY ? -1 : 1
   ctx.beginPath()
-  ctx.ellipse(cx, cy, s * 0.85, s * 0.28, 0, 0, Math.PI * 2)
-  ctx.fill()
-  // Tassel — amber gold
-  ctx.strokeStyle = '#C9920A'
-  ctx.lineWidth = 1.5
-  ctx.beginPath()
-  ctx.moveTo(cx + s * 0.9, cy - s * 0.3)
-  ctx.lineTo(cx + s * 0.9, cy + s * 0.7)
+  ctx.moveTo(x, y + dy * armLen)
+  ctx.lineTo(x, y)
+  ctx.lineTo(x + dx * armLen, y)
   ctx.stroke()
-  ctx.beginPath()
-  ctx.arc(cx + s * 0.9, cy + s * 0.85, s * 0.14, 0, Math.PI * 2)
-  ctx.fillStyle = '#C9920A'
-  ctx.fill()
 }
 
-const CONFETTI_COLORS = ['#C9920A', '#FFFFFF', '#E8D5A3', '#1B3A6B', '#4A7FB5', '#8BA7C5']
-
-function drawGraduation(ctx, images, label) {
+function drawYearBook(ctx, images, label) {
   const h = stripTotalHeight(images.length)
 
-  ctx.fillStyle = '#08061A'
+  // Cream page background
+  ctx.fillStyle = '#F4EFE4'
   ctx.fillRect(0, 0, W, h)
 
-  for (let s = 0; s < 90; s++) {
-    const x  = seededRand(s * 3) * W
-    const y  = seededRand(s * 7) * h
-    const cw = 3 + seededRand(s * 11) * 5
-    const ch = 2 + seededRand(s * 13) * 3
-    ctx.fillStyle = CONFETTI_COLORS[Math.floor(seededRand(s * 17) * CONFETTI_COLORS.length)]
-    ctx.save()
-    ctx.globalAlpha = 0.2 + seededRand(s * 19) * 0.35
-    ctx.translate(x, y)
-    ctx.rotate(seededRand(s * 23) * Math.PI)
-    ctx.fillRect(-cw / 2, -ch / 2, cw, ch)
-    ctx.restore()
+  // Subtle inner cream texture — faint horizontal lines like ruled paper
+  ctx.strokeStyle = 'rgba(180,165,140,0.18)'
+  ctx.lineWidth = 1
+  for (let y = PAD_TOP; y < h - FOOTER_H; y += 12) {
+    ctx.beginPath(); ctx.moveTo(PAD_X, y); ctx.lineTo(W - PAD_X, y); ctx.stroke()
   }
 
-  // Gold border
-  ctx.strokeStyle = '#C9920A'
+  // Thick black outer border
+  ctx.strokeStyle = '#1C1C1C'
   ctx.lineWidth = 8
   ctx.strokeRect(4, 4, W - 8, h - 8)
 
-  ctx.strokeStyle = 'rgba(201,146,10,0.35)'
-  ctx.lineWidth = 1.5
+  // Thin inner rule
+  ctx.strokeStyle = '#1C1C1C'
+  ctx.lineWidth = 1
   ctx.strokeRect(14, 14, W - 28, h - 28)
 
-  ;[[28, 28], [W - 28, 28], [28, h - 28], [W - 28, h - 28]].forEach(([cx, cy]) =>
-    drawMortarboard(ctx, cx, cy, 10)
-  )
+  // Typographic corner brackets
+  const armLen = 18
+  const ci = 19
+  ctx.strokeStyle = '#1C1C1C'
+  ctx.lineWidth = 2.5
+  drawCornerBracket(ctx, ci, ci, armLen, false, false)
+  drawCornerBracket(ctx, W - ci, ci, armLen, true, false)
+  drawCornerBracket(ctx, ci, h - ci, armLen, false, true)
+  drawCornerBracket(ctx, W - ci, h - ci, armLen, true, true)
 
-  drawWatermarks(ctx, images, 0.05)
-  drawPhotos(ctx, images, { clipRadius: 2 })
+  // Thin ruled dividers between photos
+  ctx.strokeStyle = 'rgba(28,28,28,0.25)'
+  ctx.lineWidth = 1
+  images.forEach((_, i) => {
+    if (i === images.length - 1) return
+    const gy = PAD_TOP + (i + 1) * PHOTO_H + i * GAP + GAP / 2
+    ctx.beginPath(); ctx.moveTo(PAD_X + 8, gy); ctx.lineTo(W - PAD_X - 8, gy); ctx.stroke()
+  })
 
-  // Gold photo outlines
-  ctx.strokeStyle = 'rgba(201,146,10,0.4)'
-  ctx.lineWidth = 1.5
+  drawQuote(ctx, 'These are the days.', 'rgba(28,28,28,0.45)')
+  drawWatermarks(ctx, images, 0.04)
+  drawPhotos(ctx, images, { clipRadius: 0 })
+
+  // Thin photo outlines
+  ctx.strokeStyle = 'rgba(28,28,28,0.3)'
+  ctx.lineWidth = 1
   images.forEach((_, i) => {
     ctx.strokeRect(PAD_X, PAD_TOP + i * (PHOTO_H + GAP), PHOTO_W, PHOTO_H)
   })
 
-  // Footer: very dark → red logo is clearly visible
+  // Footer: dark charcoal — red logo pops on near-black
   const fy = h - FOOTER_H
-  const grad = ctx.createLinearGradient(0, fy, 0, fy + FOOTER_H)
-  grad.addColorStop(0, '#060414')
-  grad.addColorStop(1, '#0A0620')
-  ctx.fillStyle = grad
+  ctx.fillStyle = '#1C1C1C'
   ctx.fillRect(0, fy, W, FOOTER_H)
-  ctx.strokeStyle = '#C9920A'
-  ctx.lineWidth = 2
+  ctx.strokeStyle = '#1C1C1C'
+  ctx.lineWidth = 3
   ctx.beginPath(); ctx.moveTo(0, fy); ctx.lineTo(W, fy); ctx.stroke()
 
   const logoH = 30
@@ -273,7 +266,7 @@ function drawGraduation(ctx, images, label) {
   drawLogo(ctx, W / 2, logoY, logoH)
 
   if (label) {
-    ctx.fillStyle = 'rgba(201,146,10,0.85)'
+    ctx.fillStyle = 'rgba(244,239,228,0.65)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
     ctx.fillText(label, W / 2, fy + FOOTER_H - 10)
@@ -282,7 +275,7 @@ function drawGraduation(ctx, images, label) {
 
 // ── Squad Goals ───────────────────────────────────────────────────────────────
 // Pastel pink-to-purple, hearts.
-// Footer: white background → red logo on white = perfect contrast.
+// Quote: "We learn better together."
 
 function drawSquadGoals(ctx, images, label) {
   const h = stripTotalHeight(images.length)
@@ -315,6 +308,7 @@ function drawSquadGoals(ctx, images, label) {
     ;[-18, 0, 18].forEach(offset => drawHeart(ctx, W / 2 + offset, gy, 4))
   })
 
+  drawQuote(ctx, 'We learn better together.', 'rgba(193,0,90,0.6)')
   drawWatermarks(ctx, images, 0.06)
   drawPhotos(ctx, images, { clipRadius: 6 })
 
@@ -325,7 +319,6 @@ function drawSquadGoals(ctx, images, label) {
     ctx.beginPath(); ctx.roundRect(PAD_X, y, PHOTO_W, PHOTO_H, 6); ctx.stroke()
   })
 
-  // Footer: white → red logo on white = crisp and clean
   const fy = h - FOOTER_H
   ctx.fillStyle = '#FFFFFF'
   ctx.fillRect(0, fy, W, FOOTER_H)
@@ -348,13 +341,12 @@ function drawSquadGoals(ctx, images, label) {
 // ── Public API ────────────────────────────────────────────────────────────────
 
 export const THEMES = [
-  { id: 'classic',    label: 'MeeOpp Classic',  colors: ['#C1005A', '#FFFFFF'],  draw: drawClassic    },
-  { id: 'milestone',  label: 'Milestone',        colors: ['#1A1A2E', '#C9920A'],  draw: drawMilestone  },
-  { id: 'graduation', label: 'Graduation Day',   colors: ['#08061A', '#4A7FB5'],  draw: drawGraduation },
-  { id: 'squad',      label: 'Squad Goals',      colors: ['#FFF0F8', '#C1005A'],  draw: drawSquadGoals },
+  { id: 'classic',  label: 'MeeOpp Classic', colors: ['#C1005A', '#FFFFFF'],  draw: drawClassic  },
+  { id: 'milestone', label: 'Milestone',      colors: ['#1A1A2E', '#C9920A'],  draw: drawMilestone },
+  { id: 'yearbook',  label: 'Year Book',      colors: ['#F4EFE4', '#1C1C1C'],  draw: drawYearBook  },
+  { id: 'squad',     label: 'Squad Goals',    colors: ['#FFF0F8', '#C1005A'],  draw: drawSquadGoals },
 ]
 
 export const STRIP_W    = W
 export const PHOTO_DIMS = { w: PHOTO_W, h: PHOTO_H }
-// Exported so ThemePreview can listen for load and redraw
 export { _logo as logoImg }
