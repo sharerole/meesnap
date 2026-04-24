@@ -11,7 +11,7 @@ const PHOTO_H  = 238
 const PAD_X    = (W - PHOTO_W) / 2   // 21
 const PAD_TOP  = 20
 const GAP      = 10
-const FOOTER_H = 62
+const FOOTER_H = 64
 
 export function stripTotalHeight(numPhotos) {
   return PAD_TOP + numPhotos * PHOTO_H + (numPhotos - 1) * GAP + PAD_TOP + FOOTER_H
@@ -34,32 +34,26 @@ function drawPhotos(ctx, images, { clipRadius = 2 } = {}) {
   })
 }
 
-// Draw the real MeeOpp logo PNG in the footer, centered horizontally.
-// white=true applies brightness(0) invert(1) to make it white.
-// dark=true applies brightness(0) to make it solid dark.
-function drawLogo(ctx, centerX, y, h, { white = false, dark = false } = {}) {
+// Draw the real logo PNG — no filter tricks, callers design backgrounds
+// so the natural red logo always has contrast.
+function drawLogo(ctx, centerX, y, h) {
   if (!_logo.complete || !_logo.naturalWidth) return
   const w = h * (_logo.naturalWidth / _logo.naturalHeight)
-  ctx.save()
-  if (white) ctx.filter = 'brightness(0) invert(1)'
-  else if (dark) ctx.filter = 'brightness(0)'
   ctx.drawImage(_logo, centerX - w / 2, y, w, h)
-  ctx.restore()
 }
 
 // Faint watermark logo behind each photo
-function drawWatermarks(ctx, images, alpha = 0.06, { white = false } = {}) {
+function drawWatermarks(ctx, images, alpha = 0.06) {
   if (!_logo.complete || !_logo.naturalWidth) return
   const wh = 30
   const ww = wh * (_logo.naturalWidth / _logo.naturalHeight)
-  ctx.save()
+  const prev = ctx.globalAlpha
   ctx.globalAlpha = alpha
-  if (white) ctx.filter = 'brightness(0) invert(1)'
   images.forEach((_, i) => {
     const wy = PAD_TOP + i * (PHOTO_H + GAP) + PHOTO_H / 2 - wh / 2
     ctx.drawImage(_logo, (W - ww) / 2, wy, ww, wh)
   })
-  ctx.restore()
+  ctx.globalAlpha = prev
 }
 
 function drawEightPointStar(ctx, cx, cy, r1, r2) {
@@ -84,36 +78,9 @@ function drawHeart(ctx, hx, hy, s) {
   ctx.fill()
 }
 
-// Footer helper: fills background, draws logo, optionally draws label
-function drawFooter(ctx, h, { bg, logoCfg = {}, label, labelColor = 'rgba(255,255,255,0.8)', topLine = null } = {}) {
-  const fy = h - FOOTER_H
-
-  if (typeof bg === 'function') {
-    bg(ctx, fy)
-  } else {
-    ctx.fillStyle = bg
-    ctx.fillRect(0, fy, W, FOOTER_H)
-  }
-
-  if (topLine) {
-    ctx.strokeStyle = topLine
-    ctx.lineWidth = 1.5
-    ctx.beginPath(); ctx.moveTo(0, fy); ctx.lineTo(W, fy); ctx.stroke()
-  }
-
-  const logoH  = 26
-  const logoY  = fy + (FOOTER_H - logoH) / 2 - (label ? 7 : 0)
-  drawLogo(ctx, W / 2, logoY, logoH, logoCfg)
-
-  if (label) {
-    ctx.fillStyle = labelColor
-    ctx.font = '11px "DM Sans",Arial,sans-serif'
-    ctx.textAlign = 'center'
-    ctx.fillText(label, W / 2, fy + FOOTER_H - 10)
-  }
-}
-
 // ── MeeOpp Classic ────────────────────────────────────────────────────────────
+// White strip, magenta border.
+// Footer: white background → red logo reads perfectly.
 
 function drawClassic(ctx, images, label) {
   const h = stripTotalHeight(images.length)
@@ -124,23 +91,36 @@ function drawClassic(ctx, images, label) {
   ctx.lineWidth = 10
   ctx.strokeRect(5, 5, W - 10, h - 10)
 
-  ctx.strokeStyle = 'rgba(193,0,90,0.2)'
+  ctx.strokeStyle = 'rgba(193,0,90,0.18)'
   ctx.lineWidth = 1
   ctx.strokeRect(13, 13, W - 26, h - 26)
 
   drawWatermarks(ctx, images, 0.05)
   drawPhotos(ctx, images, { clipRadius: 2 })
 
-  drawFooter(ctx, h, {
-    bg: '#C1005A',
-    logoCfg: { white: true },
-    label,
-    labelColor: 'rgba(255,255,255,0.82)',
-  })
+  // Footer: white with magenta top rule — red logo on white = perfect contrast
+  const fy = h - FOOTER_H
+  ctx.fillStyle = '#FFFFFF'
+  ctx.fillRect(0, fy, W, FOOTER_H)
+  ctx.strokeStyle = '#C1005A'
+  ctx.lineWidth = 3
+  ctx.beginPath(); ctx.moveTo(0, fy); ctx.lineTo(W, fy); ctx.stroke()
+
+  const logoH = 30
+  const logoY  = fy + (FOOTER_H - logoH) / 2 - (label ? 8 : 0)
+  drawLogo(ctx, W / 2, logoY, logoH)
+
+  if (label) {
+    ctx.fillStyle = 'rgba(60,60,60,0.75)'
+    ctx.font = '11px "DM Sans",Arial,sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText(label, W / 2, fy + FOOTER_H - 10)
+  }
 }
 
 // ── Milestone ─────────────────────────────────────────────────────────────────
-// Navy background, gold border, achievement stars in corners, gold footer.
+// Navy background, gold border, achievement stars.
+// Footer: deep navy → red logo reads well on dark.
 
 function drawMilestone(ctx, images, label) {
   const h = stripTotalHeight(images.length)
@@ -148,17 +128,15 @@ function drawMilestone(ctx, images, label) {
   ctx.fillStyle = '#1A1A2E'
   ctx.fillRect(0, 0, W, h)
 
-  // Gold outer border
   ctx.strokeStyle = '#F5C518'
   ctx.lineWidth = 8
   ctx.strokeRect(4, 4, W - 8, h - 8)
 
-  // Hairline inner border
   ctx.strokeStyle = 'rgba(245,197,24,0.35)'
   ctx.lineWidth = 1.5
   ctx.strokeRect(14, 14, W - 28, h - 28)
 
-  // Gold dot rows in photo gaps
+  // Gold dots in photo gaps
   ctx.fillStyle = 'rgba(245,197,24,0.45)'
   images.forEach((_, i) => {
     if (i === images.length - 1) return
@@ -168,7 +146,6 @@ function drawMilestone(ctx, images, label) {
     }
   })
 
-  // Eight-point gold stars at corners
   ctx.fillStyle = '#F5C518'
   ;[[26, 26], [W - 26, 26], [26, h - 26], [W - 26, h - 26]].forEach(([cx, cy]) =>
     drawEightPointStar(ctx, cx, cy, 9, 4)
@@ -177,39 +154,47 @@ function drawMilestone(ctx, images, label) {
   drawWatermarks(ctx, images, 0.05)
   drawPhotos(ctx, images, { clipRadius: 2 })
 
-  // Thin gold outline on each photo
   ctx.strokeStyle = 'rgba(245,197,24,0.4)'
   ctx.lineWidth = 1.5
   images.forEach((_, i) => {
-    const y = PAD_TOP + i * (PHOTO_H + GAP)
-    ctx.strokeRect(PAD_X, y, PHOTO_W, PHOTO_H)
+    ctx.strokeRect(PAD_X, PAD_TOP + i * (PHOTO_H + GAP), PHOTO_W, PHOTO_H)
   })
 
-  drawFooter(ctx, h, {
-    bg: '#F5C518',
-    logoCfg: { dark: true },
-    label,
-    labelColor: 'rgba(26,26,46,0.75)',
-  })
+  // Footer: dark navy → red logo reads clearly against dark background
+  const fy = h - FOOTER_H
+  ctx.fillStyle = '#0E0C1E'
+  ctx.fillRect(0, fy, W, FOOTER_H)
+  ctx.strokeStyle = '#F5C518'
+  ctx.lineWidth = 2
+  ctx.beginPath(); ctx.moveTo(0, fy); ctx.lineTo(W, fy); ctx.stroke()
+
+  const logoH = 30
+  const logoY  = fy + (FOOTER_H - logoH) / 2 - (label ? 8 : 0)
+  drawLogo(ctx, W / 2, logoY, logoH)
+
+  if (label) {
+    ctx.fillStyle = 'rgba(245,197,24,0.8)'
+    ctx.font = '11px "DM Sans",Arial,sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText(label, W / 2, fy + FOOTER_H - 10)
+  }
 }
 
 // ── Graduation Day ────────────────────────────────────────────────────────────
-// Deep navy background, confetti, mortarboard corners, magenta border.
+// Deep navy background, confetti, mortarboard corners.
+// Footer: very dark navy → red logo pops on dark.
 
 function drawMortarboard(ctx, cx, cy, size) {
   const s = size
   ctx.fillStyle = '#C1005A'
-  // Diamond-shaped board top
   ctx.save()
   ctx.translate(cx, cy - s * 0.3)
   ctx.rotate(Math.PI / 4)
   ctx.fillRect(-s * 0.65, -s * 0.65, s * 1.3, s * 1.3)
   ctx.restore()
-  // Brim ellipse
   ctx.beginPath()
   ctx.ellipse(cx, cy, s * 0.85, s * 0.28, 0, 0, Math.PI * 2)
   ctx.fill()
-  // Tassel
   ctx.strokeStyle = '#F5C518'
   ctx.lineWidth = 1.5
   ctx.beginPath()
@@ -230,7 +215,6 @@ function drawGraduation(ctx, images, label) {
   ctx.fillStyle = '#08061A'
   ctx.fillRect(0, 0, W, h)
 
-  // Confetti specs (seeded so preview matches final)
   for (let s = 0; s < 90; s++) {
     const x  = seededRand(s * 3) * W
     const y  = seededRand(s * 7) * h
@@ -245,48 +229,53 @@ function drawGraduation(ctx, images, label) {
     ctx.restore()
   }
 
-  // Magenta border
   ctx.strokeStyle = '#C1005A'
   ctx.lineWidth = 8
   ctx.strokeRect(4, 4, W - 8, h - 8)
 
-  // Hairline inner
   ctx.strokeStyle = 'rgba(193,0,90,0.3)'
   ctx.lineWidth = 1.5
   ctx.strokeRect(14, 14, W - 28, h - 28)
 
-  // Mortarboard corners
   ;[[26, 26], [W - 26, 26], [26, h - 26], [W - 26, h - 26]].forEach(([cx, cy]) =>
     drawMortarboard(ctx, cx, cy, 10)
   )
 
-  drawWatermarks(ctx, images, 0.05, { white: true })
+  drawWatermarks(ctx, images, 0.05)
   drawPhotos(ctx, images, { clipRadius: 2 })
 
-  // Photo outlines
   ctx.strokeStyle = 'rgba(193,0,90,0.35)'
   ctx.lineWidth = 1.5
   images.forEach((_, i) => {
     ctx.strokeRect(PAD_X, PAD_TOP + i * (PHOTO_H + GAP), PHOTO_W, PHOTO_H)
   })
 
-  drawFooter(ctx, h, {
-    bg: (c, fy) => {
-      const grad = c.createLinearGradient(0, fy, W, fy + FOOTER_H)
-      grad.addColorStop(0, '#0D0420')
-      grad.addColorStop(1, '#1A0630')
-      c.fillStyle = grad
-      c.fillRect(0, fy, W, FOOTER_H)
-    },
-    logoCfg: { white: true },
-    label,
-    labelColor: 'rgba(245,197,24,0.85)',
-    topLine: '#C1005A',
-  })
+  // Footer: very dark → red logo is clearly visible
+  const fy = h - FOOTER_H
+  const grad = ctx.createLinearGradient(0, fy, 0, fy + FOOTER_H)
+  grad.addColorStop(0, '#060414')
+  grad.addColorStop(1, '#0A0620')
+  ctx.fillStyle = grad
+  ctx.fillRect(0, fy, W, FOOTER_H)
+  ctx.strokeStyle = '#C1005A'
+  ctx.lineWidth = 2
+  ctx.beginPath(); ctx.moveTo(0, fy); ctx.lineTo(W, fy); ctx.stroke()
+
+  const logoH = 30
+  const logoY  = fy + (FOOTER_H - logoH) / 2 - (label ? 8 : 0)
+  drawLogo(ctx, W / 2, logoY, logoH)
+
+  if (label) {
+    ctx.fillStyle = 'rgba(245,197,24,0.82)'
+    ctx.font = '11px "DM Sans",Arial,sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText(label, W / 2, fy + FOOTER_H - 10)
+  }
 }
 
 // ── Squad Goals ───────────────────────────────────────────────────────────────
-// Pastel pink-to-purple gradient, heart motifs, MeeOpp magenta accents.
+// Pastel pink-to-purple, hearts.
+// Footer: white background → red logo on white = perfect contrast.
 
 function drawSquadGoals(ctx, images, label) {
   const h = stripTotalHeight(images.length)
@@ -297,25 +286,21 @@ function drawSquadGoals(ctx, images, label) {
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, W, h)
 
-  // Rounded magenta border
   ctx.strokeStyle = '#C1005A'
   ctx.lineWidth = 10
   ctx.beginPath(); ctx.roundRect(5, 5, W - 10, h - 10, 16); ctx.stroke()
 
-  // Dashed inner border
   ctx.strokeStyle = 'rgba(193,0,90,0.25)'
   ctx.lineWidth = 1.5
   ctx.setLineDash([5, 5])
   ctx.beginPath(); ctx.roundRect(16, 16, W - 32, h - 32, 10); ctx.stroke()
   ctx.setLineDash([])
 
-  // Corner hearts
   ctx.fillStyle = '#C1005A'
   ;[[26, 26], [W - 26, 26], [26, h - 26], [W - 26, h - 26]].forEach(([cx, cy]) =>
     drawHeart(ctx, cx, cy, 9)
   )
 
-  // Heart dividers between photos
   images.forEach((_, i) => {
     if (i === images.length - 1) return
     const gy = PAD_TOP + (i + 1) * PHOTO_H + i * GAP + GAP / 2
@@ -326,7 +311,6 @@ function drawSquadGoals(ctx, images, label) {
   drawWatermarks(ctx, images, 0.06)
   drawPhotos(ctx, images, { clipRadius: 6 })
 
-  // Photo borders
   ctx.strokeStyle = 'rgba(193,0,90,0.4)'
   ctx.lineWidth = 1.5
   images.forEach((_, i) => {
@@ -334,16 +318,24 @@ function drawSquadGoals(ctx, images, label) {
     ctx.beginPath(); ctx.roundRect(PAD_X, y, PHOTO_W, PHOTO_H, 6); ctx.stroke()
   })
 
-  drawFooter(ctx, h, {
-    bg: (c, fy) => {
-      c.fillStyle = 'rgba(255,107,173,0.12)'
-      c.fillRect(0, fy, W, FOOTER_H)
-    },
-    logoCfg: {},         // red logo as-is on light pink
-    label,
-    labelColor: 'rgba(193,0,90,0.7)',
-    topLine: 'rgba(193,0,90,0.25)',
-  })
+  // Footer: white → red logo on white = crisp and clean
+  const fy = h - FOOTER_H
+  ctx.fillStyle = '#FFFFFF'
+  ctx.fillRect(0, fy, W, FOOTER_H)
+  ctx.strokeStyle = '#C1005A'
+  ctx.lineWidth = 2
+  ctx.beginPath(); ctx.moveTo(0, fy); ctx.lineTo(W, fy); ctx.stroke()
+
+  const logoH = 30
+  const logoY  = fy + (FOOTER_H - logoH) / 2 - (label ? 8 : 0)
+  drawLogo(ctx, W / 2, logoY, logoH)
+
+  if (label) {
+    ctx.fillStyle = 'rgba(193,0,90,0.7)'
+    ctx.font = '11px "DM Sans",Arial,sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText(label, W / 2, fy + FOOTER_H - 10)
+  }
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────

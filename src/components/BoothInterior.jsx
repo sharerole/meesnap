@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 import styles from './BoothInterior.module.css'
 import { THEMES } from '../lib/themes'
+import ThemePreview from './ThemePreview'
 
 const COUNTDOWN_SEC = 3
 
@@ -162,6 +163,12 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
       {/* Options panel — visible only in setup mode */}
       {inSetup && (
         <div className={styles.optionsPanel}>
+
+          {/* Live frame preview — updates as you pick a theme */}
+          <div className={styles.previewWrap}>
+            <ThemePreview theme={theme} displayWidth={116} numPhotos={1} />
+          </div>
+
           <p className={styles.optSection}>Frame</p>
           <div className={styles.themeGrid}>
             {THEMES.map(t => (
