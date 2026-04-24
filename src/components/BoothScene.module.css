@@ -1,0 +1,468 @@
+/* ── Scene ── */
+.scene {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at 50% 0%, #1C0A2A 0%, #0E0C18 50%, #080610 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 32px 16px 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle floor plane */
+.scene::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: linear-gradient(to top, rgba(190,0,85,0.04) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+/* ── Booth row (booth + preview side by side) ── */
+.boothRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+/* ── Pill sign ── */
+.pillSign {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #0A0410;
+  border: 3px solid #555;
+  border-radius: 50px;
+  padding: 11px 28px;
+  margin-bottom: -3px; /* overlaps booth top slightly */
+  position: relative;
+  z-index: 2;
+  box-shadow:
+    0 0 18px rgba(190,0,85,0.55),
+    0 0 40px rgba(190,0,85,0.2),
+    inset 0 0 24px rgba(190,0,85,0.12);
+}
+
+.pillText {
+  font-size: 0.95rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 0 12px rgba(190,0,85,0.7);
+}
+
+/* ── Booth unit (chrome frame) ── */
+.boothUnit {
+  display: flex;
+  border: 7px solid #B8B8B8;
+  border-image: linear-gradient(180deg, #E0E0E0 0%, #A8A8A8 40%, #D0D0D0 60%, #909090 100%) 1;
+  box-shadow:
+    inset 2px 2px 0 rgba(255,255,255,0.35),
+    inset -2px -2px 0 rgba(0,0,0,0.25),
+    0 16px 48px rgba(0,0,0,0.7),
+    0 4px 12px rgba(0,0,0,0.5);
+  position: relative;
+}
+
+/* ── Machine panel (left) ── */
+.machinePanel {
+  width: 210px;
+  /* Dark walnut wood grain */
+  background-color: #1A0C06;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent           0px,
+      transparent           5px,
+      rgba(100,55,15,0.22)  5px,
+      rgba(100,55,15,0.22)  6px,
+      transparent           6px,
+      transparent          11px,
+      rgba(60,28,6,0.28)   11px,
+      rgba(60,28,6,0.28)   12px,
+      transparent          12px,
+      transparent          17px,
+      rgba(120,70,20,0.15) 17px,
+      rgba(120,70,20,0.15) 18px
+    );
+  display: flex;
+  flex-direction: column;
+  padding: 14px 12px 14px;
+  gap: 10px;
+  min-height: 420px;
+}
+
+/* Brand box at top of machine panel */
+.brandBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0,0,0,0.35);
+  border: 1.5px solid rgba(190,0,85,0.4);
+  border-radius: 6px;
+  padding: 8px 10px;
+  box-shadow:
+    0 0 10px rgba(190,0,85,0.2),
+    inset 0 0 8px rgba(190,0,85,0.05);
+}
+
+.brandName {
+  font-size: 0.85rem;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: #fff;
+  text-shadow: 0 0 8px rgba(190,0,85,0.5);
+}
+
+/* Theme picker */
+.themeSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  overflow: hidden;
+}
+
+.themeTitle {
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+}
+
+.themeList {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.themeOpt {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(0,0,0,0.3);
+  border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  padding: 6px 8px;
+  color: rgba(255,255,255,0.55);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+  width: 100%;
+}
+.themeOpt:hover { background: rgba(255,255,255,0.08); color: #fff; }
+.themeOptActive {
+  background: rgba(190,0,85,0.15);
+  border-color: rgba(190,0,85,0.5);
+  color: #fff;
+}
+
+.themeDots {
+  display: flex;
+  width: 22px;
+  height: 10px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
+  flex-shrink: 0;
+}
+.themeDots span { flex: 1; display: block; }
+
+.themeOptLabel { font-size: 0.7rem; }
+
+/* Filler when not in lobby */
+.machineFiller { flex: 1; }
+
+/* Output section */
+.outputSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin-top: auto;
+}
+
+.collectLabel {
+  font-size: 0.5rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.22);
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  font-family: monospace;
+}
+
+/* Horizontal slot opening — where strip comes out */
+.outputSlot {
+  width: 76px;
+  height: 9px;
+  background: #050505;
+  border: 1.5px solid #888;
+  border-radius: 2px 2px 0 0;
+  box-shadow: inset 0 1px 4px rgba(0,0,0,0.9);
+  transition: box-shadow 0.5s;
+}
+
+.slotGlow {
+  box-shadow:
+    inset 0 1px 4px rgba(0,0,0,0.9),
+    0 0 10px rgba(190,0,85,0.7),
+    0 0 22px rgba(190,0,85,0.3);
+  border-color: rgba(190,0,85,0.5);
+}
+
+/* Tray — contains the strip so it can't fall out */
+.outputTray {
+  width: 76px;
+  height: 72px;
+  background: linear-gradient(180deg, #111 0%, #1a1a1a 100%);
+  border: 1.5px solid #777;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  overflow: hidden;        /* ← this is what keeps the strip contained */
+  position: relative;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.8);
+}
+
+/* Strip printing into the tray */
+.stripInTray {
+  position: absolute;
+  top: 0;
+  left: 4px;
+  right: 4px;
+  background: linear-gradient(180deg, #e0e0e0 0%, #f8f8f8 100%);
+  border-radius: 0 0 2px 2px;
+  height: 0;
+  animation: printIntoTray 2.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes printIntoTray {
+  0%   { height: 0; }
+  100% { height: calc(100% - 4px); }
+}
+
+/* Fix: explicitly set height when ready so animation override can't collapse it */
+.stripFull {
+  height: calc(100% - 4px);
+  animation: none;
+}
+
+/* ── Chrome divider ── */
+.panelDivider {
+  width: 8px;
+  background: linear-gradient(180deg,
+    #D8D8D8 0%, #A0A0A0 20%, #C8C8C8 40%,
+    #888888 60%, #C0C0C0 80%, #A8A8A8 100%
+  );
+  box-shadow:
+    1px 0 0 rgba(255,255,255,0.2) inset,
+    -1px 0 0 rgba(0,0,0,0.2) inset;
+}
+
+/* ── Curtain area (right panel) ── */
+.curtainArea {
+  width: 248px;
+  position: relative;
+  background: #1A0A10;
+  overflow: hidden;
+}
+
+/* Curtain rod */
+.curtainRod {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 11px;
+  z-index: 4;
+  background: linear-gradient(180deg,
+    #CCC 0%, #EEE 25%, #AAA 50%, #DDD 75%, #999 100%
+  );
+  box-shadow:
+    0 2px 6px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.4);
+}
+
+/* Interior visible through the parted curtain */
+.interiorPreview {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.interiorWall {
+  flex: 1;
+  background: radial-gradient(ellipse at 60% 40%, #2E0A14 0%, #180408 100%);
+}
+
+.checkerFloor {
+  height: 80px;
+  flex-shrink: 0;
+  background-image:
+    linear-gradient(45deg, #1A1A1A 25%, transparent 25%),
+    linear-gradient(-45deg, #1A1A1A 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #1A1A1A 75%),
+    linear-gradient(-45deg, transparent 75%, #1A1A1A 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  background-color: #D4D4D4;
+}
+
+/* Simple CSS stool */
+.stool {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stoolSeat {
+  width: 52px;
+  height: 10px;
+  background: radial-gradient(ellipse at 50% 30%, #555, #222);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.stoolStem {
+  width: 5px;
+  height: 58px;
+  background: linear-gradient(180deg, #444, #333);
+  box-shadow: 1px 0 0 rgba(255,255,255,0.1);
+}
+
+.stoolBase {
+  width: 38px;
+  height: 7px;
+  background: radial-gradient(ellipse at 50% 30%, #555, #222);
+  border-radius: 50%;
+}
+
+/* ── Single curtain panel ── */
+.curtainPanel {
+  position: absolute;
+  top: 11px; /* starts just below the rod */
+  left: 0;
+  width: 100%;
+  bottom: 0;
+  z-index: 3;
+  /* Magenta velvet fold texture */
+  background: repeating-linear-gradient(
+    to right,
+    #7A002E  0%,
+    #9E0040  9%,
+    #BE0055 18%,
+    #A00042 27%,
+    #7A002E 36%,
+    #9E0040 45%,
+    #BE0055 54%,
+    #A00042 63%,
+    #7A002E 72%,
+    #9E0040 81%,
+    #BE0055 90%,
+    #7A002E 100%
+  );
+  box-shadow: -6px 0 16px rgba(0,0,0,0.6);
+  transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Subtle sheen at top (light catching the fabric) */
+.curtainPanel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.07) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Open: curtain pushed 58% to the right — left side of entrance is clear */
+.curtainOpen {
+  transform: translateX(58%);
+}
+
+/* ── Enter button ── */
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.enterBtn {
+  background: linear-gradient(135deg, #BE0055, #8C003E);
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  padding: 15px 52px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgba(190,0,85,0.5), 0 0 40px rgba(190,0,85,0.1);
+  transition: all 0.2s;
+}
+.enterBtn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 10px 32px rgba(190,0,85,0.7), 0 0 60px rgba(190,0,85,0.15);
+}
+.enterBtn:active { transform: scale(0.98); }
+
+.hint {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.28);
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+/* ── Reveal area ── */
+.revealArea {
+  margin-top: 24px;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.revealMsg {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.5px;
+}
+
+.pickupBtn {
+  background: linear-gradient(135deg, #BE0055, #8C003E);
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 900;
+  padding: 15px 44px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgba(190,0,85,0.5);
+  animation: pickupPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pickupPulse {
+  0%, 100% { box-shadow: 0 6px 24px rgba(190,0,85,0.5); transform: scale(1); }
+  50%       { box-shadow: 0 8px 36px rgba(190,0,85,0.8); transform: scale(1.03); }
+}

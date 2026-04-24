@@ -1,0 +1,42 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 36px; /* aligns bottom with booth legs */
+}
+
+.heading {
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+}
+
+/* Clipping window — overflow hidden keeps the canvas contained */
+.window {
+  overflow: hidden;
+  position: relative;
+  border-radius: 3px;
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.6),
+    0 0 0 1px rgba(255,255,255,0.07);
+}
+
+/* Full-resolution canvas, scaled down by CSS transform */
+.canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+  display: block;
+}
+
+.name {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 0.5px;
+  text-align: center;
+}
