@@ -203,11 +203,19 @@
 }
 .optionsPanel::-webkit-scrollbar { display: none; }
 
-/* Live frame preview inside the panel */
-.previewWrap {
+/* Frame preview + chips side by side */
+.frameRow {
   display: flex;
-  justify-content: center;
-  margin-bottom: 4px;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.frameChips {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
 }
 
 .optSection {

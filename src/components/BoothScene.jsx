@@ -98,16 +98,30 @@ export default function BoothScene({
               {/* LEFT: Machine panel */}
               <div className={styles.machinePanel}>
 
-                {/* Camera lens replaces duplicate logo */}
+                {/* Brand box with MeeOpp logo */}
                 <div className={styles.brandBox}>
-                  <div className={styles.lens}>
-                    <div className={styles.lensRing} />
-                    <div className={styles.lensCore} />
-                    <div className={styles.lensGlint} />
-                  </div>
+                  <MeeOppLogo height={16} />
                 </div>
 
-                <div className={styles.machineFiller} />
+                {/* Display board — sample strips left by previous users */}
+                <div className={styles.displayBoard}>
+                  <div className={`${styles.boardStrip} ${styles.boardStripClassic}`}>
+                    <div className={styles.boardPhoto} />
+                    <div className={styles.boardPhoto} />
+                    <div className={styles.boardPhoto} />
+                  </div>
+                  <div className={`${styles.boardStrip} ${styles.boardStripMilestone}`}>
+                    <div className={styles.boardPhoto} />
+                    <div className={styles.boardPhoto} />
+                    <div className={styles.boardPhoto} />
+                    <div className={styles.boardPhoto} />
+                  </div>
+                  <div className={`${styles.boardStrip} ${styles.boardStripSquad}`}>
+                    <div className={styles.boardPhoto} />
+                    <div className={styles.boardPhoto} />
+                    <div className={styles.boardPhoto} />
+                  </div>
+                </div>
 
                 <div className={styles.outputSection}>
                   <span className={styles.collectLabel}>COLLECT PRINTS</span>
@@ -141,27 +155,6 @@ export default function BoothScene({
 
             </div>
 
-            {/* Sample strips — visible in lobby only */}
-            {isLobby && (
-              <div className={styles.sampleStrips}>
-                <div className={`${styles.sampleStrip} ${styles.stripClassic}`}>
-                  <div className={styles.samplePhoto} />
-                  <div className={styles.samplePhoto} />
-                  <div className={styles.samplePhoto} />
-                </div>
-                <div className={`${styles.sampleStrip} ${styles.stripYearBook}`}>
-                  <div className={styles.samplePhoto} />
-                  <div className={styles.samplePhoto} />
-                  <div className={styles.samplePhoto} />
-                  <div className={styles.samplePhoto} />
-                </div>
-                <div className={`${styles.sampleStrip} ${styles.stripSquad}`}>
-                  <div className={styles.samplePhoto} />
-                  <div className={styles.samplePhoto} />
-                  <div className={styles.samplePhoto} />
-                </div>
-              </div>
-            )}
 
           </div>
 
