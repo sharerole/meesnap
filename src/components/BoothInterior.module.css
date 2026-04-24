@@ -6,6 +6,13 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
+  padding: 40px 60px;
+  gap: 48px;
+}
+
+/* Row layout during setup (camera left, options right) */
+.setupMode {
+  flex-direction: row;
 }
 
 /* Camera flash */
@@ -22,7 +29,7 @@
   100% { opacity: 0; }
 }
 
-/* Velvet curtain edges (visual immersion — you're inside) */
+/* Velvet curtain edges */
 .curtainEdgeLeft,
 .curtainEdgeRight {
   position: absolute;
@@ -47,7 +54,7 @@
   );
 }
 
-/* Camera */
+/* Camera wrap — full size when shooting, smaller in setup */
 .cameraWrap {
   position: relative;
   width: min(640px, calc(100vw - 160px));
@@ -55,9 +62,14 @@
   border-radius: 6px;
   overflow: hidden;
   box-shadow:
-    0 0 0 3px rgba(190,0,85,0.4),
+    0 0 0 3px rgba(193,0,90,0.4),
     0 0 40px rgba(0,0,0,0.8),
-    0 0 80px rgba(190,0,85,0.15);
+    0 0 80px rgba(193,0,90,0.15);
+  flex-shrink: 0;
+}
+
+.cameraWrapSetup {
+  width: min(460px, calc(60vw - 100px));
 }
 
 .video {
@@ -88,9 +100,9 @@
   transition: all 0.3s;
 }
 .dotDone {
-  background: #BE0055;
-  border-color: #BE0055;
-  box-shadow: 0 0 8px rgba(190,0,85,0.7);
+  background: #C1005A;
+  border-color: #C1005A;
+  box-shadow: 0 0 8px rgba(193,0,90,0.7);
 }
 .dotActive {
   border-color: #F5C518;
@@ -119,7 +131,7 @@
   font-weight: 900;
   color: #fff;
   text-shadow:
-    0 0 40px rgba(190,0,85,0.8),
+    0 0 40px rgba(193,0,90,0.8),
     0 4px 20px rgba(0,0,0,0.8);
   animation: numPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   display: block;
@@ -160,62 +172,6 @@
   color: rgba(255,255,255,0.6);
 }
 
-/* Start button overlay */
-.startOverlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  z-index: 5;
-  backdrop-filter: blur(2px);
-}
-
-.startInstruction {
-  font-size: 1rem;
-  font-weight: 700;
-  color: rgba(255,255,255,0.7);
-  letter-spacing: 1px;
-}
-
-.startBtn {
-  background: linear-gradient(135deg, #BE0055, #8C003E);
-  color: #fff;
-  font-family: var(--font-main);
-  font-size: 1.4rem;
-  font-weight: 900;
-  letter-spacing: 2px;
-  padding: 18px 60px;
-  border-radius: 50px;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 6px 28px rgba(190,0,85,0.6), 0 0 60px rgba(190,0,85,0.2);
-  transition: all 0.2s;
-  animation: startPulse 2s ease-in-out infinite;
-}
-.startBtn:hover {
-  transform: scale(1.06);
-  box-shadow: 0 10px 36px rgba(190,0,85,0.8);
-  animation: none;
-}
-.startBtn:active { transform: scale(0.97); }
-
-@keyframes startPulse {
-  0%, 100% { box-shadow: 0 6px 28px rgba(190,0,85,0.6), 0 0 60px rgba(190,0,85,0.2); }
-  50%       { box-shadow: 0 6px 40px rgba(190,0,85,0.9), 0 0 80px rgba(190,0,85,0.35); }
-}
-
-.startNote {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: rgba(255,255,255,0.35);
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-}
-
 /* Error */
 .errorState {
   display: flex;
@@ -230,3 +186,146 @@
 }
 .errorIcon { font-size: 2.5rem; }
 .errorSub  { font-size: 0.75rem; opacity: 0.5; }
+
+/* ── Options panel ─────────────────────────────────────────────────────── */
+
+.optionsPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 240px;
+  flex-shrink: 0;
+  z-index: 3;
+}
+
+.optSection {
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: -8px;
+}
+
+/* Theme chips */
+.themeGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.themeChip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid rgba(255,255,255,0.09);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: rgba(255,255,255,0.55);
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: var(--font-main);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+}
+.themeChip:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+.themeChipActive {
+  background: rgba(193,0,90,0.15);
+  border-color: rgba(193,0,90,0.55);
+  color: #fff;
+}
+
+.chipSwatch {
+  width: 28px;
+  height: 14px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.chipLabel {
+  font-size: 0.76rem;
+}
+
+/* Shot count buttons */
+.shotRow {
+  display: flex;
+  gap: 8px;
+}
+
+.shotBtn {
+  flex: 1;
+  padding: 10px 0;
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid rgba(255,255,255,0.09);
+  border-radius: 8px;
+  color: rgba(255,255,255,0.55);
+  font-size: 1rem;
+  font-weight: 800;
+  font-family: var(--font-main);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.shotBtn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.shotBtnActive {
+  background: rgba(193,0,90,0.15);
+  border-color: rgba(193,0,90,0.55);
+  color: #fff;
+}
+
+/* Start area */
+.startWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.startBtn {
+  background: linear-gradient(135deg, #C1005A, #8C003E);
+  color: #fff;
+  font-family: var(--font-main);
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  padding: 16px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 6px 28px rgba(193,0,90,0.6), 0 0 60px rgba(193,0,90,0.2);
+  transition: all 0.2s;
+  animation: startPulse 2s ease-in-out infinite;
+}
+.startBtn:hover {
+  transform: scale(1.04);
+  box-shadow: 0 10px 36px rgba(193,0,90,0.8);
+  animation: none;
+}
+.startBtn:active { transform: scale(0.97); }
+
+@keyframes startPulse {
+  0%, 100% { box-shadow: 0 6px 28px rgba(193,0,90,0.6), 0 0 60px rgba(193,0,90,0.2); }
+  50%       { box-shadow: 0 6px 40px rgba(193,0,90,0.9), 0 0 80px rgba(193,0,90,0.35); }
+}
+
+.camWait {
+  text-align: center;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.35);
+  font-weight: 600;
+}
+
+.startNote {
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.28);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}

@@ -1,10 +1,10 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 import styles from './BoothInterior.module.css'
+import { THEMES } from '../lib/themes'
 
-const TOTAL_SHOTS = 4
 const COUNTDOWN_SEC = 3
 
-export default function BoothInterior({ onPhotosReady }) {
+export default function BoothInterior({ theme, setTheme, shotCount, setShotCount, onPhotosReady }) {
   const videoRef  = useRef(null)
   const canvasRef = useRef(null)
   const streamRef = useRef(null)
@@ -12,9 +12,9 @@ export default function BoothInterior({ onPhotosReady }) {
   const [camReady, setCamReady]   = useState(false)
   const [camError, setCamError]   = useState(null)
   const [running, setRunning]     = useState(false)
-  const [countdown, setCountdown] = useState(null)  // null | 3 | 2 | 1 | 0
-  const [shotIndex, setShotIndex] = useState(0)     // 0-based current shot
-  const [captured, setCaptured]   = useState(0)     // photos taken so far
+  const [countdown, setCountdown] = useState(null)
+  const [shotIndex, setShotIndex] = useState(0)
+  const [captured, setCaptured]   = useState(0)
   const [flash, setFlash]         = useState(false)
   const [done, setDone]           = useState(false)
 
@@ -45,7 +45,6 @@ export default function BoothInterior({ onPhotosReady }) {
     canvas.width  = video.videoWidth  || 640
     canvas.height = video.videoHeight || 480
     const ctx = canvas.getContext('2d')
-    // Mirror horizontally so the image matches what the user sees
     ctx.save()
     ctx.translate(canvas.width, 0)
     ctx.scale(-1, 1)
@@ -79,7 +78,7 @@ export default function BoothInterior({ onPhotosReady }) {
             setCaptured(imgs.length)
             setCountdown(null)
 
-            if (imgs.length < TOTAL_SHOTS) {
+            if (imgs.length < shotCount) {
               setTimeout(() => doShot(shotNum + 1), 900)
             } else {
               setDone(true)
@@ -91,21 +90,19 @@ export default function BoothInterior({ onPhotosReady }) {
     }
 
     doShot(0)
-  }, [running, captureFrame, onPhotosReady])
+  }, [running, captureFrame, onPhotosReady, shotCount])
 
-  // No auto-start — user presses the Start button when ready
+  const inSetup = !running && !done
 
   return (
-    <div className={styles.interior}>
-      {/* Camera flash */}
+    <div className={`${styles.interior} ${inSetup ? styles.setupMode : ''}`}>
       {flash && <div className={styles.flash} />}
 
-      {/* Side curtain edges to feel inside the booth */}
       <div className={styles.curtainEdgeLeft} />
       <div className={styles.curtainEdgeRight} />
 
-      {/* Camera frame */}
-      <div className={styles.cameraWrap}>
+      {/* Camera */}
+      <div className={`${styles.cameraWrap} ${inSetup ? styles.cameraWrapSetup : ''}`}>
         {camError ? (
           <div className={styles.errorState}>
             <p className={styles.errorIcon}>📷</p>
@@ -124,25 +121,27 @@ export default function BoothInterior({ onPhotosReady }) {
         )}
 
         {/* Shot progress dots */}
-        <div className={styles.dots}>
-          {[...Array(TOTAL_SHOTS)].map((_, i) => (
-            <span
-              key={i}
-              className={`
-                ${styles.dot}
-                ${i < captured ? styles.dotDone : ''}
-                ${i === shotIndex && countdown !== null ? styles.dotActive : ''}
-              `}
-            />
-          ))}
-        </div>
+        {running && (
+          <div className={styles.dots}>
+            {[...Array(shotCount)].map((_, i) => (
+              <span
+                key={i}
+                className={`
+                  ${styles.dot}
+                  ${i < captured ? styles.dotDone : ''}
+                  ${i === shotIndex && countdown !== null ? styles.dotActive : ''}
+                `}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Countdown overlay */}
         {countdown !== null && countdown > 0 && (
           <div className={styles.countdownOverlay}>
             <span key={countdown} className={styles.countdownNum}>{countdown}</span>
             <span className={styles.shotLabel}>
-              Shot {shotIndex + 1} / {TOTAL_SHOTS}
+              Shot {shotIndex + 1} / {shotCount}
             </span>
           </div>
         )}
@@ -153,23 +152,58 @@ export default function BoothInterior({ onPhotosReady }) {
           </div>
         )}
 
-        {/* Start button — shown once camera is live, before session begins */}
-        {camReady && !running && !done && (
-          <div className={styles.startOverlay}>
-            <p className={styles.startInstruction}>Get in position…</p>
-            <button className={styles.startBtn} onClick={runSession}>
-              Start
-            </button>
-            <p className={styles.startNote}>4 shots · 3 sec countdown each</p>
-          </div>
-        )}
-
-        {!camReady && !camError && (
+        {!camReady && !camError && !running && (
           <div className={styles.loadingOverlay}>
             <p>Setting up camera…</p>
           </div>
         )}
       </div>
+
+      {/* Options panel — visible only in setup mode */}
+      {inSetup && (
+        <div className={styles.optionsPanel}>
+          <p className={styles.optSection}>Frame</p>
+          <div className={styles.themeGrid}>
+            {THEMES.map(t => (
+              <button
+                key={t.id}
+                className={`${styles.themeChip} ${theme === t.id ? styles.themeChipActive : ''}`}
+                onClick={() => setTheme(t.id)}
+              >
+                <span
+                  className={styles.chipSwatch}
+                  style={{ background: `linear-gradient(135deg, ${t.colors[0]} 0%, ${t.colors[1]} 100%)` }}
+                />
+                <span className={styles.chipLabel}>{t.label}</span>
+              </button>
+            ))}
+          </div>
+
+          <p className={styles.optSection}>Shots</p>
+          <div className={styles.shotRow}>
+            {[2, 3, 4].map(n => (
+              <button
+                key={n}
+                className={`${styles.shotBtn} ${shotCount === n ? styles.shotBtnActive : ''}`}
+                onClick={() => setShotCount(n)}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+
+          <div className={styles.startWrap}>
+            {camReady ? (
+              <button className={styles.startBtn} onClick={runSession}>
+                Start
+              </button>
+            ) : (
+              <p className={styles.camWait}>Setting up camera…</p>
+            )}
+            <p className={styles.startNote}>{shotCount} shots · {COUNTDOWN_SEC}s each</p>
+          </div>
+        </div>
+      )}
 
       <canvas ref={canvasRef} style={{ display: 'none' }} />
     </div>
