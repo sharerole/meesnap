@@ -180,7 +180,7 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
 
           {/* Frame preview + chips side by side */}
           <div className={styles.frameRow}>
-            <ThemePreview theme={theme} displayWidth={100} numPhotos={shotCount} />
+            <ThemePreview theme={theme} displayWidth={100} numPhotos={shotCount} showHeading={false} />
             <div className={styles.frameChips}>
               <p className={styles.optSection}>Frame</p>
               <div className={styles.themeGrid}>
