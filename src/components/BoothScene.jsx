@@ -98,8 +98,6 @@ export default function BoothScene({
               {/* LEFT: Machine panel */}
               <div className={styles.machinePanel}>
 
-                <div className={styles.machineFiller} />
-
                 {/* Display board — sample strips left by previous users */}
                 <div className={styles.displayBoard}>
                   <div className={`${styles.boardStrip} ${styles.boardStripClassic}`}>
@@ -119,6 +117,8 @@ export default function BoothScene({
                     <div className={styles.boardPhoto} />
                   </div>
                 </div>
+
+                <div className={styles.machineFiller} />
 
                 <div className={styles.outputSection}>
                   <span className={styles.collectLabel}>COLLECT PRINTS</span>

@@ -308,6 +308,7 @@
 /* ── Display board (machine panel — sample strips) ── */
 .displayBoard {
   height: 148px;
+  margin-top: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
