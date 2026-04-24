@@ -178,26 +178,27 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
       {inSetup && (
         <div className={styles.optionsPanel}>
 
-          {/* Live frame preview — updates as you pick a theme */}
-          <div className={styles.previewWrap}>
-            <ThemePreview theme={theme} displayWidth={140} numPhotos={shotCount} />
-          </div>
-
-          <p className={styles.optSection}>Frame</p>
-          <div className={styles.themeGrid}>
-            {THEMES.map(t => (
-              <button
-                key={t.id}
-                className={`${styles.themeChip} ${theme === t.id ? styles.themeChipActive : ''}`}
-                onClick={() => setTheme(t.id)}
-              >
-                <span
-                  className={styles.chipSwatch}
-                  style={{ background: `linear-gradient(135deg, ${t.colors[0]} 0%, ${t.colors[1]} 100%)` }}
-                />
-                <span className={styles.chipLabel}>{t.label}</span>
-              </button>
-            ))}
+          {/* Frame preview + chips side by side */}
+          <div className={styles.frameRow}>
+            <ThemePreview theme={theme} displayWidth={100} numPhotos={shotCount} />
+            <div className={styles.frameChips}>
+              <p className={styles.optSection}>Frame</p>
+              <div className={styles.themeGrid}>
+                {THEMES.map(t => (
+                  <button
+                    key={t.id}
+                    className={`${styles.themeChip} ${theme === t.id ? styles.themeChipActive : ''}`}
+                    onClick={() => setTheme(t.id)}
+                  >
+                    <span
+                      className={styles.chipSwatch}
+                      style={{ background: `linear-gradient(135deg, ${t.colors[0]} 0%, ${t.colors[1]} 100%)` }}
+                    />
+                    <span className={styles.chipLabel}>{t.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           <p className={styles.optSection}>Shots</p>
