@@ -1,0 +1,322 @@
+.scene {
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 50% 30%, #2D1040 0%, var(--navy) 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.star {
+  position: absolute;
+  color: var(--gold);
+  opacity: 0.4;
+  animation: twinkle 2s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+  from { opacity: 0.2; transform: scale(0.8); }
+  to { opacity: 0.7; transform: scale(1.2); }
+}
+
+.wrapper {
+  display: flex;
+  align-items: flex-end;
+  gap: 32px;
+  position: relative;
+}
+
+/* ── Machine ── */
+.machine {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  filter: drop-shadow(0 20px 60px rgba(190, 0, 85, 0.4));
+}
+
+.signBar {
+  width: 300px;
+  display: flex;
+  justify-content: center;
+}
+
+.neonSign {
+  background: var(--navy-light);
+  border: 3px solid var(--magenta);
+  border-radius: 12px 12px 0 0;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s;
+}
+
+.neonSign.on {
+  box-shadow:
+    0 0 10px var(--magenta),
+    0 0 30px var(--magenta),
+    inset 0 0 10px rgba(190, 0, 85, 0.2);
+}
+
+.neonSign.dim {
+  box-shadow: 0 0 4px rgba(190, 0, 85, 0.3);
+  opacity: 0.7;
+}
+
+.signText {
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: var(--white);
+  text-shadow: 0 0 8px var(--magenta-light);
+  text-transform: uppercase;
+}
+
+.body {
+  width: 300px;
+  background: linear-gradient(160deg, #3A3A5C 0%, #22223A 100%);
+  border: 4px solid var(--navy-light);
+  border-radius: 16px;
+  padding: 20px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow:
+    inset 0 2px 8px rgba(255,255,255,0.05),
+    0 8px 32px rgba(0,0,0,0.6);
+}
+
+.rivet {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #888, #333);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+/* Window */
+.window {
+  border: 4px solid var(--magenta-dark);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--navy);
+  box-shadow:
+    inset 0 0 20px rgba(0,0,0,0.8),
+    0 0 12px rgba(190, 0, 85, 0.3);
+}
+
+.windowGlass {
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: radial-gradient(ellipse at 50% 100%, rgba(27, 111, 212, 0.15) 0%, transparent 70%);
+  padding: 16px;
+}
+
+.mascotInWindow {
+  width: 100px;
+  height: 100px;
+  animation: mascotFloat 3s ease-in-out infinite;
+}
+
+@keyframes mascotFloat {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-10px) rotate(3deg); }
+}
+
+.windowText {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--magenta-light);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Coin */
+.coinArea {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+.coinSlotLabel {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+.coinSlot {
+  width: 40px;
+  height: 6px;
+  background: #111;
+  border-radius: 3px;
+  border: 2px solid #555;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+}
+
+/* Panel */
+.panel {
+  background: rgba(0,0,0,0.3);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.panelLights {
+  display: flex;
+  gap: 8px;
+}
+
+.panelLight {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  animation: pulse 1.2s ease-in-out infinite alternate;
+  box-shadow: 0 0 6px currentColor;
+}
+
+@keyframes pulse {
+  from { opacity: 0.4; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1.1); }
+}
+
+.enterBtn {
+  background: linear-gradient(135deg, var(--magenta), var(--magenta-dark));
+  color: var(--white);
+  font-size: 1.1rem;
+  font-weight: 900;
+  padding: 14px 32px;
+  border-radius: 50px;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+  box-shadow:
+    0 4px 16px rgba(190, 0, 85, 0.5),
+    0 0 30px rgba(190, 0, 85, 0.2);
+  width: 100%;
+}
+
+.enterBtn:hover {
+  background: linear-gradient(135deg, var(--magenta-light), var(--magenta));
+  transform: translateY(-2px) scale(1.03);
+  box-shadow:
+    0 8px 24px rgba(190, 0, 85, 0.7),
+    0 0 40px rgba(190, 0, 85, 0.3);
+}
+
+.enterBtn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.tagline {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.5);
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* Tray */
+.tray {
+  background: linear-gradient(90deg, #111 0%, #222 50%, #111 100%);
+  border-radius: 0 0 8px 8px;
+  padding: 8px 16px;
+  border-top: 2px solid #444;
+}
+
+.trayLabel {
+  font-size: 0.65rem;
+  color: var(--gold);
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-align: center;
+}
+
+/* Legs */
+.legs {
+  display: flex;
+  gap: 160px;
+}
+
+.leg {
+  width: 20px;
+  height: 40px;
+  background: linear-gradient(90deg, #444, #222, #444);
+  border-radius: 0 0 6px 6px;
+}
+
+/* ── Sides ── */
+.sideLeft, .sideRight {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 60px;
+}
+
+.sideLeft { margin-right: 8px; }
+.sideRight { margin-left: 8px; }
+
+.floatingBadge {
+  background: var(--magenta);
+  border-radius: 50px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 16px rgba(190, 0, 85, 0.4);
+  animation: badgeBob 3s ease-in-out infinite;
+}
+
+@keyframes badgeBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.sideNote {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.6);
+  text-align: center;
+  line-height: 1.4;
+}
+
+.miniStrip {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.miniFrame {
+  width: 48px;
+  height: 36px;
+  border-radius: 4px;
+}
+
+.miniFrame_classic { background: linear-gradient(135deg, var(--magenta) 0%, var(--magenta-dark) 100%); }
+.miniFrame_retro { background: linear-gradient(135deg, #8B7355 0%, #3D2B1F 100%); }
+.miniFrame_kawaii { background: linear-gradient(135deg, #FFB3D9 0%, #C8A2D8 100%); }
