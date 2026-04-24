@@ -1,35 +1,46 @@
 import { useState } from 'react'
-import Lobby from './components/Lobby'
-import Booth from './components/Booth'
+import BoothScene from './components/BoothScene'
+import BoothInterior from './components/BoothInterior'
 import PhotoStrip from './components/PhotoStrip'
 
+// phases: lobby → entering → inside → exiting → revealing → strip
 export default function App() {
-  const [screen, setScreen] = useState('lobby')
+  const [phase, setPhase] = useState('lobby')
   const [photos, setPhotos] = useState([])
   const [theme, setTheme] = useState('classic')
 
-  function handlePhotosReady(shots) {
-    setPhotos(shots)
-    setScreen('strip')
-  }
+  function handleEnter()           { setPhase('entering') }
+  function handleCurtainsOpen()    { setPhase('inside') }
+  function handlePhotosReady(imgs) { setPhotos(imgs); setPhase('exiting') }
+  function handleCurtainsClosed()  { setPhase('revealing') }
+  function handlePickUp()          { setPhase('strip') }
+  function handleRetake()          { setPhotos([]); setPhase('lobby') }
+  function handleRestart()         { setPhotos([]); setPhase('lobby') }
+
+  const showBooth = ['lobby', 'entering', 'exiting', 'revealing'].includes(phase)
 
   return (
     <>
-      {screen === 'lobby' && <Lobby onEnter={() => setScreen('booth')} />}
-      {screen === 'booth' && (
-        <Booth
-          onPhotosReady={handlePhotosReady}
+      {showBooth && (
+        <BoothScene
+          phase={phase}
           theme={theme}
           setTheme={setTheme}
-          onBack={() => setScreen('lobby')}
+          onEnter={handleEnter}
+          onCurtainsOpen={handleCurtainsOpen}
+          onCurtainsClosed={handleCurtainsClosed}
+          onPickUp={handlePickUp}
         />
       )}
-      {screen === 'strip' && (
+      {phase === 'inside' && (
+        <BoothInterior onPhotosReady={handlePhotosReady} />
+      )}
+      {phase === 'strip' && (
         <PhotoStrip
           photos={photos}
           theme={theme}
-          onRetake={() => { setPhotos([]); setScreen('booth') }}
-          onRestart={() => { setPhotos([]); setScreen('lobby') }}
+          onRetake={handleRetake}
+          onRestart={handleRestart}
         />
       )}
     </>
