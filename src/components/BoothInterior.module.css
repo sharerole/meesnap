@@ -15,7 +15,6 @@
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-}
 
 /* Row layout during setup (camera left, options right) */
 .setupMode {

@@ -3,7 +3,7 @@ import styles from './PhotoStrip.module.css'
 import MeeOppLogo from './MeeOppLogo'
 import StickerPicker from './StickerPicker'
 import { THEMES, STRIP_W, stripTotalHeight } from '../lib/themes'
-import { STICKER_DEFS, makeSvgDataUrl } from '../lib/stickers'
+import { STICKER_DEFS, makeSvgDataUrl, getStickerDrawSize } from '../lib/stickers'
 
 // Pre-load all sticker images so canvas draw is synchronous
 const stickerImages = {}
@@ -26,10 +26,14 @@ function toCanvasXY(e, canvas) {
   }
 }
 
-function hitTest(s, x, y) {
-  const half = s.size / 2
-  return x >= s.x - half && x <= s.x + half &&
-         y >= s.y - half && y <= s.y + half
+function hitTest(s, x, y, dw, dh) {
+  return x >= s.x - dw / 2 && x <= s.x + dw / 2 &&
+         y >= s.y - dh / 2 && y <= s.y + dh / 2
+}
+
+function stickerSize(s) {
+  const def = STICKER_DEFS.find(d => d.id === s.id)
+  return def ? getStickerDrawSize(def, s.size) : { dw: s.size, dh: s.size }
 }
 
 export default function PhotoStrip({ photos, theme, onRetake, onRestart }) {
@@ -82,7 +86,9 @@ export default function PhotoStrip({ photos, theme, onRetake, onRestart }) {
     ctx.drawImage(base, 0, 0)
     stickersRef.current.forEach(s => {
       const img = stickerImages[s.id]
-      if (img?.complete) ctx.drawImage(img, s.x - s.size / 2, s.y - s.size / 2, s.size, s.size)
+      if (!img?.complete) return
+      const { dw, dh } = stickerSize(s)
+      ctx.drawImage(img, s.x - dw / 2, s.y - dh / 2, dw, dh)
     })
   }, [])
 
@@ -131,9 +137,9 @@ export default function PhotoStrip({ photos, theme, onRetake, onRestart }) {
       const { idx, ox, oy } = dragging.current
 
       // Clamp so sticker stays fully inside the canvas
-      const half = stickersRef.current[idx].size / 2
-      const cx   = Math.max(half, Math.min(canvas.width  - half, x - ox))
-      const cy   = Math.max(half, Math.min(canvas.height - half, y - oy))
+      const { dw, dh } = stickerSize(stickersRef.current[idx])
+      const cx   = Math.max(dw / 2, Math.min(canvas.width  - dw / 2, x - ox))
+      const cy   = Math.max(dh / 2, Math.min(canvas.height - dh / 2, y - oy))
 
       stickersRef.current = stickersRef.current.map((s, i) =>
         i === idx ? { ...s, x: cx, y: cy } : s
@@ -172,7 +178,8 @@ export default function PhotoStrip({ photos, theme, onRetake, onRestart }) {
     // Reverse iterate: last sticker is rendered on top
     for (let i = stickersRef.current.length - 1; i >= 0; i--) {
       const s = stickersRef.current[i]
-      if (hitTest(s, x, y)) {
+      const { dw, dh } = stickerSize(s)
+      if (hitTest(s, x, y, dw, dh)) {
         dragging.current = { idx: i, ox: x - s.x, oy: y - s.y }
         canvas.style.cursor = 'grabbing'
         e.preventDefault()
@@ -187,7 +194,10 @@ export default function PhotoStrip({ photos, theme, onRetake, onRestart }) {
     const canvas = canvasRef.current
     if (!canvas) return
     const { x, y } = toCanvasXY(e, canvas)
-    const over = stickersRef.current.some(s => hitTest(s, x, y))
+    const over = stickersRef.current.some(s => {
+      const { dw, dh } = stickerSize(s)
+      return hitTest(s, x, y, dw, dh)
+    })
     canvas.style.cursor = over ? 'grab' : 'default'
   }
 
