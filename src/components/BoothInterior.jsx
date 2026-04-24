@@ -93,13 +93,7 @@ export default function BoothInterior({ onPhotosReady }) {
     doShot(0)
   }, [running, captureFrame, onPhotosReady])
 
-  // Auto-start once camera is ready
-  useEffect(() => {
-    if (camReady && !running) {
-      const t = setTimeout(runSession, 600)
-      return () => clearTimeout(t)
-    }
-  }, [camReady, running, runSession])
+  // No auto-start — user presses the Start button when ready
 
   return (
     <div className={styles.interior}>
@@ -156,6 +150,17 @@ export default function BoothInterior({ onPhotosReady }) {
         {done && (
           <div className={styles.doneOverlay}>
             <p className={styles.doneMsg}>Printing your strip…</p>
+          </div>
+        )}
+
+        {/* Start button — shown once camera is live, before session begins */}
+        {camReady && !running && !done && (
+          <div className={styles.startOverlay}>
+            <p className={styles.startInstruction}>Get in position…</p>
+            <button className={styles.startBtn} onClick={runSession}>
+              Start
+            </button>
+            <p className={styles.startNote}>4 shots · 3 sec countdown each</p>
           </div>
         )}
 

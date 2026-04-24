@@ -25,6 +25,13 @@
   pointer-events: none;
 }
 
+/* ── Booth row (booth + preview side by side) ── */
+.boothRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+}
+
 /* ── Pill sign ── */
 .pillSign {
   display: flex;

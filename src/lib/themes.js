@@ -318,3 +318,4 @@ export const THEMES = [
 ]
 
 export const STRIP_W = W
+export const PHOTO_DIMS = { w: PHOTO_W, h: PHOTO_H }

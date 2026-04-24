@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import styles from './BoothScene.module.css'
 import MeeOppLogo from './MeeOppLogo'
+import ThemePreview from './ThemePreview'
 import { THEMES } from '../lib/themes'
 
 const STRIP_TIMINGS = { glow: 1200, print: 2000, ready: 4800 }
@@ -53,6 +54,9 @@ export default function BoothScene({
         <MeeOppLogo size={22} />
         <span className={styles.pillText}>MeeOpp Photo Booth</span>
       </div>
+
+      {/* ── Booth row: machine + theme preview side by side ── */}
+      <div className={styles.boothRow}>
 
       {/* ── Main booth unit (chrome frame wraps both panels) ── */}
       <div className={styles.boothUnit}>
@@ -134,7 +138,12 @@ export default function BoothScene({
 
         </div>
 
-      </div>
+      </div>{/* end boothUnit */}
+
+      {/* Theme preview — lobby only, shown to the right of the booth */}
+      {isLobby && <ThemePreview theme={theme} />}
+
+      </div>{/* end boothRow */}
 
       {/* ── Bottom actions ── */}
       {isLobby && (
