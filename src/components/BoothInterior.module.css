@@ -8,6 +8,13 @@
   overflow: hidden;
   padding: 40px 60px;
   gap: 48px;
+  animation: boothFadeIn 0.35s ease-out forwards;
+}
+
+@keyframes boothFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
 }
 
 /* Row layout during setup (camera left, options right) */

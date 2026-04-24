@@ -539,12 +539,14 @@
 }
 
 .trayStripOut {
-  animation: stripSlideIn 2.5s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+  animation: stripSlideIn 0.65s ease-in forwards;
 }
 
 @keyframes stripSlideIn {
-  from { transform: translateX(-50%) translateY(-110%); }
-  to   { transform: translateX(-50%) translateY(calc(270px - 100%)); }
+  0%   { transform: translateX(-50%) translateY(-110%); }
+  78%  { transform: translateX(-50%) translateY(calc(270px - 100% + 10px)); }
+  91%  { transform: translateX(-50%) translateY(calc(270px - 100% - 4px)); }
+  100% { transform: translateX(-50%) translateY(calc(270px - 100%)); }
 }
 
 /* Pick up button */
