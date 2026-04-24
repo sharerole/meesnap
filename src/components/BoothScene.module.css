@@ -98,20 +98,6 @@
   min-height: 420px;
 }
 
-/* Brand box */
-.brandBox {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0,0,0,0.35);
-  border: 1.5px solid rgba(193,0,90,0.4);
-  border-radius: 6px;
-  padding: 8px 10px;
-  box-shadow:
-    0 0 10px rgba(193,0,90,0.2),
-    inset 0 0 8px rgba(193,0,90,0.05);
-}
-
 /* Filler */
 .machineFiller { flex: 1; }
 
@@ -326,23 +312,29 @@
   align-items: center;
   justify-content: center;
   gap: 0;
-  background: rgba(0,0,0,0.28);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: #4A2E0E;
+  border: 2px solid #6B4318;
   border-radius: 4px;
   padding: 10px 8px;
   position: relative;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
 }
 
-/* Subtle corkboard texture */
+/* Cork grain texture */
 .displayBoard::before {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 4px;
+  border-radius: 3px;
   background: repeating-linear-gradient(
-    45deg,
-    transparent 0px, transparent 3px,
-    rgba(120,80,30,0.05) 3px, rgba(120,80,30,0.05) 4px
+    38deg,
+    transparent 0px, transparent 4px,
+    rgba(200,140,60,0.08) 4px, rgba(200,140,60,0.08) 5px
+  ),
+  repeating-linear-gradient(
+    -38deg,
+    transparent 0px, transparent 6px,
+    rgba(100,60,10,0.1) 6px, rgba(100,60,10,0.1) 7px
   );
   pointer-events: none;
 }

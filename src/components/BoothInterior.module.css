@@ -207,7 +207,7 @@
 .frameRow {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 12px;
 }
 
 .frameChips {
@@ -216,6 +216,11 @@
   flex-direction: column;
   gap: 4px;
   min-width: 0;
+}
+
+.frameChips .optSection {
+  text-align: center;
+  margin-bottom: 2px;
 }
 
 .optSection {
