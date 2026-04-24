@@ -89,8 +89,7 @@ export default function PhotoStrip({ photos, theme, onRetake, onRestart }) {
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerLogo}>
-          <MeeOppLogo size={26} />
-          <span>MeeOpp</span>
+          <MeeOppLogo height={22} />
         </div>
         <div className={styles.headerActions}>
           <button className={styles.ghostBtn} onClick={onRetake}>↩ Retake</button>

@@ -5,9 +5,10 @@ import PhotoStrip from './components/PhotoStrip'
 
 // phases: lobby → entering → inside → exiting → revealing → strip
 export default function App() {
-  const [phase, setPhase] = useState('lobby')
-  const [photos, setPhotos] = useState([])
-  const [theme, setTheme] = useState('classic')
+  const [phase, setPhase]         = useState('lobby')
+  const [photos, setPhotos]       = useState([])
+  const [theme, setTheme]         = useState('classic')
+  const [shotCount, setShotCount] = useState(4)
 
   function handleEnter()           { setPhase('entering') }
   function handleCurtainsOpen()    { setPhase('inside') }
@@ -24,8 +25,6 @@ export default function App() {
       {showBooth && (
         <BoothScene
           phase={phase}
-          theme={theme}
-          setTheme={setTheme}
           onEnter={handleEnter}
           onCurtainsOpen={handleCurtainsOpen}
           onCurtainsClosed={handleCurtainsClosed}
@@ -33,7 +32,13 @@ export default function App() {
         />
       )}
       {phase === 'inside' && (
-        <BoothInterior onPhotosReady={handlePhotosReady} />
+        <BoothInterior
+          theme={theme}
+          setTheme={setTheme}
+          shotCount={shotCount}
+          setShotCount={setShotCount}
+          onPhotosReady={handlePhotosReady}
+        />
       )}
       {phase === 'strip' && (
         <PhotoStrip
