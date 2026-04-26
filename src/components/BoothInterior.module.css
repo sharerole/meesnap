@@ -306,10 +306,15 @@
 }
 
 /* Layout picker */
+.layoutOptGroup {
+  align-items: center;
+}
+
 .layoutRow {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .layoutBtn {

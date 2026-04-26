@@ -213,7 +213,7 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
           </div>
 
           {/* Layout picker */}
-          <div className={styles.optGroup}>
+          <div className={`${styles.optGroup} ${styles.layoutOptGroup}`}>
             <p className={styles.optSection}>Layout</p>
             <div className={styles.layoutRow}>
               {LAYOUTS.map(l => (
