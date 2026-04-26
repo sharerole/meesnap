@@ -310,6 +310,13 @@
   align-items: center;
 }
 
+.layoutInner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
 .layoutRow {
   display: flex;
   gap: 6px;
