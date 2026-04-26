@@ -4,6 +4,23 @@ import MeeOppLogo from './MeeOppLogo'
 
 const STRIP_TIMINGS = { glow: 1200, print: 2000, ready: 4800 }
 
+const PARTICLES = [
+  { x: '7%',  s: 3, d: '15s', delay: '0s'   },
+  { x: '19%', s: 5, d: '20s', delay: '-6s'  },
+  { x: '34%', s: 2, d: '13s', delay: '-10s' },
+  { x: '51%', s: 4, d: '18s', delay: '-3s'  },
+  { x: '66%', s: 3, d: '23s', delay: '-14s' },
+  { x: '79%', s: 5, d: '16s', delay: '-8s'  },
+  { x: '91%', s: 2, d: '12s', delay: '-2s'  },
+  { x: '43%', s: 3, d: '21s', delay: '-18s' },
+]
+
+const HOW_STEPS = [
+  { n: '1', title: 'Pick your frame',      desc: 'Choose a theme and layout' },
+  { n: '2', title: 'Strike a pose',        desc: '3-second countdown per shot' },
+  { n: '3', title: 'Download your strip',  desc: 'Add stickers, a label and save' },
+]
+
 export default function BoothScene({
   phase, stripDataUrl,
   onEnter, onCurtainsOpen, onCurtainsClosed, onPickUp,
@@ -41,10 +58,22 @@ export default function BoothScene({
   return (
     <div className={styles.scene}>
 
+      {/* Ambient background elements */}
+      <div className={styles.ambientGlow} />
+      <div className={styles.particles} aria-hidden="true">
+        {PARTICLES.map((p, i) => (
+          <span
+            key={i}
+            className={styles.particle}
+            style={{ left: p.x, width: p.s, height: p.s, animationDuration: p.d, animationDelay: p.delay }}
+          />
+        ))}
+      </div>
+
       {/* Pill-shaped illuminated sign — hidden during tray reveal */}
       {!isRevealing && (
         <div className={styles.pillSign}>
-          <MeeOppLogo height={20} />
+          <span className={styles.neonLogo}><MeeOppLogo height={20} /></span>
           <span className={styles.pillText}>Photo Booth</span>
         </div>
       )}
@@ -170,6 +199,15 @@ export default function BoothScene({
                 Step Inside
               </button>
               <p className={styles.hint}>Choose your frame and shots once you're inside</p>
+              <div className={styles.howItWorks}>
+                {HOW_STEPS.map(step => (
+                  <div key={step.n} className={styles.howStep}>
+                    <div className={styles.howNum}>{step.n}</div>
+                    <p className={styles.howTitle}>{step.title}</p>
+                    <p className={styles.howDesc}>{step.desc}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </>
