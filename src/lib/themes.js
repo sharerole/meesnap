@@ -15,7 +15,7 @@ const PHOTO_H  = 208
 const PAD_X    = (W - PHOTO_W) / 2   // 41
 const PAD_TOP  = 40
 const GAP      = 14
-const FOOTER_H = 38
+const FOOTER_H = 48
 
 export function stripTotalHeight(numPhotos) {
   return PAD_TOP + numPhotos * PHOTO_H + (numPhotos - 1) * GAP + PAD_TOP + FOOTER_H
