@@ -2,7 +2,7 @@ import { useRef, useEffect, useState, useCallback } from 'react'
 import styles from './PhotoStrip.module.css'
 import MeeOppLogo from './MeeOppLogo'
 import StickerPicker from './StickerPicker'
-import { THEMES, STRIP_W, stripTotalHeight } from '../lib/themes'
+import { THEMES, STRIP_W, stripTotalHeight, logoReady } from '../lib/themes'
 import { STICKER_DEFS, makeSvgDataUrl, getStickerDrawSize } from '../lib/stickers'
 
 // Pre-load all sticker images so canvas draw is synchronous
@@ -97,8 +97,8 @@ export default function PhotoStrip({ photos, theme, onRetake, onRestart }) {
     const canvas = canvasRef.current
     if (!canvas || photos.length === 0) return
 
-    const imgs = await loadImages()
-    const h    = stripTotalHeight(imgs.length)
+    const [imgs] = await Promise.all([loadImages(), logoReady])
+    const h      = stripTotalHeight(imgs.length)
 
     // Build / reuse the offscreen base canvas
     let base = baseRef.current
