@@ -57,19 +57,10 @@ function drawPhotos(ctx, images, { clipRadius = 2 } = {}) {
   })
 }
 
-function drawTintedLogo(ctx, centerX, y, h, color) {
+function drawLogo(ctx, centerX, y, h) {
   if (!_logo.complete || !_logo.naturalWidth) return
   const w = h * (_logo.naturalWidth / _logo.naturalHeight)
-  const x = centerX - w / 2
-  // Offscreen canvas isolates the tint so it only affects logo pixels
-  const off = document.createElement('canvas')
-  off.width = Math.ceil(w); off.height = Math.ceil(h)
-  const offCtx = off.getContext('2d')
-  offCtx.drawImage(_logo, 0, 0, w, h)
-  offCtx.globalCompositeOperation = 'source-atop'
-  offCtx.fillStyle = color
-  offCtx.fillRect(0, 0, w, h)
-  ctx.drawImage(off, x, y)
+  ctx.drawImage(_logo, centerX - w / 2, y, w, h)
 }
 
 function drawWatermarks(ctx, images, alpha = 0.06) {
@@ -136,17 +127,10 @@ function drawClassic(ctx, images, label) {
   drawWatermarks(ctx, images, 0.05)
   drawPhotos(ctx, images, { clipRadius: 2 })
 
-  // Footer: white with magenta logo
   const fy = h - FOOTER_H
-  ctx.fillStyle = '#FFFFFF'
-  ctx.fillRect(0, fy, W, FOOTER_H)
-  ctx.strokeStyle = '#C1005A'
-  ctx.lineWidth = 3
-  ctx.beginPath(); ctx.moveTo(0, fy); ctx.lineTo(W, fy); ctx.stroke()
-
-  const logoH = 28
+  const logoH = 26
   const logoY  = fy + (FOOTER_H - logoH) / 2 - (label ? 8 : 0)
-  drawTintedLogo(ctx, W / 2, logoY, logoH, '#C1005A')
+  drawLogo(ctx, W / 2, logoY, logoH)
 
   if (label) {
     ctx.fillStyle = 'rgba(193,0,90,0.7)'
@@ -198,17 +182,10 @@ function drawMilestone(ctx, images, label) {
     ctx.strokeRect(PAD_X, PAD_TOP + i * (PHOTO_H + GAP), PHOTO_W, PHOTO_H)
   })
 
-  // Footer: deep navy with gold logo
   const fy = h - FOOTER_H
-  ctx.fillStyle = '#0E0C1E'
-  ctx.fillRect(0, fy, W, FOOTER_H)
-  ctx.strokeStyle = '#C9920A'
-  ctx.lineWidth = 2
-  ctx.beginPath(); ctx.moveTo(0, fy); ctx.lineTo(W, fy); ctx.stroke()
-
-  const logoH = 28
+  const logoH = 26
   const logoY  = fy + (FOOTER_H - logoH) / 2 - (label ? 8 : 0)
-  drawTintedLogo(ctx, W / 2, logoY, logoH, '#C9920A')
+  drawLogo(ctx, W / 2, logoY, logoH)
 
   if (label) {
     ctx.fillStyle = 'rgba(201,146,10,0.8)'
@@ -287,17 +264,10 @@ function drawYearBook(ctx, images, label) {
     ctx.strokeRect(PAD_X, PAD_TOP + i * (PHOTO_H + GAP), PHOTO_W, PHOTO_H)
   })
 
-  // Footer: charcoal matching border, cream logo
   const fy = h - FOOTER_H
-  ctx.fillStyle = '#1C1C1C'
-  ctx.fillRect(0, fy, W, FOOTER_H)
-  ctx.strokeStyle = '#3A3A3A'
-  ctx.lineWidth = 1
-  ctx.beginPath(); ctx.moveTo(16, fy); ctx.lineTo(W - 16, fy); ctx.stroke()
-
-  const logoH = 28
+  const logoH = 26
   const logoY  = fy + (FOOTER_H - logoH) / 2 - (label ? 8 : 0)
-  drawTintedLogo(ctx, W / 2, logoY, logoH, '#F4EFE4')
+  drawLogo(ctx, W / 2, logoY, logoH)
 
   if (label) {
     ctx.fillStyle = 'rgba(244,239,228,0.65)'
@@ -353,20 +323,10 @@ function drawSquadGoals(ctx, images, label) {
     ctx.beginPath(); ctx.roundRect(PAD_X, y, PHOTO_W, PHOTO_H, 6); ctx.stroke()
   })
 
-  // Footer: pink-purple gradient continuing the strip, magenta logo
   const fy = h - FOOTER_H
-  const footerGrad = ctx.createLinearGradient(0, fy, 0, fy + FOOTER_H)
-  footerGrad.addColorStop(0, '#EDD5F8')
-  footerGrad.addColorStop(1, '#E0C8F8')
-  ctx.fillStyle = footerGrad
-  ctx.fillRect(0, fy, W, FOOTER_H)
-  ctx.strokeStyle = '#C1005A'
-  ctx.lineWidth = 2
-  ctx.beginPath(); ctx.moveTo(0, fy); ctx.lineTo(W, fy); ctx.stroke()
-
-  const logoH = 28
+  const logoH = 26
   const logoY  = fy + (FOOTER_H - logoH) / 2 - (label ? 8 : 0)
-  drawTintedLogo(ctx, W / 2, logoY, logoH, '#C1005A')
+  drawLogo(ctx, W / 2, logoY, logoH)
 
   if (label) {
     ctx.fillStyle = 'rgba(193,0,90,0.7)'
@@ -443,17 +403,10 @@ function drawCrew(ctx, images, label) {
     ctx.strokeRect(PAD_X, PAD_TOP + i * (PHOTO_H + GAP), PHOTO_W, PHOTO_H)
   })
 
-  // Footer: near-black with electric-blue logo
   const fy = h - FOOTER_H
-  ctx.fillStyle = '#040A10'
-  ctx.fillRect(0, fy, W, FOOTER_H)
-  ctx.strokeStyle = '#1A6EF5'
-  ctx.lineWidth = 2
-  ctx.beginPath(); ctx.moveTo(0, fy); ctx.lineTo(W, fy); ctx.stroke()
-
-  const logoH = 28
+  const logoH = 26
   const logoY  = fy + (FOOTER_H - logoH) / 2 - (label ? 8 : 0)
-  drawTintedLogo(ctx, W / 2, logoY, logoH, '#4A9FFF')
+  drawLogo(ctx, W / 2, logoY, logoH)
 
   if (label) {
     ctx.fillStyle = 'rgba(74,159,255,0.8)'
