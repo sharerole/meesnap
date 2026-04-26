@@ -70,25 +70,30 @@ export default function BoothScene({
             )
           })()}
 
-          {/* Output tray unit */}
-          <div className={styles.trayUnit}>
-            <div className={`${styles.traySlot} ${stripStage !== 'idle' ? styles.traySlotGlow : ''}`} />
-            <div className={styles.trayWindow}>
-              {stripDataUrl && (
-                <img
-                  src={stripDataUrl}
-                  alt="Your photo strip"
-                  className={`${styles.trayStrip} ${(stripStage === 'printing' || stripStage === 'ready') ? styles.trayStripOut : ''}`}
-                />
-              )}
+          {/* Output tray unit — clickable once strip is ready */}
+          <div
+            className={`${styles.trayUnitWrap} ${stripStage === 'ready' ? styles.trayUnitReady : ''}`}
+            onClick={stripStage === 'ready' ? onPickUp : undefined}
+            role={stripStage === 'ready' ? 'button' : undefined}
+            tabIndex={stripStage === 'ready' ? 0 : undefined}
+            onKeyDown={stripStage === 'ready' ? (e) => { if (e.key === 'Enter' || e.key === ' ') onPickUp() } : undefined}
+          >
+            <div className={styles.trayUnit}>
+              <div className={`${styles.traySlot} ${stripStage !== 'idle' ? styles.traySlotGlow : ''}`} />
+              <div className={styles.trayWindow}>
+                {stripDataUrl && (
+                  <img
+                    src={stripDataUrl}
+                    alt="Your photo strip"
+                    className={`${styles.trayStrip} ${(stripStage === 'printing' || stripStage === 'ready') ? styles.trayStripOut : ''}`}
+                  />
+                )}
+              </div>
             </div>
+            {stripStage === 'ready' && (
+              <p className={styles.pickupLabel}>↑ Click to pick up</p>
+            )}
           </div>
-
-          {stripStage === 'ready' && (
-            <button className={styles.pickupBtn} onClick={onPickUp}>
-              Pick up →
-            </button>
-          )}
         </div>
 
       ) : (
