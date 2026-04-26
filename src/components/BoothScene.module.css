@@ -568,3 +568,33 @@
   0%, 100% { box-shadow: 0 6px 24px rgba(193,0,90,0.5); transform: scale(1); }
   50%       { box-shadow: 0 8px 36px rgba(193,0,90,0.8); transform: scale(1.03); }
 }
+
+/* ── Mobile ── */
+@media (max-width: 540px) {
+  .scene {
+    padding: 16px 12px 28px;
+  }
+
+  /* Scale the entire booth visual down to fit narrow viewports.
+     transform-origin keeps the center horizontal anchor so it stays centred;
+     the negative margin-bottom closes the layout gap left by the shrunken element. */
+  .boothRow {
+    transform: scale(0.75);
+    transform-origin: top center;
+    margin-bottom: -105px;
+  }
+
+  .enterBtn {
+    padding: 14px 40px;
+    font-size: 0.95rem;
+  }
+
+  .pickupBtn {
+    padding: 12px 32px;
+    font-size: 0.95rem;
+  }
+
+  .actions {
+    margin-top: 12px;
+  }
+}
