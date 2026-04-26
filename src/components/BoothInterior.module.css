@@ -305,30 +305,54 @@
   font-size: 0.76rem;
 }
 
-/* Shot count buttons */
-.shotRow {
+/* Layout picker */
+.layoutRow {
   display: flex;
-  gap: 8px;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
-.shotBtn {
-  flex: 1;
-  padding: 10px 0;
+.layoutBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 10px;
   background: rgba(255,255,255,0.05);
   border: 1.5px solid rgba(255,255,255,0.09);
   border-radius: 8px;
-  color: rgba(255,255,255,0.55);
-  font-size: 1rem;
-  font-weight: 800;
+  color: rgba(255,255,255,0.45);
   font-family: var(--font-main);
   cursor: pointer;
   transition: all 0.15s;
+  min-width: 52px;
 }
-.shotBtn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-.shotBtnActive {
+.layoutBtn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.layoutBtnActive {
   background: rgba(193,0,90,0.15);
   border-color: rgba(193,0,90,0.55);
   color: #fff;
+}
+
+.layoutIcon {
+  display: grid;
+  gap: 2px;
+  width: 28px;
+  height: 28px;
+}
+
+.layoutCell {
+  background: rgba(255,255,255,0.25);
+  border-radius: 1px;
+}
+.layoutBtnActive .layoutCell {
+  background: rgba(193,0,90,0.65);
+}
+
+.layoutLabel {
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
 }
 
 /* Filter chips */

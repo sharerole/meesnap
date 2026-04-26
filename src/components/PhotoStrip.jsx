@@ -2,7 +2,8 @@ import { useRef, useEffect, useState, useCallback } from 'react'
 import styles from './PhotoStrip.module.css'
 import MeeOppLogo from './MeeOppLogo'
 import StickerPicker from './StickerPicker'
-import { THEMES, STRIP_W, stripTotalHeight, logoReady } from '../lib/themes'
+import { THEMES, logoReady } from '../lib/themes'
+import { getMetrics } from '../lib/layouts'
 import { STICKER_DEFS, makeSvgDataUrl, getStickerDrawSize } from '../lib/stickers'
 
 const MIN_STICKER_SIZE = 20
@@ -61,7 +62,7 @@ function stickerSize(s) {
   return def ? getStickerDrawSize(def, s.size) : { dw: s.size, dh: s.size }
 }
 
-export default function PhotoStrip({ photos, theme, onRetake, onRestart }) {
+export default function PhotoStrip({ photos, theme, layout, onRetake, onRestart }) {
   const canvasRef  = useRef(null)
   const baseRef    = useRef(null)   // offscreen canvas: theme + photos, no stickers
   const imgsRef    = useRef(null)   // cached loaded Image objects
@@ -108,11 +109,12 @@ export default function PhotoStrip({ photos, theme, onRetake, onRestart }) {
     const base   = baseRef.current
     if (!canvas || !base) return
     const ctx = canvas.getContext('2d')
+    const W   = canvas.width  / DPR
     const h   = canvas.height / DPR
     ctx.setTransform(1, 0, 0, 1, 0, 0)
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0)
-    ctx.drawImage(base, 0, 0, STRIP_W, h)
+    ctx.drawImage(base, 0, 0, W, h)
     stickersRef.current.forEach(s => {
       const img = stickerImages[s.id]
       if (!img?.complete) return
@@ -127,24 +129,24 @@ export default function PhotoStrip({ photos, theme, onRetake, onRestart }) {
     if (!canvas || photos.length === 0) return
 
     const [imgs] = await Promise.all([loadImages(), logoReady])
-    const h      = stripTotalHeight(imgs.length)
+    const { W, h } = getMetrics(layout)
 
     // Build / reuse the offscreen base canvas
     let base = baseRef.current
     if (!base) { base = document.createElement('canvas'); baseRef.current = base }
-    base.width  = STRIP_W * DPR
+    base.width  = W * DPR
     base.height = h * DPR
     const baseCtx = base.getContext('2d')
     baseCtx.setTransform(DPR, 0, 0, DPR, 0, 0)
-    themeObj.draw(baseCtx, imgs, label)
+    themeObj.draw(baseCtx, imgs, label, layout)
 
-    canvas.width  = STRIP_W * DPR
+    canvas.width  = W * DPR
     canvas.height = h * DPR
 
     compositeNow()
-  }, [photos, themeObj, label, loadImages, compositeNow])
+  }, [photos, themeObj, label, layout, loadImages, compositeNow])
 
-  // Re-render base + composite when photos, theme, or label change
+  // Re-render base + composite when photos, theme, layout, or label change
   useEffect(() => { renderBase() }, [renderBase])
 
   // Just re-composite (instant) when sticker list changes
@@ -184,10 +186,10 @@ export default function PhotoStrip({ photos, theme, onRetake, onRestart }) {
       const { x, y } = toCanvasXY(e, canvas)
       const { idx, ox, oy } = dragging.current
 
-      // Clamp so sticker stays fully inside the canvas
+      // Clamp so sticker stays fully inside the canvas (logical coordinates)
       const { dw, dh } = stickerSize(stickersRef.current[idx])
-      const cx   = Math.max(dw / 2, Math.min(canvas.width  - dw / 2, x - ox))
-      const cy   = Math.max(dh / 2, Math.min(canvas.height - dh / 2, y - oy))
+      const cx = Math.max(dw / 2, Math.min(canvas.width  / DPR - dw / 2, x - ox))
+      const cy = Math.max(dh / 2, Math.min(canvas.height / DPR - dh / 2, y - oy))
 
       stickersRef.current = stickersRef.current.map((s, i) =>
         i === idx ? { ...s, x: cx, y: cy } : s
@@ -305,8 +307,8 @@ export default function PhotoStrip({ photos, theme, onRetake, onRestart }) {
   }
 
   function addSticker(def) {
-    const h = stripTotalHeight(photos.length)
-    const x = 40 + Math.random() * (STRIP_W - 80)
+    const { W, h } = getMetrics(layout)
+    const x = 40 + Math.random() * (W - 80)
     const y = 30 + Math.random() * (h - 100)
     setStickers(prev => [...prev, { id: def.id, x, y, size: def.defaultSize ?? 56 }])
   }
