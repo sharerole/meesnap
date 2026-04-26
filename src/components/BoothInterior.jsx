@@ -19,6 +19,7 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
   const canvasRef = useRef(null)
   const streamRef = useRef(null)
 
+  const [setupDone, setSetupDone] = useState(false)
   const [camReady, setCamReady]   = useState(false)
   const [camError, setCamError]   = useState(null)
   const [running, setRunning]     = useState(false)
@@ -28,8 +29,13 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
   const [flash, setFlash]         = useState(false)
   const [done, setDone]           = useState(false)
 
-  // Acquire camera
+  const themeIdx = THEMES.findIndex(t => t.id === theme)
+  const prevTheme = () => setTheme(THEMES[(themeIdx - 1 + THEMES.length) % THEMES.length].id)
+  const nextTheme = () => setTheme(THEMES[(themeIdx + 1) % THEMES.length].id)
+
+  // Camera only initialises after the user confirms setup
   useEffect(() => {
+    if (!setupDone) return
     let active = true
     navigator.mediaDevices
       .getUserMedia({ video: { facingMode: 'user', width: 640, height: 480 }, audio: false })
@@ -46,7 +52,7 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
       active = false
       streamRef.current?.getTracks().forEach(t => t.stop())
     }
-  }, [])
+  }, [setupDone])
 
   const captureFrame = useCallback(() => {
     const video  = videoRef.current
@@ -69,14 +75,11 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
     if (running) return
     setRunning(true)
     setCaptured(0)
-
     const imgs = []
-
     const doShot = (shotNum) => {
       setShotIndex(shotNum)
       let count = COUNTDOWN_SEC
       setCountdown(count)
-
       const tick = setInterval(() => {
         count -= 1
         setCountdown(count)
@@ -89,7 +92,6 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
             if (dataUrl) imgs.push(dataUrl)
             setCaptured(imgs.length)
             setCountdown(null)
-
             if (imgs.length < shotCount) {
               setTimeout(() => doShot(shotNum + 1), 900)
             } else {
@@ -100,27 +102,96 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
         }
       }, 1000)
     }
-
     doShot(0)
   }, [running, captureFrame, onPhotosReady, shotCount])
 
-  const inSetup = !running && !done
+  // Auto-start session as soon as camera is ready
+  useEffect(() => {
+    if (setupDone && camReady && !running && !done) runSession()
+  }, [setupDone, camReady, running, done, runSession])
 
+  // ── Setup screen ─────────────────────────────────────────────────────────────
+  if (!setupDone) {
+    return (
+      <div className={styles.setupScreen}>
+        <div className={styles.curtainEdgeLeft} />
+        <div className={styles.curtainEdgeRight} />
+
+        <button className={styles.exitBtn} onClick={onExit}>← Exit</button>
+
+        <div className={styles.setupContent}>
+          <p className={styles.setupHeading}>Choose your style</p>
+
+          {/* Frame carousel */}
+          <div className={styles.carousel}>
+            <button className={styles.carouselArrow} onClick={prevTheme} aria-label="Previous frame">‹</button>
+            <div className={styles.carouselCenter}>
+              <ThemePreview theme={theme} displayWidth={180} numPhotos={shotCount} showHeading={false} />
+              <div className={styles.carouselDots}>
+                {THEMES.map((t, i) => (
+                  <span
+                    key={t.id}
+                    className={`${styles.carouselDot} ${i === themeIdx ? styles.carouselDotActive : ''}`}
+                    onClick={() => setTheme(t.id)}
+                  />
+                ))}
+              </div>
+              <p className={styles.carouselLabel}>{THEMES[themeIdx].label}</p>
+            </div>
+            <button className={styles.carouselArrow} onClick={nextTheme} aria-label="Next frame">›</button>
+          </div>
+
+          {/* Shots */}
+          <div className={styles.optGroup}>
+            <p className={styles.optSection}>Shots</p>
+            <div className={styles.shotRow}>
+              {[2, 3, 4].map(n => (
+                <button
+                  key={n}
+                  className={`${styles.shotBtn} ${shotCount === n ? styles.shotBtnActive : ''}`}
+                  onClick={() => setShotCount(n)}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Filter */}
+          <div className={styles.optGroup}>
+            <p className={styles.optSection}>Filter</p>
+            <div className={styles.filterGrid}>
+              {FILTERS.map(f => (
+                <button
+                  key={f.id}
+                  className={`${styles.filterChip} ${filter === f.id ? styles.filterChipActive : ''}`}
+                  onClick={() => setFilter(f.id)}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.startWrap}>
+            <button className={styles.startBtn} onClick={() => setSetupDone(true)}>
+              Start Session
+            </button>
+            <p className={styles.startNote}>{shotCount} shots · {COUNTDOWN_SEC} sec each</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Shooting screen ───────────────────────────────────────────────────────────
   return (
-    <div className={`${styles.interior} ${inSetup ? styles.setupMode : ''}`}>
+    <div className={styles.interior}>
       {flash && <div className={styles.flash} />}
-
       <div className={styles.curtainEdgeLeft} />
       <div className={styles.curtainEdgeRight} />
 
-      {inSetup && (
-        <button className={styles.exitBtn} onClick={onExit} aria-label="Exit booth">
-          ← Exit
-        </button>
-      )}
-
-      {/* Camera */}
-      <div className={`${styles.cameraWrap} ${inSetup ? styles.cameraWrapSetup : ''}`}>
+      <div className={styles.cameraWrap}>
         {camError ? (
           <div className={styles.errorState}>
             <p className={styles.errorIcon}>📷</p>
@@ -141,7 +212,6 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
           />
         )}
 
-        {/* Shot progress dots */}
         {running && (
           <div className={styles.dots}>
             {[...Array(shotCount)].map((_, i) => (
@@ -157,13 +227,10 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
           </div>
         )}
 
-        {/* Countdown overlay */}
         {countdown !== null && countdown > 0 && (
           <div className={styles.countdownOverlay}>
             <span key={countdown} className={styles.countdownNum}>{countdown}</span>
-            <span className={styles.shotLabel}>
-              Shot {shotIndex + 1} / {shotCount}
-            </span>
+            <span className={styles.shotLabel}>Shot {shotIndex + 1} / {shotCount}</span>
           </div>
         )}
 
@@ -173,78 +240,12 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
           </div>
         )}
 
-        {!camReady && !camError && !running && (
+        {!camReady && !camError && (
           <div className={styles.loadingOverlay}>
             <p>Setting up camera…</p>
           </div>
         )}
       </div>
-
-      {/* Options panel — visible only in setup mode */}
-      {inSetup && (
-        <div className={styles.optionsPanel}>
-
-          {/* Frame preview + chips side by side */}
-          <div className={styles.frameRow}>
-            <ThemePreview theme={theme} displayWidth={100} numPhotos={shotCount} showHeading={false} />
-            <div className={styles.frameChips}>
-              <p className={styles.optSection}>Frame</p>
-              <div className={styles.themeGrid}>
-                {THEMES.map(t => (
-                  <button
-                    key={t.id}
-                    className={`${styles.themeChip} ${theme === t.id ? styles.themeChipActive : ''}`}
-                    onClick={() => setTheme(t.id)}
-                  >
-                    <span
-                      className={styles.chipSwatch}
-                      style={{ background: `linear-gradient(135deg, ${t.colors[0]} 0%, ${t.colors[1]} 100%)` }}
-                    />
-                    <span className={styles.chipLabel}>{t.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <p className={styles.optSection}>Shots</p>
-          <div className={styles.shotRow}>
-            {[2, 3, 4].map(n => (
-              <button
-                key={n}
-                className={`${styles.shotBtn} ${shotCount === n ? styles.shotBtnActive : ''}`}
-                onClick={() => setShotCount(n)}
-              >
-                {n}
-              </button>
-            ))}
-          </div>
-
-          <p className={styles.optSection}>Filter</p>
-          <div className={styles.filterGrid}>
-            {FILTERS.map(f => (
-              <button
-                key={f.id}
-                className={`${styles.filterChip} ${filter === f.id ? styles.filterChipActive : ''}`}
-                onClick={() => setFilter(f.id)}
-              >
-                {f.label}
-              </button>
-            ))}
-          </div>
-
-          <div className={styles.startWrap}>
-            {camReady ? (
-              <button className={styles.startBtn} onClick={runSession}>
-                Start
-              </button>
-            ) : (
-              <p className={styles.camWait}>Setting up camera…</p>
-            )}
-            <p className={styles.startNote}>{shotCount} shots · {COUNTDOWN_SEC} sec each</p>
-          </div>
-        </div>
-      )}
 
       <canvas ref={canvasRef} style={{ display: 'none' }} />
     </div>

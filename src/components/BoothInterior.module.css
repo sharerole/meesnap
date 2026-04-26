@@ -413,6 +413,112 @@
   text-transform: uppercase;
 }
 
+/* ── Setup screen ─────────────────────────────────────────────────────────── */
+
+.setupScreen {
+  min-height: 100vh;
+  background: #06040C;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 60px 24px 40px;
+  animation: boothFadeIn 0.35s ease-out forwards;
+}
+
+.setupContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  max-width: 440px;
+  z-index: 3;
+}
+
+.setupHeading {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  margin: 0;
+}
+
+/* Frame carousel */
+.carousel {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  justify-content: center;
+}
+
+.carouselArrow {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.65);
+  font-size: 2rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+  font-family: var(--font-main);
+}
+.carouselArrow:hover {
+  background: rgba(255,255,255,0.14);
+  color: #fff;
+}
+
+.carouselCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.carouselDots {
+  display: flex;
+  gap: 7px;
+}
+
+.carouselDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.carouselDotActive {
+  background: #C1005A;
+  box-shadow: 0 0 7px rgba(193,0,90,0.75);
+}
+
+.carouselLabel {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+/* Option groups */
+.optGroup {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 /* ── Mobile ── */
 @media (max-width: 768px) {
   /* Stack camera above options instead of side-by-side */
