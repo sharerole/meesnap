@@ -41,11 +41,13 @@ export default function BoothScene({
   return (
     <div className={styles.scene}>
 
-      {/* Pill-shaped illuminated sign */}
-      <div className={styles.pillSign}>
-        <MeeOppLogo height={20} />
-        <span className={styles.pillText}>Photo Booth</span>
-      </div>
+      {/* Pill-shaped illuminated sign — hidden during tray reveal */}
+      {!isRevealing && (
+        <div className={styles.pillSign}>
+          <MeeOppLogo height={20} />
+          <span className={styles.pillText}>Photo Booth</span>
+        </div>
+      )}
 
       {isRevealing ? (
 
@@ -54,12 +56,19 @@ export default function BoothScene({
           <div className={styles.darkroomGlow} />
 
           {/* Safelight indicator */}
+          {(() => {
+            const bulbMod  = { glow: styles.safelightBulbGlow, printing: styles.safelightBulbPrint, ready: styles.safelightBulbReady }[stripStage] ?? ''
+            const labelMod = { printing: styles.safelightLabelAlmost, ready: styles.safelightLabelReady }[stripStage] ?? ''
+            const labelTxt = { idle: 'Developing...', glow: 'Developing...', printing: 'Almost ready...', ready: 'Ready' }[stripStage]
+            return (
           <div className={styles.safelight}>
-            <div className={`${styles.safelightBulb} ${stripStage === 'ready' ? styles.safelightBulbReady : ''}`} />
-            <span className={`${styles.safelightLabel} ${stripStage === 'ready' ? styles.safelightLabelReady : ''}`}>
-              {stripStage === 'ready' ? 'Ready' : 'Developing...'}
+            <div className={`${styles.safelightBulb} ${bulbMod}`} />
+            <span className={`${styles.safelightLabel} ${labelMod}`}>
+              {labelTxt}
             </span>
           </div>
+            )
+          })()}
 
           {/* Output tray unit */}
           <div className={styles.trayUnit}>

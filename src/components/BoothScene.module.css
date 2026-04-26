@@ -485,6 +485,22 @@
   animation: safelightPulse 2.4s ease-in-out infinite;
 }
 
+/* glow stage — slightly brighter, faster pulse */
+.safelightBulbGlow {
+  animation-duration: 1.6s;
+  box-shadow:
+    inset 2px 2px 6px rgba(255,140,80,0.35),
+    inset -2px -2px 4px rgba(0,0,0,0.5),
+    0 0 20px rgba(210,35,0,0.7),
+    0 0 48px rgba(210,35,0,0.3);
+}
+
+/* printing stage — bright red, fast pulse */
+.safelightBulbPrint {
+  animation: safelightPulse 0.9s ease-in-out infinite;
+}
+
+/* ready stage — steady amber */
 .safelightBulbReady {
   background: radial-gradient(circle at 35% 32%, #FFD080 0%, #E8A020 55%, #B07010 100%);
   border-color: #5A3A00;
@@ -524,6 +540,10 @@
   text-transform: uppercase;
   color: rgba(255,255,255,0.35);
   font-family: monospace;
+}
+
+.safelightLabelAlmost {
+  color: rgba(255,255,255,0.6);
 }
 
 .safelightLabelReady {
