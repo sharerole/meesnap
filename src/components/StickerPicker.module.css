@@ -30,12 +30,21 @@
 }
 
 .grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+  scrollbar-width: none;
+  padding-bottom: 2px;
 }
+.grid::-webkit-scrollbar { display: none; }
 
 .stickerBtn {
+  flex: 0 0 72px;
+  height: 72px;
   background: rgba(255,255,255,0.05);
   border: 1.5px solid rgba(255,255,255,0.08);
   border-radius: 10px;
@@ -45,7 +54,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  aspect-ratio: 1;
+  scroll-snap-align: start;
 }
 .stickerBtn:hover {
   background: rgba(255,255,255,0.12);
@@ -69,13 +78,7 @@
 
 /* ── Mobile ── */
 @media (max-width: 720px) {
-  /* Wrap tabs if there are many categories */
   .tabs {
     flex-wrap: wrap;
-  }
-
-  /* Fewer columns → bigger tap targets */
-  .grid {
-    grid-template-columns: repeat(4, 1fr);
   }
 }
