@@ -3,6 +3,10 @@
 import logoUrl from '../assets/meeopp-logo.png'
 
 const _logo = new Image()
+export const logoReady = new Promise(resolve => {
+  if (_logo.complete && _logo.naturalWidth) resolve()
+  else { _logo.onload = resolve; _logo.onerror = resolve }
+})
 _logo.src = logoUrl
 
 const W        = 360
