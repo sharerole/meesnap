@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import BoothScene from './components/BoothScene'
 import BoothInterior from './components/BoothInterior'
 import PhotoStrip from './components/PhotoStrip'
@@ -93,6 +94,7 @@ export default function App() {
           onRestart={handleRestart}
         />
       )}
+      <Analytics />
     </>
   )
 }
