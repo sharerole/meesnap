@@ -16,8 +16,17 @@ export default function App() {
   const [stripDataUrl, setStripDataUrl] = useState(null)
 
   const backingOut = useRef(false)
+  const [irisPhase, setIrisPhase] = useState(null)
 
-  function handleEnter()        { setPhase('entering') }
+  function handleEnter() {
+    setPhase('entering')
+    setIrisPhase('closing')
+    setTimeout(() => {
+      setPhase('inside')
+      setIrisPhase('opening')
+      setTimeout(() => setIrisPhase(null), 820)
+    }, 750)
+  }
   function handleCurtainsOpen() { setPhase('inside') }
 
   function handleExitBooth() {
@@ -65,6 +74,12 @@ export default function App() {
 
   return (
     <>
+      {irisPhase && (
+        <div
+          className={`${appStyles.iris} ${irisPhase === 'closing' ? appStyles.irisClosing : appStyles.irisOpening}`}
+          aria-hidden="true"
+        />
+      )}
       {showBooth && (
         <BoothScene
           phase={phase}
