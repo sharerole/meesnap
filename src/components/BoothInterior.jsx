@@ -4,6 +4,8 @@ import { THEMES } from '../lib/themes'
 import ThemePreview from './ThemePreview'
 
 const COUNTDOWN_SEC = 3
+const RING_R    = 48
+const RING_CIRC = +(2 * Math.PI * RING_R).toFixed(2)
 
 const FILTERS = [
   { id: 'natural', label: 'Natural',  css: 'none' },
@@ -42,12 +44,14 @@ function playShutter() {
 }
 
 export default function BoothInterior({ theme, setTheme, shotCount, setShotCount, filter, setFilter, onPhotosReady, onExit }) {
-  const videoRef  = useRef(null)
-  const canvasRef = useRef(null)
-  const streamRef = useRef(null)
+  const videoRef      = useRef(null)
+  const canvasRef     = useRef(null)
+  const streamRef     = useRef(null)
+  const touchStartX   = useRef(null)
 
   const [step, setStep]           = useState('style')
   const [slideDir, setSlideDir]   = useState('right')
+  const [carouselDir, setCarouselDir] = useState('right')
   const [camStarted, setCamStarted] = useState(false)
   const [camReady, setCamReady]   = useState(false)
   const [camError, setCamError]   = useState(null)
@@ -59,8 +63,16 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
   const [done, setDone]           = useState(false)
 
   const themeIdx = THEMES.findIndex(t => t.id === theme)
-  const prevTheme = () => setTheme(THEMES[(themeIdx - 1 + THEMES.length) % THEMES.length].id)
-  const nextTheme = () => setTheme(THEMES[(themeIdx + 1) % THEMES.length].id)
+  const prevTheme = () => { setCarouselDir('left');  setTheme(THEMES[(themeIdx - 1 + THEMES.length) % THEMES.length].id) }
+  const nextTheme = () => { setCarouselDir('right'); setTheme(THEMES[(themeIdx + 1) % THEMES.length].id) }
+
+  function handleTouchStart(e) { touchStartX.current = e.touches[0].clientX }
+  function handleTouchEnd(e) {
+    if (touchStartX.current === null) return
+    const dx = e.changedTouches[0].clientX - touchStartX.current
+    if (Math.abs(dx) > 40) dx < 0 ? nextTheme() : prevTheme()
+    touchStartX.current = null
+  }
 
   // Camera only initialises when camStarted becomes true
   useEffect(() => {
@@ -172,16 +184,25 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
           <p className={styles.setupHeading}>Choose your style</p>
 
           {/* Frame carousel */}
-          <div className={styles.carousel}>
+          <div
+            className={styles.carousel}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
             <button className={styles.carouselArrow} onClick={prevTheme} aria-label="Previous frame">‹</button>
             <div className={styles.carouselCenter}>
-              <ThemePreview theme={theme} displayWidth={180} numPhotos={shotCount} showHeading={false} />
+              <div
+                key={theme}
+                className={carouselDir === 'right' ? styles.carouselSlideRight : styles.carouselSlideLeft}
+              >
+                <ThemePreview theme={theme} displayWidth={180} numPhotos={shotCount} showHeading={false} />
+              </div>
               <div className={styles.carouselDots}>
                 {THEMES.map((t, i) => (
                   <span
                     key={t.id}
                     className={`${styles.carouselDot} ${i === themeIdx ? styles.carouselDotActive : ''}`}
-                    onClick={() => setTheme(t.id)}
+                    onClick={() => { setCarouselDir('right'); setTheme(t.id) }}
                   />
                 ))}
               </div>
@@ -317,8 +338,31 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
 
         {countdown !== null && countdown > 0 && (
           <div className={styles.countdownOverlay}>
-            <span key={countdown} className={styles.countdownNum}>{countdown}</span>
-            <span className={styles.shotLabel}>Shot {shotIndex + 1} / {shotCount}</span>
+            <div className={styles.ringWrap}>
+              <div className={styles.ringSvgOuter}>
+                <svg viewBox="0 0 120 120" className={styles.ringSvg}>
+                  <circle cx="60" cy="60" r={RING_R} className={styles.ringTrack} />
+                  <circle
+                    cx="60" cy="60" r={RING_R}
+                    className={styles.ringProgress}
+                    style={{
+                      strokeDasharray:  RING_CIRC,
+                      strokeDashoffset: RING_CIRC * (COUNTDOWN_SEC - countdown + 1) / COUNTDOWN_SEC,
+                    }}
+                  />
+                  <g className={styles.apertureRing}>
+                    {[0, 60, 120, 180, 240, 300].map(deg => (
+                      <line key={deg} x1="60" y1="2" x2="60" y2="9"
+                        transform={`rotate(${deg} 60 60)`}
+                        className={styles.ringTick}
+                      />
+                    ))}
+                  </g>
+                </svg>
+                <span key={countdown} className={styles.ringNum}>{countdown}</span>
+              </div>
+              <span className={styles.shotLabel}>Shot {shotIndex + 1} / {shotCount}</span>
+            </div>
           </div>
         )}
 
