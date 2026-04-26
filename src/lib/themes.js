@@ -15,7 +15,7 @@ const PHOTO_H  = 208
 const PAD_X    = (W - PHOTO_W) / 2   // 41
 const PAD_TOP  = 40
 const GAP      = 14
-const FOOTER_H = 64
+const FOOTER_H = 48
 
 export function stripTotalHeight(numPhotos) {
   return PAD_TOP + numPhotos * PHOTO_H + (numPhotos - 1) * GAP + PAD_TOP + FOOTER_H
@@ -129,7 +129,7 @@ function drawClassic(ctx, images, label) {
 
   const fy = h - FOOTER_H
   const logoH = 26
-  const logoY  = fy + (FOOTER_H - logoH) / 2 - (label ? 8 : 0)
+  const logoY  = fy + 10
   drawLogo(ctx, W / 2, logoY, logoH)
 
   if (label) {
@@ -184,7 +184,7 @@ function drawMilestone(ctx, images, label) {
 
   const fy = h - FOOTER_H
   const logoH = 26
-  const logoY  = fy + (FOOTER_H - logoH) / 2 - (label ? 8 : 0)
+  const logoY  = fy + 10
   drawLogo(ctx, W / 2, logoY, logoH)
 
   if (label) {
@@ -266,7 +266,7 @@ function drawYearBook(ctx, images, label) {
 
   const fy = h - FOOTER_H
   const logoH = 26
-  const logoY  = fy + (FOOTER_H - logoH) / 2 - (label ? 8 : 0)
+  const logoY  = fy + 10
   drawLogo(ctx, W / 2, logoY, logoH)
 
   if (label) {
@@ -325,7 +325,7 @@ function drawSquadGoals(ctx, images, label) {
 
   const fy = h - FOOTER_H
   const logoH = 26
-  const logoY  = fy + (FOOTER_H - logoH) / 2 - (label ? 8 : 0)
+  const logoY  = fy + 10
   drawLogo(ctx, W / 2, logoY, logoH)
 
   if (label) {
@@ -405,7 +405,7 @@ function drawCrew(ctx, images, label) {
 
   const fy = h - FOOTER_H
   const logoH = 26
-  const logoY  = fy + (FOOTER_H - logoH) / 2 - (label ? 8 : 0)
+  const logoY  = fy + 10
   drawLogo(ctx, W / 2, logoY, logoH)
 
   if (label) {
