@@ -519,6 +519,41 @@
   gap: 8px;
 }
 
+/* ── Filter step camera preview ── */
+.filterCamWrap {
+  width: 100%;
+  aspect-ratio: 4/3;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  box-shadow:
+    0 0 0 2px rgba(193,0,90,0.35),
+    0 0 40px rgba(0,0,0,0.7),
+    0 0 80px rgba(193,0,90,0.1);
+  background: #000;
+  flex-shrink: 0;
+}
+
+.filterVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Step slide animations ── */
+@keyframes slideInFromRight {
+  from { opacity: 0; transform: translateX(36px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInFromLeft {
+  from { opacity: 0; transform: translateX(-36px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.slideInRight { animation: slideInFromRight 0.3s ease-out; }
+.slideInLeft  { animation: slideInFromLeft  0.3s ease-out; }
+
 /* ── Mobile ── */
 @media (max-width: 768px) {
   /* Stack camera above options instead of side-by-side */

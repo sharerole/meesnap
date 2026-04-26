@@ -14,12 +14,41 @@ const FILTERS = [
   { id: 'warm',    label: 'Warm',     css: 'sepia(0.25) saturate(1.2) brightness(1.05)' },
 ]
 
+function playShutter() {
+  try {
+    const ac = new (window.AudioContext || window.webkitAudioContext)()
+    const sr = ac.sampleRate
+    const buf = ac.createBuffer(1, Math.floor(sr * 0.12), sr)
+    const d = buf.getChannelData(0)
+    for (let i = 0; i < d.length; i++) {
+      const t = i / sr
+      const e1 = Math.exp(-t * 300)
+      const t2 = Math.max(0, t - 0.06)
+      const e2 = Math.exp(-t2 * 400) * (t >= 0.06 ? 0.7 : 0)
+      d[i] = (Math.random() * 2 - 1) * (e1 + e2) * 0.5
+    }
+    const src = ac.createBufferSource()
+    src.buffer = buf
+    const bpf = ac.createBiquadFilter()
+    bpf.type = 'bandpass'
+    bpf.frequency.value = 1200
+    bpf.Q.value = 0.5
+    const gain = ac.createGain()
+    gain.gain.value = 0.8
+    src.connect(bpf); bpf.connect(gain); gain.connect(ac.destination)
+    src.start()
+    setTimeout(() => { try { ac.close() } catch {} }, 500)
+  } catch {}
+}
+
 export default function BoothInterior({ theme, setTheme, shotCount, setShotCount, filter, setFilter, onPhotosReady, onExit }) {
   const videoRef  = useRef(null)
   const canvasRef = useRef(null)
   const streamRef = useRef(null)
 
-  const [setupDone, setSetupDone] = useState(false)
+  const [step, setStep]           = useState('style')
+  const [slideDir, setSlideDir]   = useState('right')
+  const [camStarted, setCamStarted] = useState(false)
   const [camReady, setCamReady]   = useState(false)
   const [camError, setCamError]   = useState(null)
   const [running, setRunning]     = useState(false)
@@ -33,9 +62,9 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
   const prevTheme = () => setTheme(THEMES[(themeIdx - 1 + THEMES.length) % THEMES.length].id)
   const nextTheme = () => setTheme(THEMES[(themeIdx + 1) % THEMES.length].id)
 
-  // Camera only initialises after the user confirms setup
+  // Camera only initialises when camStarted becomes true
   useEffect(() => {
-    if (!setupDone) return
+    if (!camStarted) return
     let active = true
     navigator.mediaDevices
       .getUserMedia({ video: { facingMode: 'user', width: 640, height: 480 }, audio: false })
@@ -52,7 +81,14 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
       active = false
       streamRef.current?.getTracks().forEach(t => t.stop())
     }
-  }, [setupDone])
+  }, [camStarted])
+
+  // Re-attach stream to video after step changes
+  useEffect(() => {
+    if (streamRef.current && videoRef.current) {
+      videoRef.current.srcObject = streamRef.current
+    }
+  }, [step])
 
   const captureFrame = useCallback(() => {
     const video  = videoRef.current
@@ -85,6 +121,8 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
         setCountdown(count)
         if (count <= 0) {
           clearInterval(tick)
+          playShutter()
+          if (navigator.vibrate) navigator.vibrate(40)
           setFlash(true)
           setTimeout(() => {
             setFlash(false)
@@ -105,13 +143,24 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
     doShot(0)
   }, [running, captureFrame, onPhotosReady, shotCount])
 
-  // Auto-start session as soon as camera is ready
+  // Auto-start session as soon as camera is ready in shooting step
   useEffect(() => {
-    if (setupDone && camReady && !running && !done) runSession()
-  }, [setupDone, camReady, running, done, runSession])
+    if (step === 'shooting' && camReady && !running && !done) runSession()
+  }, [step, camReady, running, done, runSession])
 
-  // ── Setup screen ─────────────────────────────────────────────────────────────
-  if (!setupDone) {
+  function goToFilter() {
+    setSlideDir('right')
+    setCamStarted(true)
+    setStep('filter')
+  }
+
+  function goBackToStyle() {
+    setSlideDir('left')
+    setStep('style')
+  }
+
+  // ── Style step ────────────────────────────────────────────────────────────────
+  if (step === 'style') {
     return (
       <div className={styles.setupScreen}>
         <div className={styles.curtainEdgeLeft} />
@@ -119,7 +168,7 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
 
         <button className={styles.exitBtn} onClick={onExit}>← Exit</button>
 
-        <div className={styles.setupContent}>
+        <div className={`${styles.setupContent} ${slideDir === 'left' ? styles.slideInLeft : styles.slideInRight}`}>
           <p className={styles.setupHeading}>Choose your style</p>
 
           {/* Frame carousel */}
@@ -140,7 +189,7 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
             <button className={styles.carouselArrow} onClick={nextTheme} aria-label="Next frame">›</button>
           </div>
 
-          {/* Shots */}
+          {/* Shot count */}
           <div className={styles.optGroup}>
             <p className={styles.optSection}>Shots</p>
             <div className={styles.shotRow}>
@@ -156,7 +205,49 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
             </div>
           </div>
 
-          {/* Filter */}
+          <div className={styles.startWrap}>
+            <button className={styles.startBtn} onClick={goToFilter}>Next →</button>
+            <p className={styles.startNote}>{shotCount} shots · {COUNTDOWN_SEC} sec each</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Filter step ───────────────────────────────────────────────────────────────
+  if (step === 'filter') {
+    return (
+      <div className={styles.setupScreen}>
+        <div className={styles.curtainEdgeLeft} />
+        <div className={styles.curtainEdgeRight} />
+
+        <button className={styles.exitBtn} onClick={goBackToStyle}>← Back</button>
+
+        <div className={`${styles.setupContent} ${slideDir === 'right' ? styles.slideInRight : styles.slideInLeft}`}>
+          <p className={styles.setupHeading}>Choose your filter</p>
+
+          <div className={styles.filterCamWrap}>
+            {camError ? (
+              <div className={styles.errorState}>
+                <p className={styles.errorIcon}>📷</p>
+                <p>Camera unavailable</p>
+                <p className={styles.errorSub}>{camError}</p>
+              </div>
+            ) : (
+              <>
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className={styles.filterVideo}
+                  style={{ transform: 'scaleX(-1)', filter: FILTERS.find(f => f.id === filter)?.css ?? 'none' }}
+                />
+                {!camReady && <div className={styles.loadingOverlay}><p>Setting up camera…</p></div>}
+              </>
+            )}
+          </div>
+
           <div className={styles.optGroup}>
             <p className={styles.optSection}>Filter</p>
             <div className={styles.filterGrid}>
@@ -173,9 +264,7 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
           </div>
 
           <div className={styles.startWrap}>
-            <button className={styles.startBtn} onClick={() => setSetupDone(true)}>
-              Start Session
-            </button>
+            <button className={styles.startBtn} onClick={() => setStep('shooting')}>Start Session</button>
             <p className={styles.startNote}>{shotCount} shots · {COUNTDOWN_SEC} sec each</p>
           </div>
         </div>
@@ -183,9 +272,9 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
     )
   }
 
-  // ── Shooting screen ───────────────────────────────────────────────────────────
+  // ── Shooting step ─────────────────────────────────────────────────────────────
   return (
-    <div className={styles.interior}>
+    <div className={`${styles.interior} ${styles.slideInRight}`}>
       {flash && <div className={styles.flash} />}
       <div className={styles.curtainEdgeLeft} />
       <div className={styles.curtainEdgeRight} />
