@@ -146,7 +146,7 @@ function drawGoldConfetti(ctx, h) {
     const x     = seededRand(i * 3 + 1) * W
     const y     = seededRand(i * 3 + 2) * h
     const r     = 1.5 + seededRand(i * 3 + 3) * 3
-    const alpha = 0.12 + seededRand(i * 5 + 1) * 0.22
+    const alpha = 0.35 + seededRand(i * 5 + 1) * 0.35
     ctx.fillStyle = `rgba(201,146,10,${alpha.toFixed(2)})`
     ctx.beginPath()
     ctx.arc(x, y, r, 0, Math.PI * 2)
@@ -155,19 +155,19 @@ function drawGoldConfetti(ctx, h) {
   for (let i = 0; i < 18; i++) {
     const x     = seededRand(i * 7 + 4) * W
     const y     = seededRand(i * 7 + 5) * h
-    const alpha = 0.1 + seededRand(i * 7 + 6) * 0.2
+    const alpha = 0.3 + seededRand(i * 7 + 6) * 0.3
     ctx.fillStyle = `rgba(201,146,10,${alpha.toFixed(2)})`
     drawEightPointStar(ctx, x, y, 4, 2)
   }
 }
 
-// Scattered hearts + sparkle dots for Squad Goals background
+// Scattered hearts + sparkle dots for Squad Goals
 function drawBackgroundHearts(ctx, h) {
   for (let i = 0; i < 28; i++) {
     const x     = seededRand(i * 11 + 1) * W
     const y     = seededRand(i * 11 + 2) * h
     const s     = 3 + seededRand(i * 11 + 3) * 6
-    const alpha = 0.06 + seededRand(i * 11 + 4) * 0.14
+    const alpha = 0.2 + seededRand(i * 11 + 4) * 0.25
     ctx.fillStyle = `rgba(193,0,90,${alpha.toFixed(2)})`
     drawHeart(ctx, x, y, s)
   }
@@ -175,7 +175,7 @@ function drawBackgroundHearts(ctx, h) {
     const x     = seededRand(i * 13 + 1) * W
     const y     = seededRand(i * 13 + 2) * h
     const r     = 1 + seededRand(i * 13 + 3) * 2.5
-    const alpha = 0.08 + seededRand(i * 13 + 4) * 0.18
+    const alpha = 0.25 + seededRand(i * 13 + 4) * 0.3
     ctx.fillStyle = `rgba(193,0,90,${alpha.toFixed(2)})`
     ctx.beginPath()
     ctx.arc(x, y, r, 0, Math.PI * 2)
@@ -183,11 +183,11 @@ function drawBackgroundHearts(ctx, h) {
   }
 }
 
-// Subtle dot grid for The Crew background
+// Dot grid overlay for The Crew
 function drawDotGrid(ctx, h) {
   const spacing = 22
   const dotR    = 1.5
-  ctx.fillStyle = 'rgba(26,110,245,0.07)'
+  ctx.fillStyle = 'rgba(26,110,245,0.18)'
   for (let gx = spacing; gx < W - spacing / 2; gx += spacing) {
     for (let gy = spacing; gy < h - spacing / 2; gy += spacing) {
       ctx.beginPath()
@@ -239,9 +239,6 @@ function drawClassic(ctx, images, label) {
     ctx.textAlign = 'center'
     ctx.fillText(label, W / 2, fy + FOOTER_H - 10)
   }
-
-  // Sprocket holes punched through the magenta border
-  drawSprocketHoles(ctx, h, '#FFFFFF')
 }
 
 // ── Milestone ─────────────────────────────────────────────────────────────────
@@ -261,8 +258,6 @@ function drawMilestone(ctx, images, label) {
   ctx.strokeStyle = 'rgba(201,146,10,0.35)'
   ctx.lineWidth = 1.5
   ctx.strokeRect(14, 14, W - 28, h - 28)
-
-  drawGoldConfetti(ctx, h)
 
   ctx.fillStyle = 'rgba(201,146,10,0.45)'
   images.forEach((_, i) => {
@@ -302,6 +297,8 @@ function drawMilestone(ctx, images, label) {
   images.forEach((_, i) => {
     ctx.strokeRect(PAD_X, PAD_TOP + i * (PHOTO_H + GAP), PHOTO_W, PHOTO_H)
   })
+
+  drawGoldConfetti(ctx, h)
 
   const fy    = h - FOOTER_H
   const logoH = 26
@@ -402,8 +399,6 @@ function drawSquadGoals(ctx, images, label) {
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, W, h)
 
-  drawBackgroundHearts(ctx, h)
-
   ctx.strokeStyle = '#C1005A'
   ctx.lineWidth = 10
   ctx.beginPath(); ctx.roundRect(5, 5, W - 10, h - 10, 16); ctx.stroke()
@@ -437,6 +432,8 @@ function drawSquadGoals(ctx, images, label) {
     ctx.beginPath(); ctx.roundRect(PAD_X, y, PHOTO_W, PHOTO_H, 6); ctx.stroke()
   })
 
+  drawBackgroundHearts(ctx, h)
+
   const fy    = h - FOOTER_H
   const logoH = 26
   const logoY = fy + 10
@@ -464,8 +461,6 @@ function drawCrew(ctx, images, label) {
   grad.addColorStop(1, '#060E1A')
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, W, h)
-
-  drawDotGrid(ctx, h)
 
   ctx.strokeStyle = '#1A6EF5'
   ctx.lineWidth = 8
@@ -504,6 +499,8 @@ function drawCrew(ctx, images, label) {
   images.forEach((_, i) => {
     ctx.strokeRect(PAD_X, PAD_TOP + i * (PHOTO_H + GAP), PHOTO_W, PHOTO_H)
   })
+
+  drawDotGrid(ctx, h)
 
   const fy    = h - FOOTER_H
   const logoH = 26
