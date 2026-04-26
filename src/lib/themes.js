@@ -298,8 +298,6 @@ function drawMilestone(ctx, images, label) {
     ctx.strokeRect(PAD_X, PAD_TOP + i * (PHOTO_H + GAP), PHOTO_W, PHOTO_H)
   })
 
-  drawGoldConfetti(ctx, h)
-
   const fy    = h - FOOTER_H
   const logoH = 26
   const logoY = fy + 10
@@ -432,8 +430,6 @@ function drawSquadGoals(ctx, images, label) {
     ctx.beginPath(); ctx.roundRect(PAD_X, y, PHOTO_W, PHOTO_H, 6); ctx.stroke()
   })
 
-  drawBackgroundHearts(ctx, h)
-
   const fy    = h - FOOTER_H
   const logoH = 26
   const logoY = fy + 10
@@ -499,8 +495,6 @@ function drawCrew(ctx, images, label) {
   images.forEach((_, i) => {
     ctx.strokeRect(PAD_X, PAD_TOP + i * (PHOTO_H + GAP), PHOTO_W, PHOTO_H)
   })
-
-  drawDotGrid(ctx, h)
 
   const fy    = h - FOOTER_H
   const logoH = 26
