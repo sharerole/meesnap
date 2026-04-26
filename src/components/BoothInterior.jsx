@@ -285,7 +285,7 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
           </div>
 
           <div className={styles.startWrap}>
-            <button className={styles.startBtn} onClick={() => setStep('shooting')}>Start Session</button>
+            <button className={styles.startBtn} onClick={() => setStep('shooting')}>Ready? Go!</button>
             <p className={styles.startNote}>{shotCount} shots · {COUNTDOWN_SEC} sec each</p>
           </div>
         </div>
