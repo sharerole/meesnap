@@ -59,7 +59,7 @@ export default function BoothScene({
           {(() => {
             const bulbMod  = { glow: styles.safelightBulbGlow, printing: styles.safelightBulbPrint, ready: styles.safelightBulbReady }[stripStage] ?? ''
             const labelMod = { printing: styles.safelightLabelAlmost, ready: styles.safelightLabelReady }[stripStage] ?? ''
-            const labelTxt = { idle: 'Developing...', glow: 'Developing...', printing: 'Almost ready...', ready: 'Ready' }[stripStage]
+            const labelTxt = { idle: 'Developing...', glow: 'Developing...', printing: 'Printing...', ready: 'Ready' }[stripStage]
             return (
           <div className={styles.safelight}>
             <div className={`${styles.safelightBulb} ${bulbMod}`} />
