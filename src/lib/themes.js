@@ -392,22 +392,22 @@ function drawSquadGoals(ctx, images, label) {
   ctx.clip()
 
   const grad = ctx.createLinearGradient(0, 0, 0, h)
-  grad.addColorStop(0, '#FFF0F8')
-  grad.addColorStop(1, '#EEE0FF')
+  grad.addColorStop(0, '#E8D5FF')
+  grad.addColorStop(1, '#FFD0EC')
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, W, h)
 
-  ctx.strokeStyle = '#C1005A'
+  ctx.strokeStyle = '#7B2FBE'
   ctx.lineWidth = 10
   ctx.beginPath(); ctx.roundRect(5, 5, W - 10, h - 10, 16); ctx.stroke()
 
-  ctx.strokeStyle = 'rgba(193,0,90,0.25)'
+  ctx.strokeStyle = 'rgba(123,47,190,0.25)'
   ctx.lineWidth = 1.5
   ctx.setLineDash([5, 5])
   ctx.beginPath(); ctx.roundRect(16, 16, W - 32, h - 32, 10); ctx.stroke()
   ctx.setLineDash([])
 
-  ctx.fillStyle = '#C1005A'
+  ctx.fillStyle = '#EC4899'
   ;[[28, 28], [W - 28, 28], [28, h - 28], [W - 28, h - 28]].forEach(([cx, cy]) =>
     drawHeart(ctx, cx, cy, 9)
   )
@@ -415,15 +415,15 @@ function drawSquadGoals(ctx, images, label) {
   images.forEach((_, i) => {
     if (i === images.length - 1) return
     const gy = PAD_TOP + (i + 1) * PHOTO_H + i * GAP + GAP / 2
-    ctx.fillStyle = '#C1005A'
+    ctx.fillStyle = '#EC4899'
     ;[-18, 0, 18].forEach(offset => drawHeart(ctx, W / 2 + offset, gy, 4))
   })
 
-  drawQuote(ctx, 'We learn better together.', 'rgba(193,0,90,0.85)')
+  drawQuote(ctx, 'Study hard, squad harder.', 'rgba(123,47,190,0.85)')
   drawWatermarks(ctx, images, 0.06)
   drawPhotos(ctx, images, { clipRadius: 6 })
 
-  ctx.strokeStyle = 'rgba(193,0,90,0.4)'
+  ctx.strokeStyle = 'rgba(123,47,190,0.4)'
   ctx.lineWidth = 1.5
   images.forEach((_, i) => {
     const y = PAD_TOP + i * (PHOTO_H + GAP)
@@ -436,7 +436,7 @@ function drawSquadGoals(ctx, images, label) {
   drawLogo(ctx, W / 2, logoY, logoH)
 
   if (label) {
-    ctx.fillStyle = 'rgba(193,0,90,0.7)'
+    ctx.fillStyle = 'rgba(123,47,190,0.7)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
     ctx.fillText(label, W / 2, fy + FOOTER_H - 10)
@@ -515,7 +515,7 @@ export const THEMES = [
   { id: 'classic',   label: 'MeeOpp Classic', colors: ['#C1005A', '#FFFFFF'],  draw: drawClassic   },
   { id: 'milestone', label: 'Milestone',       colors: ['#1A1A2E', '#C9920A'],  draw: drawMilestone },
   { id: 'yearbook',  label: 'Year Book',       colors: ['#F4EFE4', '#1C1C1C'],  draw: drawYearBook  },
-  { id: 'squad',     label: 'Squad Goals',     colors: ['#FFF0F8', '#C1005A'],  draw: drawSquadGoals },
+  { id: 'squad',     label: 'Squad Goals',     colors: ['#E8D5FF', '#7B2FBE'],  draw: drawSquadGoals },
   { id: 'crew',      label: 'The Crew',        colors: ['#0F1E30', '#1A6EF5'],  draw: drawCrew      },
 ]
 
