@@ -3,6 +3,7 @@ import BoothScene from './components/BoothScene'
 import BoothInterior from './components/BoothInterior'
 import PhotoStrip from './components/PhotoStrip'
 import { THEMES, STRIP_W, stripTotalHeight } from './lib/themes'
+import appStyles from './App.module.css'
 
 // phases: lobby → entering → inside → exiting → revealing → strip
 export default function App() {
@@ -74,24 +75,28 @@ export default function App() {
         />
       )}
       {phase === 'inside' && (
-        <BoothInterior
-          theme={theme}
-          setTheme={setTheme}
-          shotCount={shotCount}
-          setShotCount={setShotCount}
-          filter={filter}
-          setFilter={setFilter}
-          onPhotosReady={handlePhotosReady}
-          onExit={handleExitBooth}
-        />
+        <div key="inside" className={appStyles.phaseView}>
+          <BoothInterior
+            theme={theme}
+            setTheme={setTheme}
+            shotCount={shotCount}
+            setShotCount={setShotCount}
+            filter={filter}
+            setFilter={setFilter}
+            onPhotosReady={handlePhotosReady}
+            onExit={handleExitBooth}
+          />
+        </div>
       )}
       {phase === 'strip' && (
-        <PhotoStrip
-          photos={photos}
-          theme={theme}
-          onRetake={handleRetake}
-          onRestart={handleRestart}
-        />
+        <div key="strip" className={appStyles.phaseView}>
+          <PhotoStrip
+            photos={photos}
+            theme={theme}
+            onRetake={handleRetake}
+            onRestart={handleRestart}
+          />
+        </div>
       )}
     </>
   )

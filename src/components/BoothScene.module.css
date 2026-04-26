@@ -47,6 +47,23 @@
     0 0 18px rgba(193,0,90,0.55),
     0 0 40px rgba(193,0,90,0.2),
     inset 0 0 24px rgba(193,0,90,0.12);
+  animation: neonFlicker 7s ease-in-out infinite;
+}
+
+@keyframes neonFlicker {
+  0%, 85%, 87%, 89%, 100% {
+    box-shadow:
+      0 0 18px rgba(193,0,90,0.55),
+      0 0 40px rgba(193,0,90,0.2),
+      inset 0 0 24px rgba(193,0,90,0.12);
+    opacity: 1;
+  }
+  86%, 88% {
+    box-shadow:
+      0 0 5px rgba(193,0,90,0.15),
+      inset 0 0 6px rgba(193,0,90,0.04);
+    opacity: 0.6;
+  }
 }
 
 .pillText {
@@ -353,21 +370,29 @@
 }
 
 .displayBoard > .boardStrip:nth-child(1) {
-  transform: rotate(-6deg) translateY(5px);
-  z-index: 1;
-  height: 80px;
-  margin-right: -4px;
+  animation: stripFloat1 4.5s ease-in-out infinite;
+  z-index: 1; height: 80px; margin-right: -4px;
 }
 .displayBoard > .boardStrip:nth-child(2) {
-  transform: rotate(3deg);
-  z-index: 3;
-  height: 100px;
+  animation: stripFloat2 5.2s ease-in-out infinite;
+  z-index: 3; height: 100px;
 }
 .displayBoard > .boardStrip:nth-child(3) {
-  transform: rotate(-2deg) translateY(4px);
-  z-index: 2;
-  height: 80px;
-  margin-left: -4px;
+  animation: stripFloat3 3.8s ease-in-out infinite;
+  z-index: 2; height: 80px; margin-left: -4px;
+}
+
+@keyframes stripFloat1 {
+  0%, 100% { transform: rotate(-6deg) translateY(5px); }
+  50%       { transform: rotate(-6deg) translateY(2px); }
+}
+@keyframes stripFloat2 {
+  0%, 100% { transform: rotate(3deg) translateY(0px); }
+  50%       { transform: rotate(3deg) translateY(-4px); }
+}
+@keyframes stripFloat3 {
+  0%, 100% { transform: rotate(-2deg) translateY(4px); }
+  50%       { transform: rotate(-2deg) translateY(1px); }
 }
 
 .boardPhoto {
