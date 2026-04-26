@@ -382,7 +382,7 @@ export default function PhotoStrip({ photos, theme, layout, onRetake, onRestart 
               id="strip-label"
               type="text"
               maxLength={40}
-              placeholder="Class of '26 · Best friends ever"
+              placeholder="Name your moment…"
               value={label}
               onChange={e => setLabel(e.target.value)}
               onBlur={renderBase}

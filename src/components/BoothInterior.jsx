@@ -3,7 +3,6 @@ import styles from './BoothInterior.module.css'
 import { THEMES } from '../lib/themes'
 import { LAYOUTS } from '../lib/layouts'
 import ThemePreview from './ThemePreview'
-import PoseGuide from './PoseGuide'
 
 const COUNTDOWN_SEC = 3
 const RING_R    = 48
@@ -348,8 +347,6 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
             ))}
           </div>
         )}
-
-        <PoseGuide shotIndex={shotIndex} visible={countdown !== null && countdown > 0} />
 
         {countdown !== null && countdown > 0 && (
           <div className={styles.countdownOverlay}>
