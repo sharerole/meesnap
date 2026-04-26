@@ -510,14 +510,105 @@ function drawCrew(ctx, images, label) {
   }
 }
 
+// ── Progress Saved ─────────────────────────────────────────────────────────────
+// Black terminal background, bright green CRT aesthetic, scanlines, crosshair corners.
+// Quote: "> Your progress has been saved."
+
+function drawProgressSaved(ctx, images, label) {
+  const h = stripTotalHeight(images.length)
+
+  // Background
+  ctx.fillStyle = '#050D05'
+  ctx.fillRect(0, 0, W, h)
+
+  // Outer border
+  ctx.strokeStyle = '#00FF41'
+  ctx.lineWidth = 2
+  ctx.strokeRect(5, 5, W - 10, h - 10)
+
+  // Inner border
+  ctx.strokeStyle = 'rgba(0,255,65,0.2)'
+  ctx.lineWidth = 1
+  ctx.strokeRect(11, 11, W - 22, h - 22)
+
+  // Corner crosshair markers
+  ctx.strokeStyle = '#00FF41'
+  ctx.fillStyle = '#00FF41'
+  ctx.lineWidth = 1.5
+  ;[[16, 16], [W - 16, 16], [16, h - 16], [W - 16, h - 16]].forEach(([cx, cy]) => {
+    const arm = 7
+    ctx.beginPath()
+    ctx.moveTo(cx - arm, cy); ctx.lineTo(cx + arm, cy)
+    ctx.moveTo(cx, cy - arm); ctx.lineTo(cx, cy + arm)
+    ctx.stroke()
+    ctx.beginPath()
+    ctx.arc(cx, cy, 2, 0, Math.PI * 2)
+    ctx.fill()
+  })
+
+  // Inter-frame checkpoint dividers
+  images.forEach((_, i) => {
+    if (i === images.length - 1) return
+    const gy = PAD_TOP + (i + 1) * PHOTO_H + i * GAP + GAP / 2
+    ctx.strokeStyle = 'rgba(0,255,65,0.3)'
+    ctx.lineWidth = 1
+    ctx.setLineDash([4, 4])
+    ctx.beginPath()
+    ctx.moveTo(PAD_X + 16, gy)
+    ctx.lineTo(W - PAD_X - 16, gy)
+    ctx.stroke()
+    ctx.setLineDash([])
+    ctx.fillStyle = '#00FF41'
+    ctx.beginPath()
+    ctx.arc(W / 2, gy, 3, 0, Math.PI * 2)
+    ctx.fill()
+  })
+
+  // Quote in monospace terminal style
+  ctx.fillStyle = 'rgba(0,255,65,0.85)'
+  ctx.font = '600 11px "Courier New",Courier,monospace'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText('> Your progress has been saved.', W / 2, PAD_TOP * 0.6)
+  ctx.textBaseline = 'alphabetic'
+
+  drawWatermarks(ctx, images, 0.04)
+  drawPhotos(ctx, images, { clipRadius: 0 })
+
+  // Scanlines over everything for CRT effect
+  ctx.fillStyle = 'rgba(0,0,0,0.18)'
+  for (let y = 0; y < h; y += 3) {
+    ctx.fillRect(0, y, W, 1)
+  }
+
+  // Photo borders
+  ctx.strokeStyle = 'rgba(0,255,65,0.35)'
+  ctx.lineWidth = 1
+  images.forEach((_, i) => {
+    ctx.strokeRect(PAD_X, PAD_TOP + i * (PHOTO_H + GAP), PHOTO_W, PHOTO_H)
+  })
+
+  const fy    = h - FOOTER_H
+  const logoH = 26
+  drawLogo(ctx, W / 2, fy + 10, logoH)
+
+  if (label) {
+    ctx.fillStyle = 'rgba(0,255,65,0.7)'
+    ctx.font = '11px "DM Sans",Arial,sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText(label, W / 2, fy + FOOTER_H - 10)
+  }
+}
+
 // ── Public API ────────────────────────────────────────────────────────────────
 
 export const THEMES = [
-  { id: 'classic',   label: 'MeeOpp Classic', colors: ['#C1005A', '#FFFFFF'],  draw: drawClassic   },
-  { id: 'distinction', label: 'Distinction',   colors: ['#1A1A2E', '#C9920A'],  draw: drawDistinction },
-  { id: 'yearbook',  label: 'Year Book',       colors: ['#F4EFE4', '#1C1C1C'],  draw: drawYearBook  },
-  { id: 'squad',     label: 'Squad Goals',     colors: ['#E8D5FF', '#7B2FBE'],  draw: drawSquadGoals },
-  { id: 'crew',      label: 'The Crew',        colors: ['#0F1E30', '#1A6EF5'],  draw: drawCrew      },
+  { id: 'classic',   label: 'MeeOpp Classic', colors: ['#C1005A', '#FFFFFF'],  draw: drawClassic      },
+  { id: 'distinction', label: 'Distinction',  colors: ['#1A1A2E', '#C9920A'],  draw: drawDistinction  },
+  { id: 'yearbook',  label: 'Year Book',      colors: ['#F4EFE4', '#1C1C1C'],  draw: drawYearBook     },
+  { id: 'squad',     label: 'Squad Goals',    colors: ['#E8D5FF', '#7B2FBE'],  draw: drawSquadGoals   },
+  { id: 'crew',      label: 'The Crew',       colors: ['#0F1E30', '#1A6EF5'],  draw: drawCrew         },
+  { id: 'progress',  label: 'Progress Saved', colors: ['#050D05', '#00FF41'],  draw: drawProgressSaved },
 ]
 
 export const STRIP_W    = W
