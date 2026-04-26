@@ -215,8 +215,6 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
 
           {/* Layout picker */}
           <div className={`${styles.optGroup} ${styles.layoutOptGroup}`}>
-            <div className={styles.layoutInner}>
-            <p className={styles.optSection}>Layout</p>
             <div className={styles.layoutRow}>
               {LAYOUTS.map(l => (
                 <button
@@ -238,7 +236,6 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
                   <span className={styles.layoutLabel}>{l.label}</span>
                 </button>
               ))}
-            </div>
             </div>
           </div>
 
