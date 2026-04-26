@@ -83,7 +83,7 @@ function drawQuote(ctx, text, color, italic = true) {
   ctx.font = `${italic ? 'italic ' : ''}500 10px "DM Sans",Arial,sans-serif`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  ctx.fillText(text, W / 2, PAD_TOP / 2)
+  ctx.fillText(text, W / 2, PAD_TOP * 0.7)
   ctx.textBaseline = 'alphabetic'
 }
 
