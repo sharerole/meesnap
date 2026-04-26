@@ -314,7 +314,7 @@ function drawMilestone(ctx, images, label) {
 // ── Year Book ─────────────────────────────────────────────────────────────────
 // Cream background, thick black border, typographic corner brackets,
 // ruled dividers, film strip sprocket holes.
-// Quote: "These are the days."
+// Quote: "Every lesson led here."
 
 function drawYearBook(ctx, images, label) {
   const h = stripTotalHeight(images.length)
@@ -353,7 +353,7 @@ function drawYearBook(ctx, images, label) {
     ctx.beginPath(); ctx.moveTo(PAD_X + 8, gy); ctx.lineTo(W - PAD_X - 8, gy); ctx.stroke()
   })
 
-  drawQuote(ctx, 'These are the days.', 'rgba(28,28,28,0.75)')
+  drawQuote(ctx, 'Every lesson led here.', 'rgba(28,28,28,0.75)')
   drawWatermarks(ctx, images, 0.04)
   drawPhotos(ctx, images, { clipRadius: 0 })
 
