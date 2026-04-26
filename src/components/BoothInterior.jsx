@@ -152,7 +152,7 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
         }
       }, 1000)
     }
-    doShot(0)
+    setTimeout(() => doShot(0), 2000)
   }, [running, captureFrame, onPhotosReady, shotCount])
 
   // Auto-start session as soon as camera is ready in shooting step
