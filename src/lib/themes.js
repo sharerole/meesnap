@@ -246,7 +246,7 @@ function drawClassic(ctx, images, label) {
 // Navy background, amber-gold border, achievement stars, gold confetti.
 // Quote: "Small steps. Big moments."
 
-function drawMilestone(ctx, images, label) {
+function drawDistinction(ctx, images, label) {
   const h = stripTotalHeight(images.length)
 
   ctx.fillStyle = '#1A1A2E'
@@ -514,7 +514,7 @@ function drawCrew(ctx, images, label) {
 
 export const THEMES = [
   { id: 'classic',   label: 'MeeOpp Classic', colors: ['#C1005A', '#FFFFFF'],  draw: drawClassic   },
-  { id: 'milestone', label: 'Distinction',     colors: ['#1A1A2E', '#C9920A'],  draw: drawMilestone },
+  { id: 'distinction', label: 'Distinction',   colors: ['#1A1A2E', '#C9920A'],  draw: drawDistinction },
   { id: 'yearbook',  label: 'Year Book',       colors: ['#F4EFE4', '#1C1C1C'],  draw: drawYearBook  },
   { id: 'squad',     label: 'Squad Goals',     colors: ['#E8D5FF', '#7B2FBE'],  draw: drawSquadGoals },
   { id: 'crew',      label: 'The Crew',        colors: ['#0F1E30', '#1A6EF5'],  draw: drawCrew      },
