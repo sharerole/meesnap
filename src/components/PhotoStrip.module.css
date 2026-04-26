@@ -165,3 +165,26 @@
   text-align: center;
   line-height: 1.6;
 }
+
+/* ── Mobile ── */
+@media (max-width: 720px) {
+  .header {
+    padding: 10px 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Stack strip above controls */
+  .main {
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 16px;
+    gap: 24px;
+  }
+
+  /* Controls take full width below the strip */
+  .controls {
+    width: 100%;
+    max-width: 480px;
+  }
+}
