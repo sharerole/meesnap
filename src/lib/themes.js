@@ -660,25 +660,6 @@ function drawLibraryCard(ctx, images, label, layout = DEFAULT_LAYOUT) {
   drawWatermarks(ctx, images, m, 0.04)
   drawPhotos(ctx, images, m, { clipRadius: 1 })
 
-  // Circular date-stamp impression on each photo (circles only, no text)
-  images.forEach((_, i) => {
-    const col = i % cols
-    const row = Math.floor(i / cols)
-    const px = PAD_X + col * (PHOTO_W + GAP_COL)
-    const py = PAD_TOP + row * (PHOTO_H + GAP_ROW)
-    const r  = Math.min(PHOTO_W, PHOTO_H) * 0.17
-    ctx.save()
-    ctx.translate(px + PHOTO_W * 0.75, py + PHOTO_H * 0.74)
-    ctx.rotate(0.18)
-    ctx.globalAlpha = 0.18
-    ctx.strokeStyle = '#8B2020'
-    ctx.lineWidth = 2
-    ctx.beginPath(); ctx.arc(0, 0, r,        0, Math.PI * 2); ctx.stroke()
-    ctx.beginPath(); ctx.arc(0, 0, r * 0.72, 0, Math.PI * 2); ctx.stroke()
-    ctx.globalAlpha = 1
-    ctx.restore()
-  })
-
   // Photo borders
   ctx.strokeStyle = 'rgba(92,61,30,0.22)'
   ctx.lineWidth = 1
