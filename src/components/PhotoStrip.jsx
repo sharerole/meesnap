@@ -5,6 +5,7 @@ import StickerPicker from './StickerPicker'
 import { THEMES, logoReady } from '../lib/themes'
 import { getMetrics } from '../lib/layouts'
 import { STICKER_DEFS, makeSvgDataUrl, getStickerDrawSize } from '../lib/stickers'
+import { GIFEncoder, quantize, applyPalette } from 'gifenc'
 
 const MIN_STICKER_SIZE = 20
 const MAX_STICKER_SIZE = 300
@@ -73,6 +74,7 @@ export default function PhotoStrip({ photos, theme, layout, onRetake, onRestart 
   const [label, setLabel]       = useState('')
   const [stickers, setStickers] = useState([])
   const [lifted, setLifted]     = useState(false)
+  const [gifPending, setGifPending] = useState(false)
 
   // Mirror stickers into a ref so event handlers always see the latest list
   // without needing to be recreated on every sticker change.
@@ -313,7 +315,61 @@ export default function PhotoStrip({ photos, theme, layout, onRetake, onRestart 
     setStickers(prev => [...prev, { id: def.id, x, y, size: def.defaultSize ?? 56 }])
   }
 
+  function undoSticker()  { setStickers(prev => prev.slice(0, -1)) }
   function clearStickers() { setStickers([]) }
+
+  async function handleGifDownload() {
+    if (gifPending) return
+    setGifPending(true)
+    try {
+      const imgs = await loadImages()
+      const themeObj = THEMES.find(t => t.id === theme) ?? THEMES[0]
+      const { W, h, PHOTO_W, PHOTO_H } = getMetrics(layout)
+      const GIF_W = Math.round(W / 2)
+      const GIF_H = Math.round(h / 2)
+
+      const encoder = GIFEncoder()
+
+      // Reveal animation: photo 1 appears, then 2, … then all, then hold
+      for (let count = 1; count <= imgs.length; count++) {
+        const frameImgs = imgs.map((img, i) => {
+          if (i < count) return img
+          const ph = document.createElement('canvas')
+          ph.width = PHOTO_W; ph.height = PHOTO_H
+          ph.getContext('2d').fillStyle = '#999'
+          ph.getContext('2d').fillRect(0, 0, PHOTO_W, PHOTO_H)
+          return ph
+        })
+
+        const full = document.createElement('canvas')
+        full.width = W; full.height = h
+        themeObj.draw(full.getContext('2d'), frameImgs, label, layout)
+
+        const frame = document.createElement('canvas')
+        frame.width = GIF_W; frame.height = GIF_H
+        frame.getContext('2d').drawImage(full, 0, 0, W, h, 0, 0, GIF_W, GIF_H)
+
+        const { data } = frame.getContext('2d').getImageData(0, 0, GIF_W, GIF_H)
+        const palette = quantize(data, 256)
+        const index   = applyPalette(data, palette)
+        encoder.writeFrame(index, GIF_W, GIF_H, {
+          palette,
+          delay: count === imgs.length ? 1200 : 450,
+        })
+      }
+
+      encoder.finish()
+      const blob = new Blob([encoder.bytes()], { type: 'image/gif' })
+      const url  = URL.createObjectURL(blob)
+      const a    = document.createElement('a')
+      a.download = `meeopp-${Date.now()}.gif`
+      a.href = url
+      a.click()
+      URL.revokeObjectURL(url)
+    } finally {
+      setGifPending(false)
+    }
+  }
 
   async function handleDownload() {
     const canvas = canvasRef.current
@@ -395,9 +451,12 @@ export default function PhotoStrip({ photos, theme, layout, onRetake, onRestart 
             <div className={styles.stickerHeader}>
               <span className={styles.sectionLabel}>Stickers</span>
               {stickers.length > 0 && (
-                <button className={styles.clearBtn} onClick={clearStickers}>
-                  Clear all
-                </button>
+                <div className={styles.stickerActions}>
+                  <button className={styles.clearBtn} onClick={undoSticker}>Undo</button>
+                  {stickers.length > 1 && (
+                    <button className={styles.clearBtn} onClick={clearStickers}>Clear all</button>
+                  )}
+                </div>
               )}
             </div>
             <StickerPicker onSelect={addSticker} />
@@ -408,8 +467,16 @@ export default function PhotoStrip({ photos, theme, layout, onRetake, onRestart 
             ↓ Download Strip
           </button>
 
+          <button
+            className={styles.gifBtn}
+            onClick={handleGifDownload}
+            disabled={gifPending}
+          >
+            {gifPending ? 'Generating GIF…' : '↓ Download GIF'}
+          </button>
+
           <p className={styles.tip}>
-            PNG saved at full resolution — ready to share.
+            PNG at full resolution · GIF for sharing &amp; Stories.
           </p>
         </div>
       </div>
