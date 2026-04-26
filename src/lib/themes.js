@@ -82,7 +82,7 @@ function drawQuote(ctx, text, color, italic = true) {
   ctx.fillStyle = color
   ctx.font = `${italic ? 'italic ' : ''}500 10px "DM Sans",Arial,sans-serif`
   ctx.textAlign = 'center'
-  ctx.fillText(text, W / 2, PAD_TOP - 10)
+  ctx.fillText(text, W / 2, PAD_TOP / 2)
 }
 
 function drawEightPointStar(ctx, cx, cy, r1, r2) {
