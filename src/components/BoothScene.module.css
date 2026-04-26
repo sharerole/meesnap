@@ -495,21 +495,43 @@
     0 0 48px rgba(210,35,0,0.3);
 }
 
-/* printing stage — bright red, fast pulse */
+/* printing stage — yellow, fast pulse */
 .safelightBulbPrint {
-  animation: safelightPulse 0.9s ease-in-out infinite;
+  background: radial-gradient(circle at 35% 32%, #FFE84A 0%, #D4A800 55%, #907000 100%);
+  border-color: #4A3800;
+  animation: safelightPulseYellow 0.9s ease-in-out infinite;
 }
 
-/* ready stage — steady amber */
+@keyframes safelightPulseYellow {
+  0%, 100% {
+    box-shadow:
+      inset 2px 2px 6px rgba(255,240,100,0.35),
+      inset -2px -2px 4px rgba(0,0,0,0.5),
+      0 0 14px rgba(210,170,0,0.55),
+      0 0 36px rgba(210,170,0,0.22);
+    opacity: 0.78;
+  }
+  50% {
+    box-shadow:
+      inset 2px 2px 6px rgba(255,240,100,0.35),
+      inset -2px -2px 4px rgba(0,0,0,0.5),
+      0 0 28px rgba(210,170,0,0.9),
+      0 0 60px rgba(210,170,0,0.5),
+      0 0 90px rgba(210,170,0,0.2);
+    opacity: 1;
+  }
+}
+
+/* ready stage — steady green */
 .safelightBulbReady {
-  background: radial-gradient(circle at 35% 32%, #FFD080 0%, #E8A020 55%, #B07010 100%);
-  border-color: #5A3A00;
+  background: radial-gradient(circle at 35% 32%, #80FF60 0%, #1EC000 55%, #0E7800 100%);
+  border-color: #0A3A00;
   box-shadow:
-    inset 2px 2px 6px rgba(255,230,120,0.4),
-    inset -2px -2px 4px rgba(0,0,0,0.3),
-    0 0 28px rgba(230,160,20,0.85),
-    0 0 60px rgba(230,160,20,0.45),
-    0 0 100px rgba(230,160,20,0.2);
+    inset 2px 2px 6px rgba(120,255,80,0.4),
+    inset -2px -2px 4px rgba(0,0,0,0.4),
+    0 0 28px rgba(30,192,0,0.85),
+    0 0 60px rgba(30,192,0,0.45),
+    0 0 100px rgba(30,192,0,0.2);
   animation: none;
 }
 
@@ -543,11 +565,11 @@
 }
 
 .safelightLabelAlmost {
-  color: rgba(255,255,255,0.6);
+  color: rgba(210,170,0,0.9);
 }
 
 .safelightLabelReady {
-  color: rgba(230,160,20,0.9);
+  color: rgba(30,192,0,0.9);
 }
 
 /* Output tray unit */
