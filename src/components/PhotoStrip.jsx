@@ -5,6 +5,9 @@ import StickerPicker from './StickerPicker'
 import { THEMES, STRIP_W, stripTotalHeight, logoReady } from '../lib/themes'
 import { STICKER_DEFS, makeSvgDataUrl, getStickerDrawSize } from '../lib/stickers'
 
+const MIN_STICKER_SIZE = 20
+const MAX_STICKER_SIZE = 300
+
 // Pre-load all sticker images so canvas draw is synchronous
 const stickerImages = {}
 STICKER_DEFS.forEach(def => {
@@ -26,6 +29,27 @@ function toCanvasXY(e, canvas) {
   }
 }
 
+// Distance between two touch points in canvas-space pixels
+function touchDist(e, canvas) {
+  const rect = canvas.getBoundingClientRect()
+  const sx = canvas.width  / rect.width
+  const sy = canvas.height / rect.height
+  const t0 = e.touches[0], t1 = e.touches[1]
+  return Math.hypot((t0.clientX - t1.clientX) * sx, (t0.clientY - t1.clientY) * sy)
+}
+
+// Midpoint between two touch points in canvas-space coordinates
+function touchMidpoint(e, canvas) {
+  const rect = canvas.getBoundingClientRect()
+  const sx = canvas.width  / rect.width
+  const sy = canvas.height / rect.height
+  const t0 = e.touches[0], t1 = e.touches[1]
+  return {
+    x: ((t0.clientX + t1.clientX) / 2 - rect.left) * sx,
+    y: ((t0.clientY + t1.clientY) / 2 - rect.top)  * sy,
+  }
+}
+
 function hitTest(s, x, y, dw, dh) {
   return x >= s.x - dw / 2 && x <= s.x + dw / 2 &&
          y >= s.y - dh / 2 && y <= s.y + dh / 2
@@ -41,6 +65,7 @@ export default function PhotoStrip({ photos, theme, onRetake, onRestart }) {
   const baseRef    = useRef(null)   // offscreen canvas: theme + photos, no stickers
   const imgsRef    = useRef(null)   // cached loaded Image objects
   const dragging   = useRef(null)   // { idx, ox, oy } while dragging, else null
+  const pinching   = useRef(null)   // { idx, startDist, startSize } while pinching, else null
   const rafHandle  = useRef(null)
 
   const [label, setLabel]       = useState('')
@@ -127,9 +152,26 @@ export default function PhotoStrip({ photos, theme, onRetake, onRestart }) {
     return () => clearTimeout(t)
   }, [])
 
-  // Drag event handlers — attached to document so fast mouse moves don't escape
+  // Drag + pinch event handlers — attached to document so fast moves don't escape
   useEffect(() => {
     function onMove(e) {
+      // Pinch-to-resize: two-finger touch
+      if (e.touches && e.touches.length === 2 && pinching.current) {
+        const canvas = canvasRef.current
+        if (!canvas) return
+        const newDist = touchDist(e, canvas)
+        const { idx, startDist, startSize } = pinching.current
+        const scale   = newDist / startDist
+        const newSize = Math.max(MIN_STICKER_SIZE, Math.min(MAX_STICKER_SIZE, startSize * scale))
+        stickersRef.current = stickersRef.current.map((s, i) =>
+          i === idx ? { ...s, size: newSize } : s
+        )
+        if (rafHandle.current) cancelAnimationFrame(rafHandle.current)
+        rafHandle.current = requestAnimationFrame(compositeNow)
+        e.preventDefault()
+        return
+      }
+
       if (!dragging.current) return
       const canvas = canvasRef.current
       if (!canvas) return
@@ -151,6 +193,11 @@ export default function PhotoStrip({ photos, theme, onRetake, onRestart }) {
     }
 
     function onUp() {
+      if (pinching.current) {
+        pinching.current = null
+        setStickers([...stickersRef.current])
+        return
+      }
       if (!dragging.current) return
       dragging.current = null
       // Commit final positions to React state (triggers one re-render)
@@ -158,22 +205,72 @@ export default function PhotoStrip({ photos, theme, onRetake, onRestart }) {
       if (canvasRef.current) canvasRef.current.style.cursor = 'default'
     }
 
-    document.addEventListener('mousemove',  onMove)
-    document.addEventListener('mouseup',    onUp)
-    document.addEventListener('touchmove',  onMove, { passive: false })
-    document.addEventListener('touchend',   onUp)
+    document.addEventListener('mousemove',   onMove)
+    document.addEventListener('mouseup',     onUp)
+    document.addEventListener('touchmove',   onMove, { passive: false })
+    document.addEventListener('touchend',    onUp)
+    document.addEventListener('touchcancel', onUp)
     return () => {
-      document.removeEventListener('mousemove',  onMove)
-      document.removeEventListener('mouseup',    onUp)
-      document.removeEventListener('touchmove',  onMove)
-      document.removeEventListener('touchend',   onUp)
+      document.removeEventListener('mousemove',   onMove)
+      document.removeEventListener('mouseup',     onUp)
+      document.removeEventListener('touchmove',   onMove)
+      document.removeEventListener('touchend',    onUp)
+      document.removeEventListener('touchcancel', onUp)
     }
   }, [compositeNow])
 
-  // Canvas mousedown / touchstart — start drag if clicking a sticker
+  // Scroll-to-resize: wheel event on canvas (must be non-passive for preventDefault)
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    function onWheel(e) {
+      const { x, y } = toCanvasXY(e, canvas)
+      for (let i = stickersRef.current.length - 1; i >= 0; i--) {
+        const s = stickersRef.current[i]
+        const { dw, dh } = stickerSize(s)
+        if (hitTest(s, x, y, dw, dh)) {
+          const delta   = e.deltaY > 0 ? -8 : 8
+          const newSize = Math.max(MIN_STICKER_SIZE, Math.min(MAX_STICKER_SIZE, s.size + delta))
+          stickersRef.current = stickersRef.current.map((st, idx) =>
+            idx === i ? { ...st, size: newSize } : st
+          )
+          setStickers([...stickersRef.current])
+          e.preventDefault()
+          return
+        }
+      }
+    }
+
+    canvas.addEventListener('wheel', onWheel, { passive: false })
+    return () => canvas.removeEventListener('wheel', onWheel)
+  }, [])
+
+  // Canvas mousedown / touchstart — start drag or pinch-to-resize
   function handleCanvasDown(e) {
     const canvas = canvasRef.current
-    if (!canvas || stickersRef.current.length === 0) return
+    if (!canvas) return
+
+    // Two-finger touch: cancel any drag and start pinch-to-resize
+    if (e.touches && e.touches.length === 2) {
+      dragging.current = null
+      if (stickersRef.current.length === 0) return
+      const mid  = touchMidpoint(e, canvas)
+      const dist = touchDist(e, canvas)
+      for (let i = stickersRef.current.length - 1; i >= 0; i--) {
+        const s = stickersRef.current[i]
+        const { dw, dh } = stickerSize(s)
+        // Slightly wider hit area makes pinch easier to initiate
+        if (hitTest(s, mid.x, mid.y, dw * 1.5, dh * 1.5)) {
+          pinching.current = { idx: i, startDist: dist, startSize: s.size }
+          e.preventDefault()
+          return
+        }
+      }
+      return
+    }
+
+    if (stickersRef.current.length === 0) return
     const { x, y } = toCanvasXY(e, canvas)
     // Reverse iterate: last sticker is rendered on top
     for (let i = stickersRef.current.length - 1; i >= 0; i--) {
@@ -254,7 +351,7 @@ export default function PhotoStrip({ photos, theme, onRetake, onRestart }) {
       <div className={styles.main}>
         {/* Strip display */}
         <div className={styles.stripArea}>
-          <p className={styles.stripHint}>Drag stickers to reposition</p>
+          <p className={styles.stripHint}>Drag to move · Scroll or pinch to resize</p>
           <div className={`${styles.stripHolder} ${lifted ? styles.stripLifted : ''}`}>
             <canvas
               ref={canvasRef}
