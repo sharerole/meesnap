@@ -313,6 +313,7 @@ export default function PhotoStrip({ photos, theme, layout, onRetake, onRestart 
     setStickers(prev => [...prev, { id: def.id, x, y, size: def.defaultSize ?? 56 }])
   }
 
+  function undoSticker()  { setStickers(prev => prev.slice(0, -1)) }
   function clearStickers() { setStickers([]) }
 
   async function handleDownload() {
@@ -359,7 +360,6 @@ export default function PhotoStrip({ photos, theme, layout, onRetake, onRestart 
       <div className={styles.main}>
         {/* Strip display */}
         <div className={styles.stripArea}>
-          <p className={styles.stripHint}>Drag to move · Scroll or pinch to resize</p>
           <div className={`${styles.stripHolder} ${lifted ? styles.stripLifted : ''}`}>
             <canvas
               ref={canvasRef}
@@ -394,10 +394,14 @@ export default function PhotoStrip({ photos, theme, layout, onRetake, onRestart 
           <div className={styles.section}>
             <div className={styles.stickerHeader}>
               <span className={styles.sectionLabel}>Stickers</span>
+              <span className={styles.stickerHint}>Drag · scroll or pinch to resize</span>
               {stickers.length > 0 && (
-                <button className={styles.clearBtn} onClick={clearStickers}>
-                  Clear all
-                </button>
+                <div className={styles.stickerActions}>
+                  <button className={styles.clearBtn} onClick={undoSticker}>Undo</button>
+                  {stickers.length > 1 && (
+                    <button className={styles.clearBtn} onClick={clearStickers}>Clear all</button>
+                  )}
+                </div>
               )}
             </div>
             <StickerPicker onSelect={addSticker} />

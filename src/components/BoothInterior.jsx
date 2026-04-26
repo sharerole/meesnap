@@ -3,6 +3,7 @@ import styles from './BoothInterior.module.css'
 import { THEMES } from '../lib/themes'
 import { LAYOUTS } from '../lib/layouts'
 import ThemePreview from './ThemePreview'
+import PoseGuide from './PoseGuide'
 
 const COUNTDOWN_SEC = 3
 const RING_R    = 48
@@ -214,7 +215,6 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
 
           {/* Layout picker */}
           <div className={`${styles.optGroup} ${styles.layoutOptGroup}`}>
-            <p className={styles.optSection}>Layout</p>
             <div className={styles.layoutRow}>
               {LAYOUTS.map(l => (
                 <button
@@ -240,7 +240,7 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
           </div>
 
           <div className={styles.startWrap}>
-            <button className={styles.startBtn} onClick={goToFilter}>Next →</button>
+            <button className={styles.startBtn} onClick={goToFilter}>Ready? Go! →</button>
             <p className={styles.startNote}>{shotCount} shots · {COUNTDOWN_SEC} sec each</p>
           </div>
         </div>
@@ -298,7 +298,7 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
           </div>
 
           <div className={styles.startWrap}>
-            <button className={styles.startBtn} onClick={() => setStep('shooting')}>Ready? Go!</button>
+            <button className={styles.startBtn} onClick={() => setStep('shooting')}>Smile! 📸</button>
             <p className={styles.startNote}>{shotCount} shots · {COUNTDOWN_SEC} sec each</p>
           </div>
         </div>
@@ -348,6 +348,8 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
             ))}
           </div>
         )}
+
+        <PoseGuide shotIndex={shotIndex} visible={countdown !== null && countdown > 0} />
 
         {countdown !== null && countdown > 0 && (
           <div className={styles.countdownOverlay}>
