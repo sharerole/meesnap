@@ -360,7 +360,6 @@ export default function PhotoStrip({ photos, theme, layout, onRetake, onRestart 
       <div className={styles.main}>
         {/* Strip display */}
         <div className={styles.stripArea}>
-          <p className={styles.stripHint}>Drag to move · Scroll or pinch to resize</p>
           <div className={`${styles.stripHolder} ${lifted ? styles.stripLifted : ''}`}>
             <canvas
               ref={canvasRef}
@@ -395,6 +394,7 @@ export default function PhotoStrip({ photos, theme, layout, onRetake, onRestart 
           <div className={styles.section}>
             <div className={styles.stickerHeader}>
               <span className={styles.sectionLabel}>Stickers</span>
+              <span className={styles.stickerHint}>Drag · scroll or pinch to resize</span>
               {stickers.length > 0 && (
                 <div className={styles.stickerActions}>
                   <button className={styles.clearBtn} onClick={undoSticker}>Undo</button>

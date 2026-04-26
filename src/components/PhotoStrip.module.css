@@ -58,12 +58,11 @@
   gap: 12px;
 }
 
-.stripHint {
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.3);
+.stickerHint {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.25);
+  letter-spacing: 0.5px;
 }
 
 .stripHolder {

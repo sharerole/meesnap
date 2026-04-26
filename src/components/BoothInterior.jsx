@@ -241,7 +241,7 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
           </div>
 
           <div className={styles.startWrap}>
-            <button className={styles.startBtn} onClick={goToFilter}>Next →</button>
+            <button className={styles.startBtn} onClick={goToFilter}>Ready? Go! →</button>
             <p className={styles.startNote}>{shotCount} shots · {COUNTDOWN_SEC} sec each</p>
           </div>
         </div>
@@ -299,7 +299,7 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
           </div>
 
           <div className={styles.startWrap}>
-            <button className={styles.startBtn} onClick={() => setStep('shooting')}>Ready? Go!</button>
+            <button className={styles.startBtn} onClick={() => setStep('shooting')}>Smile! 📸</button>
             <p className={styles.startNote}>{shotCount} shots · {COUNTDOWN_SEC} sec each</p>
           </div>
         </div>

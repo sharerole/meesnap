@@ -307,7 +307,7 @@
 
 /* Layout picker */
 .layoutOptGroup {
-  align-items: center;
+  align-items: flex-start;
 }
 
 .layoutRow {
@@ -440,6 +440,7 @@
   color: rgba(255,255,255,0.28);
   letter-spacing: 1px;
   text-transform: uppercase;
+  margin-top: 10px;
 }
 
 /* ── Setup screen ─────────────────────────────────────────────────────────── */
