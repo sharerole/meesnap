@@ -285,6 +285,11 @@ function drawYearBook(ctx, images, label) {
 function drawSquadGoals(ctx, images, label) {
   const h = stripTotalHeight(images.length)
 
+  ctx.save()
+  ctx.beginPath()
+  ctx.roundRect(0, 0, W, h, 16)
+  ctx.clip()
+
   const grad = ctx.createLinearGradient(0, 0, 0, h)
   grad.addColorStop(0, '#FFF0F8')
   grad.addColorStop(1, '#EEE0FF')
@@ -335,6 +340,8 @@ function drawSquadGoals(ctx, images, label) {
     ctx.textAlign = 'center'
     ctx.fillText(label, W / 2, fy + FOOTER_H - 10)
   }
+
+  ctx.restore()
 }
 
 // ── The Crew ──────────────────────────────────────────────────────────────────
