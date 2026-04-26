@@ -307,7 +307,7 @@
 
 /* Layout picker */
 .layoutOptGroup {
-  align-items: flex-start;
+  align-items: center;
 }
 
 .layoutRow {
