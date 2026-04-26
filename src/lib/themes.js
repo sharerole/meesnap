@@ -554,12 +554,10 @@ function drawReportCard(ctx, images, label, layout = DEFAULT_LAYOUT) {
   drawWatermarks(ctx, images, m, 0.04)
   drawPhotos(ctx, images, m, { clipRadius: 1 })
 
-  // A+ rubber-stamp impression on each photo (top-right area)
-  images.forEach((_, i) => {
-    const col = i % cols
-    const row = Math.floor(i / cols)
-    const px = PAD_X + col * (PHOTO_W + GAP_COL)
-    const py = PAD_TOP + row * (PHOTO_H + GAP_ROW)
+  // A+ rubber-stamp impression on the first photo only
+  if (images.length > 0) {
+    const px = PAD_X
+    const py = PAD_TOP
     const r  = Math.min(PHOTO_W, PHOTO_H) * 0.16
     ctx.save()
     ctx.translate(px + PHOTO_W * 0.76, py + PHOTO_H * 0.26)
@@ -576,7 +574,7 @@ function drawReportCard(ctx, images, label, layout = DEFAULT_LAYOUT) {
     ctx.fillText('A+', 0, 0)
     ctx.globalAlpha = 1
     ctx.restore()
-  })
+  }
 
   // Photo borders
   ctx.strokeStyle = 'rgba(28,43,94,0.18)'
@@ -662,7 +660,7 @@ function drawLibraryCard(ctx, images, label, layout = DEFAULT_LAYOUT) {
   drawWatermarks(ctx, images, m, 0.04)
   drawPhotos(ctx, images, m, { clipRadius: 1 })
 
-  // Circular date-stamp impression on each photo
+  // Circular date-stamp impression on each photo (circles only, no text)
   images.forEach((_, i) => {
     const col = i % cols
     const row = Math.floor(i / cols)
@@ -672,18 +670,11 @@ function drawLibraryCard(ctx, images, label, layout = DEFAULT_LAYOUT) {
     ctx.save()
     ctx.translate(px + PHOTO_W * 0.75, py + PHOTO_H * 0.74)
     ctx.rotate(0.18)
-    ctx.globalAlpha = 0.2
+    ctx.globalAlpha = 0.18
     ctx.strokeStyle = '#8B2020'
     ctx.lineWidth = 2
     ctx.beginPath(); ctx.arc(0, 0, r,        0, Math.PI * 2); ctx.stroke()
     ctx.beginPath(); ctx.arc(0, 0, r * 0.72, 0, Math.PI * 2); ctx.stroke()
-    ctx.fillStyle = '#8B2020'
-    const fs = Math.max(6, Math.round(r * 0.55))
-    ctx.font = `700 ${fs}px "Courier New",Courier,monospace`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText('KEEP', 0, -fs * 0.55)
-    ctx.fillText('THIS',  0,  fs * 0.55)
     ctx.globalAlpha = 1
     ctx.restore()
   })
