@@ -25,11 +25,30 @@ function drawPhotos(ctx, images, { clipRadius = 2 } = {}) {
   images.forEach((img, i) => {
     const x = PAD_X
     const y = PAD_TOP + i * (PHOTO_H + GAP)
+
+    // Crop source to fill destination while preserving aspect ratio (object-fit: cover).
+    // Without this, portrait-orientation camera frames (e.g. iPhone front camera) are
+    // stretched horizontally when squished into the landscape photo slot.
+    const srcAspect = img.width / img.height
+    const dstAspect = PHOTO_W / PHOTO_H
+    let sx, sy, sw, sh
+    if (srcAspect > dstAspect) {
+      sh = img.height
+      sw = sh * dstAspect
+      sx = (img.width - sw) / 2
+      sy = 0
+    } else {
+      sw = img.width
+      sh = sw / dstAspect
+      sx = 0
+      sy = (img.height - sh) / 2
+    }
+
     ctx.save()
     ctx.beginPath()
     ctx.roundRect(x, y, PHOTO_W, PHOTO_H, clipRadius)
     ctx.clip()
-    ctx.drawImage(img, x, y, PHOTO_W, PHOTO_H)
+    ctx.drawImage(img, sx, sy, sw, sh, x, y, PHOTO_W, PHOTO_H)
     ctx.restore()
   })
 }
