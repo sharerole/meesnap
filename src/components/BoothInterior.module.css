@@ -390,3 +390,35 @@
   letter-spacing: 1px;
   text-transform: uppercase;
 }
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  /* Stack camera above options instead of side-by-side */
+  .interior {
+    flex-direction: column;
+    padding: 16px;
+    gap: 16px;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  /* Narrow velvet edges so they don't crowd the camera */
+  .curtainEdgeLeft,
+  .curtainEdgeRight {
+    width: 16px;
+  }
+
+  /* Camera takes full content width in both setup and shooting modes */
+  .cameraWrap,
+  .cameraWrapSetup {
+    width: min(640px, calc(100vw - 32px));
+  }
+
+  /* Options panel stretches to full width below the camera */
+  .optionsPanel {
+    width: 100%;
+    max-width: 640px;
+    max-height: none;
+    align-self: center;
+  }
+}
