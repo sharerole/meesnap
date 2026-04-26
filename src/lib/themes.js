@@ -13,12 +13,13 @@ const W        = 360
 const PHOTO_W  = 278
 const PHOTO_H  = 208
 const PAD_X    = (W - PHOTO_W) / 2   // 41
-const PAD_TOP  = 40
+const PAD_TOP  = 56   // top — quote breathing room
+const PAD_BOT  = 22   // bottom — gap between last frame and logo
 const GAP      = 14
 const FOOTER_H = 72
 
 export function stripTotalHeight(numPhotos) {
-  return PAD_TOP + numPhotos * PHOTO_H + (numPhotos - 1) * GAP + PAD_TOP + FOOTER_H
+  return PAD_TOP + numPhotos * PHOTO_H + (numPhotos - 1) * GAP + PAD_BOT + FOOTER_H
 }
 
 function seededRand(seed) {
