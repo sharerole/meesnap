@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 import styles from './BoothInterior.module.css'
 import { THEMES } from '../lib/themes'
+import { LAYOUTS } from '../lib/layouts'
 import ThemePreview from './ThemePreview'
 
 const COUNTDOWN_SEC = 3
@@ -43,7 +44,8 @@ function playShutter() {
   } catch {}
 }
 
-export default function BoothInterior({ theme, setTheme, shotCount, setShotCount, filter, setFilter, onPhotosReady, onExit }) {
+export default function BoothInterior({ theme, setTheme, layout, setLayout, filter, setFilter, onPhotosReady, onExit }) {
+  const shotCount = layout.cols * layout.rows
   const videoRef      = useRef(null)
   const canvasRef     = useRef(null)
   const streamRef     = useRef(null)
@@ -195,7 +197,7 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
                 key={theme}
                 className={carouselDir === 'right' ? styles.carouselSlideRight : styles.carouselSlideLeft}
               >
-                <ThemePreview theme={theme} displayWidth={180} numPhotos={shotCount} showHeading={false} />
+                <ThemePreview theme={theme} displayWidth={180} layout={layout} showHeading={false} />
               </div>
               <div className={styles.carouselDots}>
                 {THEMES.map((t, i) => (
@@ -210,17 +212,28 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
             <button className={styles.carouselArrow} onClick={nextTheme} aria-label="Next frame">›</button>
           </div>
 
-          {/* Shot count */}
+          {/* Layout picker */}
           <div className={styles.optGroup}>
-            <p className={styles.optSection}>Shots</p>
-            <div className={styles.shotRow}>
-              {[2, 3, 4].map(n => (
+            <p className={styles.optSection}>Layout</p>
+            <div className={styles.layoutRow}>
+              {LAYOUTS.map(l => (
                 <button
-                  key={n}
-                  className={`${styles.shotBtn} ${shotCount === n ? styles.shotBtnActive : ''}`}
-                  onClick={() => setShotCount(n)}
+                  key={l.id}
+                  className={`${styles.layoutBtn} ${layout.id === l.id ? styles.layoutBtnActive : ''}`}
+                  onClick={() => setLayout(l)}
                 >
-                  {n}
+                  <div
+                    className={styles.layoutIcon}
+                    style={{
+                      gridTemplateColumns: `repeat(${l.cols}, 1fr)`,
+                      gridTemplateRows: `repeat(${l.rows}, 1fr)`,
+                    }}
+                  >
+                    {Array.from({ length: l.cols * l.rows }).map((_, i) => (
+                      <div key={i} className={styles.layoutCell} />
+                    ))}
+                  </div>
+                  <span className={styles.layoutLabel}>{l.label}</span>
                 </button>
               ))}
             </div>

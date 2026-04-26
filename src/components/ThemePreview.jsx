@@ -1,12 +1,13 @@
 import { useRef, useEffect, useMemo, useCallback } from 'react'
-import { THEMES, STRIP_W, PHOTO_DIMS, stripTotalHeight, logoImg } from '../lib/themes'
+import { THEMES, stripTotalHeight, logoImg } from '../lib/themes'
+import { DEFAULT_LAYOUT, getMetrics } from '../lib/layouts'
 import styles from './ThemePreview.module.css'
 
-function makePlaceholders(count) {
+function makePlaceholders(count, pw, ph) {
   return Array.from({ length: count }, () => {
     const c = document.createElement('canvas')
-    c.width  = PHOTO_DIMS.w
-    c.height = PHOTO_DIMS.h
+    c.width  = pw
+    c.height = ph
     const ctx = c.getContext('2d')
     const grad = ctx.createLinearGradient(0, 0, 0, c.height)
     grad.addColorStop(0, '#BEBEBE')
@@ -21,29 +22,35 @@ function makePlaceholders(count) {
   })
 }
 
-// displayWidth and numPhotos are optional — defaults give the original lobby preview size.
-export default function ThemePreview({ theme, displayWidth = 148, numPhotos = 2, showHeading = true }) {
+// displayWidth and layout are optional — defaults give the original lobby preview size.
+export default function ThemePreview({ theme, displayWidth = 148, layout = DEFAULT_LAYOUT, showHeading = true }) {
   const canvasRef = useRef(null)
   const themeObj  = THEMES.find(t => t.id === theme) ?? THEMES[0]
 
-  const placeholders = useMemo(() => makePlaceholders(numPhotos), [numPhotos])
+  const { W, PHOTO_W, PHOTO_H, cols, rows } = getMetrics(layout)
+  const numPhotos = cols * rows
+  const fullH     = stripTotalHeight(layout)
 
-  const scale    = displayWidth / STRIP_W
-  const fullH    = stripTotalHeight(numPhotos)
+  const placeholders = useMemo(
+    () => makePlaceholders(numPhotos, PHOTO_W, PHOTO_H),
+    [numPhotos, PHOTO_W, PHOTO_H]
+  )
+
+  const scale    = displayWidth / W
   const displayH = Math.round(fullH * scale)
 
   const renderCanvas = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     const dpr = window.devicePixelRatio || 1
-    canvas.width  = STRIP_W * dpr
+    canvas.width  = W * dpr
     canvas.height = fullH * dpr
-    canvas.style.width  = STRIP_W + 'px'
+    canvas.style.width  = W + 'px'
     canvas.style.height = fullH + 'px'
     const ctx = canvas.getContext('2d')
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-    themeObj.draw(ctx, placeholders, '')
-  }, [themeObj, fullH, placeholders])
+    themeObj.draw(ctx, placeholders, '', layout)
+  }, [themeObj, fullH, W, placeholders, layout])
 
   useEffect(() => {
     renderCanvas()

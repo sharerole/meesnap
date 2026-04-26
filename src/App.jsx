@@ -2,7 +2,8 @@ import { useRef, useState } from 'react'
 import BoothScene from './components/BoothScene'
 import BoothInterior from './components/BoothInterior'
 import PhotoStrip from './components/PhotoStrip'
-import { THEMES, STRIP_W, stripTotalHeight } from './lib/themes'
+import { THEMES } from './lib/themes'
+import { DEFAULT_LAYOUT, getMetrics } from './lib/layouts'
 import appStyles from './App.module.css'
 
 // phases: lobby → entering → inside → exiting → revealing → strip
@@ -10,7 +11,7 @@ export default function App() {
   const [phase, setPhase]               = useState('lobby')
   const [photos, setPhotos]             = useState([])
   const [theme, setTheme]               = useState('classic')
-  const [shotCount, setShotCount]       = useState(4)
+  const [layout, setLayout]             = useState(DEFAULT_LAYOUT)
   const [filter, setFilter]             = useState('natural')
   const [stripDataUrl, setStripDataUrl] = useState(null)
 
@@ -32,9 +33,9 @@ export default function App() {
     // Pre-render the strip offscreen during the curtain-close window (~1300ms)
     // so it's ready before the tray reveal animation starts.
     const themeObj = THEMES.find(t => t.id === theme) ?? THEMES[0]
-    const h = stripTotalHeight(imgs.length)
+    const { W, h } = getMetrics(layout)
     const canvas = document.createElement('canvas')
-    canvas.width  = STRIP_W
+    canvas.width  = W
     canvas.height = h
 
     let loaded = 0
@@ -44,7 +45,7 @@ export default function App() {
       img.onload = () => {
         loadedImgs[i] = img
         if (++loaded === imgs.length) {
-          themeObj.draw(canvas.getContext('2d'), loadedImgs, '')
+          themeObj.draw(canvas.getContext('2d'), loadedImgs, '', layout)
           setStripDataUrl(canvas.toDataURL('image/png'))
         }
       }
@@ -79,8 +80,8 @@ export default function App() {
           <BoothInterior
             theme={theme}
             setTheme={setTheme}
-            shotCount={shotCount}
-            setShotCount={setShotCount}
+            layout={layout}
+            setLayout={setLayout}
             filter={filter}
             setFilter={setFilter}
             onPhotosReady={handlePhotosReady}
@@ -93,6 +94,7 @@ export default function App() {
           <PhotoStrip
             photos={photos}
             theme={theme}
+            layout={layout}
             onRetake={handleRetake}
             onRestart={handleRestart}
           />
