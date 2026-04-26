@@ -136,7 +136,6 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
                   />
                 ))}
               </div>
-              <p className={styles.carouselLabel}>{THEMES[themeIdx].label}</p>
             </div>
             <button className={styles.carouselArrow} onClick={nextTheme} aria-label="Next frame">›</button>
           </div>
