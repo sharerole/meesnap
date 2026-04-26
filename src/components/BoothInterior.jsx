@@ -14,7 +14,7 @@ const FILTERS = [
   { id: 'warm',    label: 'Warm',     css: 'sepia(0.25) saturate(1.2) brightness(1.05)' },
 ]
 
-export default function BoothInterior({ theme, setTheme, shotCount, setShotCount, filter, setFilter, onPhotosReady }) {
+export default function BoothInterior({ theme, setTheme, shotCount, setShotCount, filter, setFilter, onPhotosReady, onExit }) {
   const videoRef  = useRef(null)
   const canvasRef = useRef(null)
   const streamRef = useRef(null)
@@ -112,6 +112,12 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
 
       <div className={styles.curtainEdgeLeft} />
       <div className={styles.curtainEdgeRight} />
+
+      {inSetup && (
+        <button className={styles.exitBtn} onClick={onExit} aria-label="Exit booth">
+          ← Exit
+        </button>
+      )}
 
       {/* Camera */}
       <div className={`${styles.cameraWrap} ${inSetup ? styles.cameraWrapSetup : ''}`}>

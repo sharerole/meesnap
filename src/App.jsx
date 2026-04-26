@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import BoothScene from './components/BoothScene'
 import BoothInterior from './components/BoothInterior'
 import PhotoStrip from './components/PhotoStrip'
@@ -13,8 +13,15 @@ export default function App() {
   const [filter, setFilter]             = useState('natural')
   const [stripDataUrl, setStripDataUrl] = useState(null)
 
+  const backingOut = useRef(false)
+
   function handleEnter()        { setPhase('entering') }
   function handleCurtainsOpen() { setPhase('inside') }
+
+  function handleExitBooth() {
+    backingOut.current = true
+    setPhase('exiting')
+  }
 
   function handlePhotosReady(imgs) {
     setPhotos(imgs)
@@ -44,7 +51,10 @@ export default function App() {
     })
   }
 
-  function handleCurtainsClosed() { setPhase('revealing') }
+  function handleCurtainsClosed() {
+    if (backingOut.current) { backingOut.current = false; setPhase('lobby') }
+    else                    { setPhase('revealing') }
+  }
   function handlePickUp()         { setPhase('strip') }
   function handleRetake()         { setPhotos([]); setStripDataUrl(null); setPhase('lobby') }
   function handleRestart()        { setPhotos([]); setStripDataUrl(null); setPhase('lobby') }
@@ -72,6 +82,7 @@ export default function App() {
           filter={filter}
           setFilter={setFilter}
           onPhotosReady={handlePhotosReady}
+          onExit={handleExitBooth}
         />
       )}
       {phase === 'strip' && (

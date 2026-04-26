@@ -395,6 +395,12 @@
 }
 .boardStripSquad .boardPhoto { background: rgba(193,0,90,0.1); border-radius: 1px; }
 
+.boardStripCrew {
+  background: linear-gradient(180deg, #0F1E30 0%, #060E1A 100%);
+  border: 2px solid #1A6EF5;
+}
+.boardStripCrew .boardPhoto { background: rgba(26,110,245,0.15); }
+
 /* ── Enter button ── */
 .actions {
   display: flex;
