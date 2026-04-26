@@ -210,11 +210,30 @@ export default function PhotoStrip({ photos, theme, onRetake, onRestart }) {
 
   function clearStickers() { setStickers([]) }
 
-  function handleDownload() {
+  async function handleDownload() {
     const canvas = canvasRef.current
     if (!canvas) return
+
+    const filename = `meeopp-${Date.now()}.png`
+
+    // On iOS, <a download> saves to Files — use Web Share API instead so the
+    // native share sheet appears and the user can tap "Save Image" → Photos.
+    if (typeof navigator.share === 'function' && typeof navigator.canShare === 'function') {
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'))
+      const file = new File([blob], filename, { type: 'image/png' })
+      if (navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file] })
+          return
+        } catch (err) {
+          if (err.name === 'AbortError') return  // user dismissed sheet
+          // any other error falls through to the standard download
+        }
+      }
+    }
+
     const a = document.createElement('a')
-    a.download = `meeopp-${Date.now()}.png`
+    a.download = filename
     a.href = canvas.toDataURL('image/png')
     a.click()
   }
