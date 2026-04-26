@@ -31,7 +31,7 @@ export default function BoothScene({
   useEffect(() => {
     if (phase === 'entering') {
       setCurtainOpen(false)
-      const t = setTimeout(onCurtainsOpen, 950)
+      const t = setTimeout(onCurtainsOpen, 1900)
       return () => clearTimeout(t)
     }
     if (phase === 'exiting') {

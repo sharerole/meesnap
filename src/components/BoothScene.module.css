@@ -378,21 +378,33 @@
   z-index: 3;
   background: repeating-linear-gradient(
     to right,
-    #7A002E  0%,
-    #9E0040  9%,
-    #BE0055 18%,
-    #A00042 27%,
-    #7A002E 36%,
-    #9E0040 45%,
-    #BE0055 54%,
-    #A00042 63%,
-    #7A002E 72%,
-    #9E0040 81%,
-    #BE0055 90%,
-    #7A002E 100%
+    #5A0020  0%,
+    #7A002E  5%,
+    #9E0040 11%,
+    #C8005C 15%,
+    #E0006A 17%,   /* bright fold highlight */
+    #C2005A 19%,
+    #9A003C 24%,
+    #720028 30%,
+    #8C0036 36%,
+    #B20048 42%,
+    #CC0058 46%,
+    #E0006A 48%,   /* bright fold highlight */
+    #CC0058 50%,
+    #AA0044 55%,
+    #7A002E 61%,
+    #8E0038 67%,
+    #B40049 73%,
+    #D0005E 77%,
+    #E0006A 79%,   /* bright fold highlight */
+    #CC0058 81%,
+    #9E0040 86%,
+    #700026 92%,
+    #8C0034 96%,
+    #5A0020 100%
   );
-  box-shadow: -6px 0 16px rgba(0,0,0,0.6);
-  transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: -8px 0 20px rgba(0,0,0,0.7), inset -4px 0 12px rgba(0,0,0,0.3);
+  transition: transform 1.5s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
 .curtainPanel::before {
@@ -566,7 +578,7 @@
   color: rgba(255,255,255,0.28);
   letter-spacing: 0.5px;
   font-weight: 600;
-  margin-top: 12px;
+  margin-top: 22px;
 }
 
 /* ── How it works ── */
