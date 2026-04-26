@@ -603,4 +603,39 @@
   .actions {
     margin-top: 12px;
   }
+
+  /* Tray reveal — compact layout for small screens */
+  .trayReveal {
+    gap: 18px;
+  }
+
+  .filmFrame {
+    width: 12px;
+    height: 17px;
+  }
+
+  .trayUnit {
+    width: 120px;
+    padding: 10px 14px;
+  }
+
+  .traySlot {
+    width: 66px;
+  }
+
+  .trayWindow {
+    width: 66px;
+    height: 180px;
+  }
+
+  .trayStrip {
+    width: 60px;
+  }
+
+  @keyframes stripSlideIn {
+    0%   { transform: translateX(-50%) translateY(-110%); }
+    78%  { transform: translateX(-50%) translateY(calc(180px - 100% + 10px)); }
+    91%  { transform: translateX(-50%) translateY(calc(180px - 100% - 4px)); }
+    100% { transform: translateX(-50%) translateY(calc(180px - 100%)); }
+  }
 }
