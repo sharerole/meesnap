@@ -77,10 +77,10 @@ function drawWatermarks(ctx, images, alpha = 0.06) {
   ctx.globalAlpha = prev
 }
 
-// Centered italic quote in the top padding area
+// Centered quote in the top padding area — 60% down so it sits between edge and first frame
 function drawQuote(ctx, text, color, italic = true) {
   ctx.fillStyle = color
-  ctx.font = `${italic ? 'italic ' : ''}500 10px "DM Sans",Arial,sans-serif`
+  ctx.font = `${italic ? 'italic ' : ''}600 12px "DM Sans",Arial,sans-serif`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillText(text, W / 2, PAD_TOP * 0.6)
@@ -109,8 +109,106 @@ function drawHeart(ctx, hx, hy, s) {
   ctx.fill()
 }
 
+function drawDiamond(ctx, cx, cy, size) {
+  ctx.beginPath()
+  ctx.moveTo(cx, cy - size)
+  ctx.lineTo(cx + size, cy)
+  ctx.lineTo(cx, cy + size)
+  ctx.lineTo(cx - size, cy)
+  ctx.closePath()
+  ctx.fill()
+}
+
+// Film strip sprocket holes — drawn on top of the border so they appear punched through
+function drawSprocketHoles(ctx, h, fillColor) {
+  const holeW  = 8
+  const holeH  = 14
+  const holeR  = 2
+  const cx_L   = 7
+  const cx_R   = W - 7
+  const firstY = 20
+  const step   = 30
+
+  ctx.fillStyle = fillColor
+  for (let y = firstY; y + holeH < h - 12; y += step) {
+    ctx.beginPath()
+    ctx.roundRect(cx_L - holeW / 2, y, holeW, holeH, holeR)
+    ctx.fill()
+    ctx.beginPath()
+    ctx.roundRect(cx_R - holeW / 2, y, holeW, holeH, holeR)
+    ctx.fill()
+  }
+}
+
+// Gold confetti + star scatter for Milestone
+function drawGoldConfetti(ctx, h) {
+  for (let i = 0; i < 50; i++) {
+    const x     = seededRand(i * 3 + 1) * W
+    const y     = seededRand(i * 3 + 2) * h
+    const r     = 1.5 + seededRand(i * 3 + 3) * 3
+    const alpha = 0.12 + seededRand(i * 5 + 1) * 0.22
+    ctx.fillStyle = `rgba(201,146,10,${alpha.toFixed(2)})`
+    ctx.beginPath()
+    ctx.arc(x, y, r, 0, Math.PI * 2)
+    ctx.fill()
+  }
+  for (let i = 0; i < 18; i++) {
+    const x     = seededRand(i * 7 + 4) * W
+    const y     = seededRand(i * 7 + 5) * h
+    const alpha = 0.1 + seededRand(i * 7 + 6) * 0.2
+    ctx.fillStyle = `rgba(201,146,10,${alpha.toFixed(2)})`
+    drawEightPointStar(ctx, x, y, 4, 2)
+  }
+}
+
+// Scattered hearts + sparkle dots for Squad Goals background
+function drawBackgroundHearts(ctx, h) {
+  for (let i = 0; i < 28; i++) {
+    const x     = seededRand(i * 11 + 1) * W
+    const y     = seededRand(i * 11 + 2) * h
+    const s     = 3 + seededRand(i * 11 + 3) * 6
+    const alpha = 0.06 + seededRand(i * 11 + 4) * 0.14
+    ctx.fillStyle = `rgba(193,0,90,${alpha.toFixed(2)})`
+    drawHeart(ctx, x, y, s)
+  }
+  for (let i = 0; i < 35; i++) {
+    const x     = seededRand(i * 13 + 1) * W
+    const y     = seededRand(i * 13 + 2) * h
+    const r     = 1 + seededRand(i * 13 + 3) * 2.5
+    const alpha = 0.08 + seededRand(i * 13 + 4) * 0.18
+    ctx.fillStyle = `rgba(193,0,90,${alpha.toFixed(2)})`
+    ctx.beginPath()
+    ctx.arc(x, y, r, 0, Math.PI * 2)
+    ctx.fill()
+  }
+}
+
+// Subtle dot grid for The Crew background
+function drawDotGrid(ctx, h) {
+  const spacing = 22
+  const dotR    = 1.5
+  ctx.fillStyle = 'rgba(26,110,245,0.07)'
+  for (let gx = spacing; gx < W - spacing / 2; gx += spacing) {
+    for (let gy = spacing; gy < h - spacing / 2; gy += spacing) {
+      ctx.beginPath()
+      ctx.arc(gx, gy, dotR, 0, Math.PI * 2)
+      ctx.fill()
+    }
+  }
+}
+
+function drawCornerBracket(ctx, x, y, armLen, flipX, flipY) {
+  const dx = flipX ? -1 : 1
+  const dy = flipY ? -1 : 1
+  ctx.beginPath()
+  ctx.moveTo(x, y + dy * armLen)
+  ctx.lineTo(x, y)
+  ctx.lineTo(x + dx * armLen, y)
+  ctx.stroke()
+}
+
 // ── MeeOpp Classic ────────────────────────────────────────────────────────────
-// White strip, magenta border.
+// White strip, magenta border, film strip sprocket holes.
 // Quote: "Learning looks good on you."
 
 function drawClassic(ctx, images, label) {
@@ -126,13 +224,13 @@ function drawClassic(ctx, images, label) {
   ctx.lineWidth = 1
   ctx.strokeRect(13, 13, W - 26, h - 26)
 
-  drawQuote(ctx, 'Learning looks good on you.', 'rgba(193,0,90,0.55)')
+  drawQuote(ctx, 'Learning looks good on you.', 'rgba(193,0,90,0.85)')
   drawWatermarks(ctx, images, 0.05)
   drawPhotos(ctx, images, { clipRadius: 2 })
 
-  const fy = h - FOOTER_H
+  const fy    = h - FOOTER_H
   const logoH = 26
-  const logoY  = fy + 10
+  const logoY = fy + 10
   drawLogo(ctx, W / 2, logoY, logoH)
 
   if (label) {
@@ -141,10 +239,13 @@ function drawClassic(ctx, images, label) {
     ctx.textAlign = 'center'
     ctx.fillText(label, W / 2, fy + FOOTER_H - 10)
   }
+
+  // Sprocket holes punched through the magenta border
+  drawSprocketHoles(ctx, h, '#FFFFFF')
 }
 
 // ── Milestone ─────────────────────────────────────────────────────────────────
-// Navy background, amber-gold border, achievement stars.
+// Navy background, amber-gold border, achievement stars, gold confetti.
 // Quote: "Small steps. Big moments."
 
 function drawMilestone(ctx, images, label) {
@@ -161,6 +262,8 @@ function drawMilestone(ctx, images, label) {
   ctx.lineWidth = 1.5
   ctx.strokeRect(14, 14, W - 28, h - 28)
 
+  drawGoldConfetti(ctx, h)
+
   ctx.fillStyle = 'rgba(201,146,10,0.45)'
   images.forEach((_, i) => {
     if (i === images.length - 1) return
@@ -175,8 +278,23 @@ function drawMilestone(ctx, images, label) {
     drawEightPointStar(ctx, cx, cy, 9, 4)
   )
 
-  drawQuote(ctx, 'Small steps. Big moments.', 'rgba(201,146,10,0.7)')
+  drawQuote(ctx, 'Small steps. Big moments.', 'rgba(201,146,10,0.9)')
   drawWatermarks(ctx, images, 0.05)
+
+  // Subtle amber glow behind each photo
+  images.forEach((_, i) => {
+    const px   = PAD_X
+    const py   = PAD_TOP + i * (PHOTO_H + GAP)
+    const grad = ctx.createRadialGradient(
+      px + PHOTO_W / 2, py + PHOTO_H / 2, 0,
+      px + PHOTO_W / 2, py + PHOTO_H / 2, Math.max(PHOTO_W, PHOTO_H) * 0.65
+    )
+    grad.addColorStop(0, 'rgba(201,146,10,0.1)')
+    grad.addColorStop(1, 'rgba(201,146,10,0)')
+    ctx.fillStyle = grad
+    ctx.fillRect(px - 20, py - 20, PHOTO_W + 40, PHOTO_H + 40)
+  })
+
   drawPhotos(ctx, images, { clipRadius: 2 })
 
   ctx.strokeStyle = 'rgba(201,146,10,0.4)'
@@ -185,9 +303,9 @@ function drawMilestone(ctx, images, label) {
     ctx.strokeRect(PAD_X, PAD_TOP + i * (PHOTO_H + GAP), PHOTO_W, PHOTO_H)
   })
 
-  const fy = h - FOOTER_H
+  const fy    = h - FOOTER_H
   const logoH = 26
-  const logoY  = fy + 10
+  const logoY = fy + 10
   drawLogo(ctx, W / 2, logoY, logoH)
 
   if (label) {
@@ -200,44 +318,29 @@ function drawMilestone(ctx, images, label) {
 
 // ── Year Book ─────────────────────────────────────────────────────────────────
 // Cream background, thick black border, typographic corner brackets,
-// ruled dividers between photos, dark charcoal footer.
+// ruled dividers, film strip sprocket holes.
 // Quote: "These are the days."
-
-function drawCornerBracket(ctx, x, y, armLen, flipX, flipY) {
-  const dx = flipX ? -1 : 1
-  const dy = flipY ? -1 : 1
-  ctx.beginPath()
-  ctx.moveTo(x, y + dy * armLen)
-  ctx.lineTo(x, y)
-  ctx.lineTo(x + dx * armLen, y)
-  ctx.stroke()
-}
 
 function drawYearBook(ctx, images, label) {
   const h = stripTotalHeight(images.length)
 
-  // Cream page background
   ctx.fillStyle = '#F4EFE4'
   ctx.fillRect(0, 0, W, h)
 
-  // Subtle inner cream texture — faint horizontal lines like ruled paper
   ctx.strokeStyle = 'rgba(180,165,140,0.18)'
   ctx.lineWidth = 1
   for (let y = PAD_TOP; y < h - FOOTER_H; y += 12) {
     ctx.beginPath(); ctx.moveTo(PAD_X, y); ctx.lineTo(W - PAD_X, y); ctx.stroke()
   }
 
-  // Thick black outer border
   ctx.strokeStyle = '#1C1C1C'
   ctx.lineWidth = 8
   ctx.strokeRect(4, 4, W - 8, h - 8)
 
-  // Thin inner rule
   ctx.strokeStyle = '#1C1C1C'
   ctx.lineWidth = 1
   ctx.strokeRect(14, 14, W - 28, h - 28)
 
-  // Typographic corner brackets
   const armLen = 18
   const ci = 19
   ctx.strokeStyle = '#1C1C1C'
@@ -247,7 +350,6 @@ function drawYearBook(ctx, images, label) {
   drawCornerBracket(ctx, ci, h - ci, armLen, false, true)
   drawCornerBracket(ctx, W - ci, h - ci, armLen, true, true)
 
-  // Thin ruled dividers between photos
   ctx.strokeStyle = 'rgba(28,28,28,0.25)'
   ctx.lineWidth = 1
   images.forEach((_, i) => {
@@ -256,32 +358,34 @@ function drawYearBook(ctx, images, label) {
     ctx.beginPath(); ctx.moveTo(PAD_X + 8, gy); ctx.lineTo(W - PAD_X - 8, gy); ctx.stroke()
   })
 
-  drawQuote(ctx, 'These are the days.', 'rgba(28,28,28,0.45)')
+  drawQuote(ctx, 'These are the days.', 'rgba(28,28,28,0.75)')
   drawWatermarks(ctx, images, 0.04)
   drawPhotos(ctx, images, { clipRadius: 0 })
 
-  // Thin photo outlines
   ctx.strokeStyle = 'rgba(28,28,28,0.3)'
   ctx.lineWidth = 1
   images.forEach((_, i) => {
     ctx.strokeRect(PAD_X, PAD_TOP + i * (PHOTO_H + GAP), PHOTO_W, PHOTO_H)
   })
 
-  const fy = h - FOOTER_H
+  const fy    = h - FOOTER_H
   const logoH = 26
-  const logoY  = fy + 10
+  const logoY = fy + 10
   drawLogo(ctx, W / 2, logoY, logoH)
 
   if (label) {
-    ctx.fillStyle = 'rgba(244,239,228,0.65)'
+    ctx.fillStyle = 'rgba(28,28,28,0.5)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
     ctx.fillText(label, W / 2, fy + FOOTER_H - 10)
   }
+
+  // Sprocket holes punched through the black border
+  drawSprocketHoles(ctx, h, '#F4EFE4')
 }
 
 // ── Squad Goals ───────────────────────────────────────────────────────────────
-// Pastel pink-to-purple, hearts.
+// Pastel pink-to-purple gradient, scattered hearts + sparkles, rounded border.
 // Quote: "We learn better together."
 
 function drawSquadGoals(ctx, images, label) {
@@ -297,6 +401,8 @@ function drawSquadGoals(ctx, images, label) {
   grad.addColorStop(1, '#EEE0FF')
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, W, h)
+
+  drawBackgroundHearts(ctx, h)
 
   ctx.strokeStyle = '#C1005A'
   ctx.lineWidth = 10
@@ -320,7 +426,7 @@ function drawSquadGoals(ctx, images, label) {
     ;[-18, 0, 18].forEach(offset => drawHeart(ctx, W / 2 + offset, gy, 4))
   })
 
-  drawQuote(ctx, 'We learn better together.', 'rgba(193,0,90,0.6)')
+  drawQuote(ctx, 'We learn better together.', 'rgba(193,0,90,0.85)')
   drawWatermarks(ctx, images, 0.06)
   drawPhotos(ctx, images, { clipRadius: 6 })
 
@@ -331,9 +437,9 @@ function drawSquadGoals(ctx, images, label) {
     ctx.beginPath(); ctx.roundRect(PAD_X, y, PHOTO_W, PHOTO_H, 6); ctx.stroke()
   })
 
-  const fy = h - FOOTER_H
+  const fy    = h - FOOTER_H
   const logoH = 26
-  const logoY  = fy + 10
+  const logoY = fy + 10
   drawLogo(ctx, W / 2, logoY, logoH)
 
   if (label) {
@@ -347,46 +453,33 @@ function drawSquadGoals(ctx, images, label) {
 }
 
 // ── The Crew ──────────────────────────────────────────────────────────────────
-// Dark navy background, electric-blue border, diamond accents.
+// Dark navy gradient, electric-blue border, dot grid, diamond accents.
 // Quote: "Learn. Grow. Repeat."
-
-function drawDiamond(ctx, cx, cy, size) {
-  ctx.beginPath()
-  ctx.moveTo(cx, cy - size)
-  ctx.lineTo(cx + size, cy)
-  ctx.lineTo(cx, cy + size)
-  ctx.lineTo(cx - size, cy)
-  ctx.closePath()
-  ctx.fill()
-}
 
 function drawCrew(ctx, images, label) {
   const h = stripTotalHeight(images.length)
 
-  // Dark navy gradient background
   const grad = ctx.createLinearGradient(0, 0, W, h)
   grad.addColorStop(0, '#0F1E30')
   grad.addColorStop(1, '#060E1A')
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, W, h)
 
-  // Outer electric-blue border
+  drawDotGrid(ctx, h)
+
   ctx.strokeStyle = '#1A6EF5'
   ctx.lineWidth = 8
   ctx.strokeRect(4, 4, W - 8, h - 8)
 
-  // Thin inner border
   ctx.strokeStyle = 'rgba(26,110,245,0.3)'
   ctx.lineWidth = 1.5
   ctx.strokeRect(14, 14, W - 28, h - 28)
 
-  // Diamond corner accents
   ctx.fillStyle = '#1A6EF5'
   ;[[28, 28], [W - 28, 28], [28, h - 28], [W - 28, h - 28]].forEach(([cx, cy]) =>
     drawDiamond(ctx, cx, cy, 9)
   )
 
-  // Between-photo dividers: dashed rule with a centre diamond
   images.forEach((_, i) => {
     if (i === images.length - 1) return
     const gy = PAD_TOP + (i + 1) * PHOTO_H + i * GAP + GAP / 2
@@ -402,20 +495,19 @@ function drawCrew(ctx, images, label) {
     drawDiamond(ctx, W / 2, gy, 4)
   })
 
-  drawQuote(ctx, 'Learn. Grow. Repeat.', 'rgba(26,110,245,0.75)')
+  drawQuote(ctx, 'Learn. Grow. Repeat.', 'rgba(26,110,245,0.95)')
   drawWatermarks(ctx, images, 0.04)
   drawPhotos(ctx, images, { clipRadius: 2 })
 
-  // Subtle blue photo outlines
   ctx.strokeStyle = 'rgba(26,110,245,0.3)'
   ctx.lineWidth = 1
   images.forEach((_, i) => {
     ctx.strokeRect(PAD_X, PAD_TOP + i * (PHOTO_H + GAP), PHOTO_W, PHOTO_H)
   })
 
-  const fy = h - FOOTER_H
+  const fy    = h - FOOTER_H
   const logoH = 26
-  const logoY  = fy + 10
+  const logoY = fy + 10
   drawLogo(ctx, W / 2, logoY, logoH)
 
   if (label) {
