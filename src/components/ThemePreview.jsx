@@ -35,9 +35,14 @@ export default function ThemePreview({ theme, displayWidth = 148, numPhotos = 2,
   const renderCanvas = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-    canvas.width  = STRIP_W
-    canvas.height = fullH
-    themeObj.draw(canvas.getContext('2d'), placeholders, '')
+    const dpr = window.devicePixelRatio || 1
+    canvas.width  = STRIP_W * dpr
+    canvas.height = fullH * dpr
+    canvas.style.width  = STRIP_W + 'px'
+    canvas.style.height = fullH + 'px'
+    const ctx = canvas.getContext('2d')
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    themeObj.draw(ctx, placeholders, '')
   }, [themeObj, fullH, placeholders])
 
   useEffect(() => {

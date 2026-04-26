@@ -7,6 +7,7 @@ import { STICKER_DEFS, makeSvgDataUrl, getStickerDrawSize } from '../lib/sticker
 
 const MIN_STICKER_SIZE = 20
 const MAX_STICKER_SIZE = 300
+const DPR = window.devicePixelRatio || 1
 
 // Pre-load all sticker images so canvas draw is synchronous
 const stickerImages = {}
@@ -16,12 +17,12 @@ STICKER_DEFS.forEach(def => {
   stickerImages[def.id] = img
 })
 
-// Convert a pointer/touch event to canvas-space coordinates,
-// accounting for any CSS scaling applied to the canvas element.
+// Convert a pointer/touch event to logical canvas coordinates,
+// accounting for CSS scaling and device pixel ratio.
 function toCanvasXY(e, canvas) {
   const rect = canvas.getBoundingClientRect()
-  const sx   = canvas.width  / rect.width
-  const sy   = canvas.height / rect.height
+  const sx   = canvas.width  / rect.width  / DPR
+  const sy   = canvas.height / rect.height / DPR
   const src  = e.touches ? e.touches[0] : e
   return {
     x: (src.clientX - rect.left) * sx,
@@ -29,20 +30,20 @@ function toCanvasXY(e, canvas) {
   }
 }
 
-// Distance between two touch points in canvas-space pixels
+// Distance between two touch points in logical canvas pixels
 function touchDist(e, canvas) {
   const rect = canvas.getBoundingClientRect()
-  const sx = canvas.width  / rect.width
-  const sy = canvas.height / rect.height
+  const sx = canvas.width  / rect.width  / DPR
+  const sy = canvas.height / rect.height / DPR
   const t0 = e.touches[0], t1 = e.touches[1]
   return Math.hypot((t0.clientX - t1.clientX) * sx, (t0.clientY - t1.clientY) * sy)
 }
 
-// Midpoint between two touch points in canvas-space coordinates
+// Midpoint between two touch points in logical canvas coordinates
 function touchMidpoint(e, canvas) {
   const rect = canvas.getBoundingClientRect()
-  const sx = canvas.width  / rect.width
-  const sy = canvas.height / rect.height
+  const sx = canvas.width  / rect.width  / DPR
+  const sy = canvas.height / rect.height / DPR
   const t0 = e.touches[0], t1 = e.touches[1]
   return {
     x: ((t0.clientX + t1.clientX) / 2 - rect.left) * sx,
@@ -107,8 +108,11 @@ export default function PhotoStrip({ photos, theme, onRetake, onRestart }) {
     const base   = baseRef.current
     if (!canvas || !base) return
     const ctx = canvas.getContext('2d')
+    const h   = canvas.height / DPR
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
     ctx.clearRect(0, 0, canvas.width, canvas.height)
-    ctx.drawImage(base, 0, 0)
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0)
+    ctx.drawImage(base, 0, 0, STRIP_W, h)
     stickersRef.current.forEach(s => {
       const img = stickerImages[s.id]
       if (!img?.complete) return
@@ -128,12 +132,14 @@ export default function PhotoStrip({ photos, theme, onRetake, onRestart }) {
     // Build / reuse the offscreen base canvas
     let base = baseRef.current
     if (!base) { base = document.createElement('canvas'); baseRef.current = base }
-    base.width  = STRIP_W
-    base.height = h
-    themeObj.draw(base.getContext('2d'), imgs, label)
+    base.width  = STRIP_W * DPR
+    base.height = h * DPR
+    const baseCtx = base.getContext('2d')
+    baseCtx.setTransform(DPR, 0, 0, DPR, 0, 0)
+    themeObj.draw(baseCtx, imgs, label)
 
-    canvas.width  = STRIP_W
-    canvas.height = h
+    canvas.width  = STRIP_W * DPR
+    canvas.height = h * DPR
 
     compositeNow()
   }, [photos, themeObj, label, loadImages, compositeNow])

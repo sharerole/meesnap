@@ -79,7 +79,7 @@ export default function BoothInterior({ theme, setTheme, shotCount, setShotCount
     if (!camStarted) return
     let active = true
     navigator.mediaDevices
-      .getUserMedia({ video: { facingMode: 'user', width: 640, height: 480 }, audio: false })
+      .getUserMedia({ video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 960 } }, audio: false })
       .then(stream => {
         if (!active) { stream.getTracks().forEach(t => t.stop()); return }
         streamRef.current = stream
