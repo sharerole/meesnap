@@ -100,12 +100,13 @@ function drawEightPointStar(ctx, cx, cy, r1, r2) {
 }
 
 function drawHeart(ctx, hx, hy, s) {
+  const r = s * 0.75   // narrower lobes give a 1:1 width-to-height ratio
   ctx.beginPath()
   ctx.moveTo(hx, hy + s * 0.3)
-  ctx.bezierCurveTo(hx, hy, hx - s, hy, hx - s, hy - s * 0.5)
-  ctx.bezierCurveTo(hx - s, hy - s * 1.2, hx, hy - s, hx, hy - s * 0.5)
-  ctx.bezierCurveTo(hx, hy - s, hx + s, hy - s * 1.2, hx + s, hy - s * 0.5)
-  ctx.bezierCurveTo(hx + s, hy, hx, hy, hx, hy + s * 0.3)
+  ctx.bezierCurveTo(hx, hy, hx - r, hy, hx - r, hy - s * 0.5)
+  ctx.bezierCurveTo(hx - r, hy - s * 1.2, hx, hy - s, hx, hy - s * 0.5)
+  ctx.bezierCurveTo(hx, hy - s, hx + r, hy - s * 1.2, hx + r, hy - s * 0.5)
+  ctx.bezierCurveTo(hx + r, hy, hx, hy, hx, hy + s * 0.3)
   ctx.fill()
 }
 
@@ -416,7 +417,7 @@ function drawSquadGoals(ctx, images, label) {
     if (i === images.length - 1) return
     const gy = PAD_TOP + (i + 1) * PHOTO_H + i * GAP + GAP / 2
     ctx.fillStyle = '#EC4899'
-    ;[-18, 0, 18].forEach(offset => drawHeart(ctx, W / 2 + offset, gy, 4))
+    ;[-18, 0, 18].forEach(offset => drawHeart(ctx, W / 2 + offset, gy + 4 * 0.45, 4))
   })
 
   drawQuote(ctx, 'Study hard, squad harder.', 'rgba(123,47,190,0.85)')
