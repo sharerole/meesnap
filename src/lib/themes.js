@@ -132,7 +132,7 @@ function drawCornerBracket(ctx, x, y, armLen, flipX, flipY) {
 }
 
 // ── MeeOpp Classic ────────────────────────────────────────────────────────────
-// White strip, magenta border, film strip sprocket holes.
+// White strip, magenta border.
 
 function drawClassic(ctx, images, label, layout = DEFAULT_LAYOUT) {
   const m = getMetrics(layout)
@@ -162,8 +162,6 @@ function drawClassic(ctx, images, label, layout = DEFAULT_LAYOUT) {
     ctx.textAlign = 'center'
     ctx.fillText(label, W / 2, fy + FOOTER_H - 10)
   }
-
-  drawSprocketHoles(ctx, W, h, '#FFFFFF')
 }
 
 // ── Distinction ───────────────────────────────────────────────────────────────
