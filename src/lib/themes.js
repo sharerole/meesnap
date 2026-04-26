@@ -509,6 +509,205 @@ function drawProgressSaved(ctx, images, label, layout = DEFAULT_LAYOUT) {
   }
 }
 
+// ── Report Card ───────────────────────────────────────────────────────────────
+// Aged cream, navy double-line border, ruled lines, A+ stamp per photo.
+
+function drawReportCard(ctx, images, label, layout = DEFAULT_LAYOUT) {
+  const m = getMetrics(layout)
+  const { W, h, PAD_X, PHOTO_W, PHOTO_H, GAP_ROW, GAP_COL, cols, rows } = m
+
+  ctx.fillStyle = '#F7F2E8'
+  ctx.fillRect(0, 0, W, h)
+
+  // Notebook ruled lines
+  ctx.strokeStyle = 'rgba(100,120,180,0.11)'
+  ctx.lineWidth = 1
+  for (let y = 16; y < h; y += 14) {
+    ctx.beginPath(); ctx.moveTo(8, y); ctx.lineTo(W - 8, y); ctx.stroke()
+  }
+
+  // Red margin line(s)
+  ctx.strokeStyle = 'rgba(200,60,60,0.18)'
+  ctx.lineWidth = 1
+  ctx.beginPath(); ctx.moveTo(PAD_X - 5, 8); ctx.lineTo(PAD_X - 5, h - 8); ctx.stroke()
+  if (cols > 1) {
+    ctx.beginPath(); ctx.moveTo(W - PAD_X + 5, 8); ctx.lineTo(W - PAD_X + 5, h - 8); ctx.stroke()
+  }
+
+  // Double-line navy border
+  ctx.strokeStyle = '#1C2B5E'
+  ctx.lineWidth = 6
+  ctx.strokeRect(4, 4, W - 8, h - 8)
+  ctx.strokeStyle = '#1C2B5E'
+  ctx.lineWidth = 1.5
+  ctx.strokeRect(13, 13, W - 26, h - 26)
+
+  // Between-row divider
+  for (let row = 0; row < rows - 1; row++) {
+    const gy = PAD_TOP + (row + 1) * PHOTO_H + row * GAP_ROW + GAP_ROW / 2
+    ctx.strokeStyle = 'rgba(28,43,94,0.22)'
+    ctx.lineWidth = 1
+    ctx.beginPath(); ctx.moveTo(PAD_X + 4, gy); ctx.lineTo(W - PAD_X - 4, gy); ctx.stroke()
+  }
+
+  drawQuote(ctx, 'Results speak for themselves.', 'rgba(28,43,94,0.75)', W, false)
+  drawWatermarks(ctx, images, m, 0.04)
+  drawPhotos(ctx, images, m, { clipRadius: 1 })
+
+  // A+ rubber-stamp impression on each photo (top-right area)
+  images.forEach((_, i) => {
+    const col = i % cols
+    const row = Math.floor(i / cols)
+    const px = PAD_X + col * (PHOTO_W + GAP_COL)
+    const py = PAD_TOP + row * (PHOTO_H + GAP_ROW)
+    const r  = Math.min(PHOTO_W, PHOTO_H) * 0.16
+    ctx.save()
+    ctx.translate(px + PHOTO_W * 0.76, py + PHOTO_H * 0.26)
+    ctx.rotate(-0.28)
+    ctx.globalAlpha = 0.26
+    ctx.strokeStyle = '#BE0055'
+    ctx.lineWidth   = 1.8
+    ctx.beginPath(); ctx.arc(0, 0, r,        0, Math.PI * 2); ctx.stroke()
+    ctx.beginPath(); ctx.arc(0, 0, r * 0.78, 0, Math.PI * 2); ctx.stroke()
+    ctx.fillStyle   = '#BE0055'
+    ctx.font        = `bold ${Math.round(r * 0.92)}px "DM Sans",Arial,sans-serif`
+    ctx.textAlign   = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText('A+', 0, 0)
+    ctx.globalAlpha = 1
+    ctx.restore()
+  })
+
+  // Photo borders
+  ctx.strokeStyle = 'rgba(28,43,94,0.18)'
+  ctx.lineWidth = 1
+  images.forEach((_, i) => {
+    const col = i % cols
+    const row = Math.floor(i / cols)
+    ctx.strokeRect(PAD_X + col * (PHOTO_W + GAP_COL), PAD_TOP + row * (PHOTO_H + GAP_ROW), PHOTO_W, PHOTO_H)
+  })
+
+  const fy = h - FOOTER_H
+  drawLogo(ctx, W / 2, fy + 10, 26)
+
+  if (label) {
+    ctx.fillStyle = 'rgba(28,43,94,0.6)'
+    ctx.font = '11px "DM Sans",Arial,sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText(label, W / 2, fy + FOOTER_H - 10)
+  }
+}
+
+// ── Library Card ──────────────────────────────────────────────────────────────
+// Buff parchment, typewriter header, checkout grid, date-stamp impression.
+
+function drawLibraryCard(ctx, images, label, layout = DEFAULT_LAYOUT) {
+  const m = getMetrics(layout)
+  const { W, h, PAD_X, PHOTO_W, PHOTO_H, GAP_ROW, GAP_COL, cols, rows } = m
+
+  ctx.fillStyle = '#EDE0C0'
+  ctx.fillRect(0, 0, W, h)
+
+  // Card-stock texture
+  ctx.strokeStyle = 'rgba(150,120,60,0.09)'
+  ctx.lineWidth = 1
+  for (let y = 10; y < h; y += 8) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke()
+  }
+
+  // Dark-brown border
+  ctx.strokeStyle = '#5C3D1E'
+  ctx.lineWidth = 5
+  ctx.strokeRect(4, 4, W - 8, h - 8)
+  ctx.strokeStyle = 'rgba(92,61,30,0.35)'
+  ctx.lineWidth = 1
+  ctx.strokeRect(11, 11, W - 22, h - 22)
+
+  // Typewriter header "MEEOPP LIBRARY"
+  ctx.fillStyle = 'rgba(92,61,30,0.88)'
+  ctx.font = '700 10px "Courier New",Courier,monospace'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText('MEEOPP LIBRARY', W / 2, 18)
+
+  // Thin rule below header
+  ctx.strokeStyle = 'rgba(92,61,30,0.28)'
+  ctx.lineWidth = 1
+  ctx.beginPath(); ctx.moveTo(PAD_X + 4, 27); ctx.lineTo(W - PAD_X - 4, 27); ctx.stroke()
+
+  // Quote
+  ctx.fillStyle = 'rgba(92,61,30,0.65)'
+  ctx.font = 'italic 600 11px "DM Sans",Arial,sans-serif'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText('A lesson worth keeping.', W / 2, 42)
+  ctx.textBaseline = 'alphabetic'
+
+  // Checkout-card grid between photo rows
+  for (let row = 0; row < rows - 1; row++) {
+    const gy = PAD_TOP + (row + 1) * PHOTO_H + row * GAP_ROW + GAP_ROW / 2
+    const x0 = PAD_X + 4, x1 = W - PAD_X - 4
+    ctx.strokeStyle = 'rgba(92,61,30,0.22)'
+    ctx.lineWidth = 1
+    for (const off of [-5, 0, 5]) {
+      ctx.beginPath(); ctx.moveTo(x0, gy + off); ctx.lineTo(x1, gy + off); ctx.stroke()
+    }
+    // Vertical column lines (3-column checkout look)
+    const segW = (x1 - x0) / 3
+    for (let c = 1; c < 3; c++) {
+      ctx.beginPath(); ctx.moveTo(x0 + c * segW, gy - 7); ctx.lineTo(x0 + c * segW, gy + 7); ctx.stroke()
+    }
+  }
+
+  drawWatermarks(ctx, images, m, 0.04)
+  drawPhotos(ctx, images, m, { clipRadius: 1 })
+
+  // Circular date-stamp impression on each photo
+  images.forEach((_, i) => {
+    const col = i % cols
+    const row = Math.floor(i / cols)
+    const px = PAD_X + col * (PHOTO_W + GAP_COL)
+    const py = PAD_TOP + row * (PHOTO_H + GAP_ROW)
+    const r  = Math.min(PHOTO_W, PHOTO_H) * 0.17
+    ctx.save()
+    ctx.translate(px + PHOTO_W * 0.75, py + PHOTO_H * 0.74)
+    ctx.rotate(0.18)
+    ctx.globalAlpha = 0.2
+    ctx.strokeStyle = '#8B2020'
+    ctx.lineWidth = 2
+    ctx.beginPath(); ctx.arc(0, 0, r,        0, Math.PI * 2); ctx.stroke()
+    ctx.beginPath(); ctx.arc(0, 0, r * 0.72, 0, Math.PI * 2); ctx.stroke()
+    ctx.fillStyle = '#8B2020'
+    const fs = Math.max(6, Math.round(r * 0.55))
+    ctx.font = `700 ${fs}px "Courier New",Courier,monospace`
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText('KEEP', 0, -fs * 0.55)
+    ctx.fillText('THIS',  0,  fs * 0.55)
+    ctx.globalAlpha = 1
+    ctx.restore()
+  })
+
+  // Photo borders
+  ctx.strokeStyle = 'rgba(92,61,30,0.22)'
+  ctx.lineWidth = 1
+  images.forEach((_, i) => {
+    const col = i % cols
+    const row = Math.floor(i / cols)
+    ctx.strokeRect(PAD_X + col * (PHOTO_W + GAP_COL), PAD_TOP + row * (PHOTO_H + GAP_ROW), PHOTO_W, PHOTO_H)
+  })
+
+  const fy = h - FOOTER_H
+  drawLogo(ctx, W / 2, fy + 10, 26)
+
+  if (label) {
+    ctx.fillStyle = 'rgba(92,61,30,0.6)'
+    ctx.font = '11px "DM Sans",Arial,sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText(label, W / 2, fy + FOOTER_H - 10)
+  }
+}
+
 // ── Public API ────────────────────────────────────────────────────────────────
 
 export const THEMES = [
@@ -518,6 +717,8 @@ export const THEMES = [
   { id: 'squad',       label: 'Squad Goals',    colors: ['#E8D5FF', '#7B2FBE'],  draw: drawSquadGoals   },
   { id: 'crew',        label: 'The Crew',       colors: ['#0F1E30', '#1A6EF5'],  draw: drawCrew         },
   { id: 'progress',    label: 'Progress Saved', colors: ['#050D05', '#00FF41'],  draw: drawProgressSaved },
+  { id: 'reportcard',  label: 'Report Card',    colors: ['#F7F2E8', '#1C2B5E'],  draw: drawReportCard    },
+  { id: 'librarycard', label: 'Library Card',   colors: ['#EDE0C0', '#5C3D1E'],  draw: drawLibraryCard   },
 ]
 
 export { _logo as logoImg }
