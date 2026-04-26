@@ -53,17 +53,12 @@ export default function BoothScene({
         <div className={styles.trayReveal}>
           <div className={styles.darkroomGlow} />
 
-          {/* Film-frame progress */}
-          <div className={styles.filmStrip}>
-            {[...Array(8)].map((_, i) => {
-              const filled = { idle: 2, glow: 4, printing: 6, ready: 8 }[stripStage] ?? 0
-              return (
-                <div
-                  key={i}
-                  className={`${styles.filmFrame} ${i < filled ? styles.filmFrameFilled : ''}`}
-                />
-              )
-            })}
+          {/* Safelight indicator */}
+          <div className={styles.safelight}>
+            <div className={`${styles.safelightBulb} ${stripStage === 'ready' ? styles.safelightBulbReady : ''}`} />
+            <span className={`${styles.safelightLabel} ${stripStage === 'ready' ? styles.safelightLabelReady : ''}`}>
+              {stripStage === 'ready' ? 'Ready' : 'Developing...'}
+            </span>
           </div>
 
           {/* Output tray unit */}

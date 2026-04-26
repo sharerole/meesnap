@@ -462,26 +462,72 @@
   margin-top: 8px;
 }
 
-/* Film-frame progress */
-.filmStrip {
+/* Safelight progress indicator */
+.safelight {
   display: flex;
-  gap: 4px;
+  flex-direction: column;
   align-items: center;
+  gap: 10px;
 }
 
-.filmFrame {
-  width: 16px;
-  height: 22px;
-  border-radius: 2px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.12);
-  transition: background 0.4s, border-color 0.4s, box-shadow 0.4s;
+.safelightBulb {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 32%, #FF4020 0%, #BB1400 55%, #700A00 100%);
+  border: 3px solid #3A0A00;
+  box-shadow:
+    inset 2px 2px 6px rgba(255,140,80,0.35),
+    inset -2px -2px 4px rgba(0,0,0,0.5),
+    0 0 22px rgba(210,35,0,0.75),
+    0 0 55px rgba(210,35,0,0.35),
+    0 0 90px rgba(210,35,0,0.15);
+  animation: safelightPulse 2.4s ease-in-out infinite;
 }
 
-.filmFrameFilled {
-  background: rgba(180,100,0,0.55);
-  border-color: rgba(201,146,10,0.7);
-  box-shadow: 0 0 8px rgba(201,146,10,0.5), inset 0 0 4px rgba(255,200,50,0.2);
+.safelightBulbReady {
+  background: radial-gradient(circle at 35% 32%, #FFD080 0%, #E8A020 55%, #B07010 100%);
+  border-color: #5A3A00;
+  box-shadow:
+    inset 2px 2px 6px rgba(255,230,120,0.4),
+    inset -2px -2px 4px rgba(0,0,0,0.3),
+    0 0 28px rgba(230,160,20,0.85),
+    0 0 60px rgba(230,160,20,0.45),
+    0 0 100px rgba(230,160,20,0.2);
+  animation: none;
+}
+
+@keyframes safelightPulse {
+  0%, 100% {
+    box-shadow:
+      inset 2px 2px 6px rgba(255,140,80,0.35),
+      inset -2px -2px 4px rgba(0,0,0,0.5),
+      0 0 12px rgba(210,35,0,0.5),
+      0 0 30px rgba(210,35,0,0.2);
+    opacity: 0.75;
+  }
+  50% {
+    box-shadow:
+      inset 2px 2px 6px rgba(255,140,80,0.35),
+      inset -2px -2px 4px rgba(0,0,0,0.5),
+      0 0 28px rgba(210,35,0,0.85),
+      0 0 60px rgba(210,35,0,0.45),
+      0 0 100px rgba(210,35,0,0.2);
+    opacity: 1;
+  }
+}
+
+.safelightLabel {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  font-family: monospace;
+}
+
+.safelightLabelReady {
+  color: rgba(230,160,20,0.9);
 }
 
 /* Output tray unit */
@@ -609,9 +655,9 @@
     gap: 18px;
   }
 
-  .filmFrame {
-    width: 12px;
-    height: 17px;
+  .safelightBulb {
+    width: 48px;
+    height: 48px;
   }
 
   .trayUnit {
