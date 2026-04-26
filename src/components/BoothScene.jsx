@@ -111,7 +111,7 @@ export default function BoothScene({
                     <div className={styles.boardPhoto} />
                     <div className={styles.boardPhoto} />
                   </div>
-                  <div className={`${styles.boardStrip} ${styles.boardStripSquad}`}>
+                  <div className={`${styles.boardStrip} ${styles.boardStripCrew}`}>
                     <div className={styles.boardPhoto} />
                     <div className={styles.boardPhoto} />
                     <div className={styles.boardPhoto} />

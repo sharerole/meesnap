@@ -338,13 +338,101 @@ function drawSquadGoals(ctx, images, label) {
   }
 }
 
+// ── The Crew ──────────────────────────────────────────────────────────────────
+// Dark navy background, electric-blue border, diamond accents.
+// Quote: "Learn. Grow. Repeat."
+
+function drawDiamond(ctx, cx, cy, size) {
+  ctx.beginPath()
+  ctx.moveTo(cx, cy - size)
+  ctx.lineTo(cx + size, cy)
+  ctx.lineTo(cx, cy + size)
+  ctx.lineTo(cx - size, cy)
+  ctx.closePath()
+  ctx.fill()
+}
+
+function drawCrew(ctx, images, label) {
+  const h = stripTotalHeight(images.length)
+
+  // Dark navy gradient background
+  const grad = ctx.createLinearGradient(0, 0, W, h)
+  grad.addColorStop(0, '#0F1E30')
+  grad.addColorStop(1, '#060E1A')
+  ctx.fillStyle = grad
+  ctx.fillRect(0, 0, W, h)
+
+  // Outer electric-blue border
+  ctx.strokeStyle = '#1A6EF5'
+  ctx.lineWidth = 8
+  ctx.strokeRect(4, 4, W - 8, h - 8)
+
+  // Thin inner border
+  ctx.strokeStyle = 'rgba(26,110,245,0.3)'
+  ctx.lineWidth = 1.5
+  ctx.strokeRect(14, 14, W - 28, h - 28)
+
+  // Diamond corner accents
+  ctx.fillStyle = '#1A6EF5'
+  ;[[28, 28], [W - 28, 28], [28, h - 28], [W - 28, h - 28]].forEach(([cx, cy]) =>
+    drawDiamond(ctx, cx, cy, 9)
+  )
+
+  // Between-photo dividers: dashed rule with a centre diamond
+  images.forEach((_, i) => {
+    if (i === images.length - 1) return
+    const gy = PAD_TOP + (i + 1) * PHOTO_H + i * GAP + GAP / 2
+    ctx.strokeStyle = 'rgba(26,110,245,0.35)'
+    ctx.lineWidth = 1
+    ctx.setLineDash([4, 4])
+    ctx.beginPath()
+    ctx.moveTo(PAD_X + 16, gy)
+    ctx.lineTo(W - PAD_X - 16, gy)
+    ctx.stroke()
+    ctx.setLineDash([])
+    ctx.fillStyle = '#1A6EF5'
+    drawDiamond(ctx, W / 2, gy, 4)
+  })
+
+  drawQuote(ctx, 'Learn. Grow. Repeat.', 'rgba(26,110,245,0.75)')
+  drawWatermarks(ctx, images, 0.04)
+  drawPhotos(ctx, images, { clipRadius: 2 })
+
+  // Subtle blue photo outlines
+  ctx.strokeStyle = 'rgba(26,110,245,0.3)'
+  ctx.lineWidth = 1
+  images.forEach((_, i) => {
+    ctx.strokeRect(PAD_X, PAD_TOP + i * (PHOTO_H + GAP), PHOTO_W, PHOTO_H)
+  })
+
+  // Footer
+  const fy = h - FOOTER_H
+  ctx.fillStyle = '#040A10'
+  ctx.fillRect(0, fy, W, FOOTER_H)
+  ctx.strokeStyle = '#1A6EF5'
+  ctx.lineWidth = 2
+  ctx.beginPath(); ctx.moveTo(0, fy); ctx.lineTo(W, fy); ctx.stroke()
+
+  const logoH = 30
+  const logoY  = fy + (FOOTER_H - logoH) / 2 - (label ? 8 : 0)
+  drawLogo(ctx, W / 2, logoY, logoH)
+
+  if (label) {
+    ctx.fillStyle = 'rgba(74,159,255,0.8)'
+    ctx.font = '11px "DM Sans",Arial,sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText(label, W / 2, fy + FOOTER_H - 10)
+  }
+}
+
 // ── Public API ────────────────────────────────────────────────────────────────
 
 export const THEMES = [
-  { id: 'classic',  label: 'MeeOpp Classic', colors: ['#C1005A', '#FFFFFF'],  draw: drawClassic  },
-  { id: 'milestone', label: 'Milestone',      colors: ['#1A1A2E', '#C9920A'],  draw: drawMilestone },
-  { id: 'yearbook',  label: 'Year Book',      colors: ['#F4EFE4', '#1C1C1C'],  draw: drawYearBook  },
-  { id: 'squad',     label: 'Squad Goals',    colors: ['#FFF0F8', '#C1005A'],  draw: drawSquadGoals },
+  { id: 'classic',   label: 'MeeOpp Classic', colors: ['#C1005A', '#FFFFFF'],  draw: drawClassic   },
+  { id: 'milestone', label: 'Milestone',       colors: ['#1A1A2E', '#C9920A'],  draw: drawMilestone },
+  { id: 'yearbook',  label: 'Year Book',       colors: ['#F4EFE4', '#1C1C1C'],  draw: drawYearBook  },
+  { id: 'squad',     label: 'Squad Goals',     colors: ['#FFF0F8', '#C1005A'],  draw: drawSquadGoals },
+  { id: 'crew',      label: 'The Crew',        colors: ['#0F1E30', '#1A6EF5'],  draw: drawCrew      },
 ]
 
 export const STRIP_W    = W
