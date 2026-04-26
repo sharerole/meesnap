@@ -144,9 +144,9 @@ function drawSprocketHoles(ctx, h, fillColor) {
 function drawGoldConfetti(ctx, h) {
   for (let i = 0; i < 50; i++) {
     const x     = seededRand(i * 3 + 1) * W
-    const y     = seededRand(i * 3 + 2) * h
-    const r     = 1.5 + seededRand(i * 3 + 3) * 3
-    const alpha = 0.35 + seededRand(i * 5 + 1) * 0.35
+    const y     = seededRand(i * 3 + 1 + 10000) * h
+    const r     = 1.5 + seededRand(i * 3 + 2 + 20000) * 3
+    const alpha = 0.35 + seededRand(i * 5 + 30000) * 0.35
     ctx.fillStyle = `rgba(201,146,10,${alpha.toFixed(2)})`
     ctx.beginPath()
     ctx.arc(x, y, r, 0, Math.PI * 2)
@@ -154,8 +154,8 @@ function drawGoldConfetti(ctx, h) {
   }
   for (let i = 0; i < 18; i++) {
     const x     = seededRand(i * 7 + 4) * W
-    const y     = seededRand(i * 7 + 5) * h
-    const alpha = 0.3 + seededRand(i * 7 + 6) * 0.3
+    const y     = seededRand(i * 7 + 4 + 10000) * h
+    const alpha = 0.3 + seededRand(i * 7 + 4 + 20000) * 0.3
     ctx.fillStyle = `rgba(201,146,10,${alpha.toFixed(2)})`
     drawEightPointStar(ctx, x, y, 4, 2)
   }
@@ -165,17 +165,17 @@ function drawGoldConfetti(ctx, h) {
 function drawBackgroundHearts(ctx, h) {
   for (let i = 0; i < 28; i++) {
     const x     = seededRand(i * 11 + 1) * W
-    const y     = seededRand(i * 11 + 2) * h
-    const s     = 3 + seededRand(i * 11 + 3) * 6
-    const alpha = 0.2 + seededRand(i * 11 + 4) * 0.25
+    const y     = seededRand(i * 11 + 1 + 10000) * h
+    const s     = 3 + seededRand(i * 11 + 1 + 20000) * 6
+    const alpha = 0.2 + seededRand(i * 11 + 1 + 30000) * 0.25
     ctx.fillStyle = `rgba(193,0,90,${alpha.toFixed(2)})`
     drawHeart(ctx, x, y, s)
   }
   for (let i = 0; i < 35; i++) {
     const x     = seededRand(i * 13 + 1) * W
-    const y     = seededRand(i * 13 + 2) * h
-    const r     = 1 + seededRand(i * 13 + 3) * 2.5
-    const alpha = 0.25 + seededRand(i * 13 + 4) * 0.3
+    const y     = seededRand(i * 13 + 1 + 10000) * h
+    const r     = 1 + seededRand(i * 13 + 1 + 20000) * 2.5
+    const alpha = 0.25 + seededRand(i * 13 + 1 + 30000) * 0.3
     ctx.fillStyle = `rgba(193,0,90,${alpha.toFixed(2)})`
     ctx.beginPath()
     ctx.arc(x, y, r, 0, Math.PI * 2)
