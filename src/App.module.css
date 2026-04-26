@@ -6,3 +6,39 @@
   from { opacity: 0; }
   to   { opacity: 1; }
 }
+
+/* ── Iris wipe transition ── */
+/* Uses a centred circle + huge box-shadow to create the dark-outside-circle effect.
+   Large circle = transparent hole fills screen (open).
+   Zero-size circle = shadow covers everything (closed). */
+.iris {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: 0 0 0 300vmax #080610;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.irisClosing {
+  animation: irisClose 0.75s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+}
+
+.irisOpening {
+  width: 0;
+  height: 0;
+  animation: irisOpen 0.82s cubic-bezier(0, 0.55, 0.45, 1) forwards;
+}
+
+@keyframes irisClose {
+  from { width: 200vmax; height: 200vmax; }
+  to   { width: 0;       height: 0; }
+}
+
+@keyframes irisOpen {
+  from { width: 0;       height: 0; }
+  to   { width: 200vmax; height: 200vmax; }
+}
