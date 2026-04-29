@@ -895,7 +895,7 @@ function drawRetroDiner(ctx, images, label, layout = DEFAULT_LAYOUT) {
     ctx.fillStyle = 'rgba(204,16,32,0.7)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText(label, W / 2, fy + 47)
+    ctx.fillText(label, W / 2, fy + 40)
   }
 }
 
@@ -1107,7 +1107,7 @@ function drawHolographic(ctx, images, label, layout = DEFAULT_LAYOUT) {
   ctx.fillStyle = headerGrad
   ctx.font = '900 9px "DM Sans",Arial,sans-serif'
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-  ctx.fillText('✧ IRIDESCENT ✧', W / 2, PAD_TOP * 0.38)
+  ctx.fillText('✧ IRIDESCENT ✧', W / 2, PAD_TOP * 0.5)
   ctx.textBaseline = 'alphabetic'
 
   // Sparkle chars (seeded)
@@ -1221,7 +1221,7 @@ function drawCyberpunk(ctx, images, label, layout = DEFAULT_LAYOUT) {
   ctx.fillStyle = '#00F5FF'
   ctx.font = '700 9px "Courier New",Courier,monospace'
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-  ctx.fillText('[ MEEOPP // CYBER ]', W / 2, PAD_TOP * 0.35)
+  ctx.fillText('01 OVERRIDE 10', W / 2, PAD_TOP * 0.35)
   ctx.restore()
   ctx.fillStyle = 'rgba(191,0,255,0.7)'
   ctx.font = '600 7px "Courier New",Courier,monospace'
@@ -1420,7 +1420,7 @@ function drawFestival(ctx, images, label, layout = DEFAULT_LAYOUT) {
 
   ctx.fillStyle = 'rgba(245,200,66,0.5)'
   ctx.font = '600 7px "DM Sans",Arial,sans-serif'
-  ctx.fillText('MEEOPP PHOTO BOOTH  ·  OFFICIAL', W / 2, 4 + hBandH * 0.76)
+  ctx.fillText('ROW A  ·  SEAT 1  ·  VALID THIS SESSION', W / 2, 4 + hBandH * 0.76)
   ctx.textBaseline = 'alphabetic'
 
   // Horizontal rule below header
@@ -1452,19 +1452,7 @@ function drawFestival(ctx, images, label, layout = DEFAULT_LAYOUT) {
     ctx.strokeRect(PAD_X+col*(PHOTO_W+GAP_COL), PAD_TOP+row*(PHOTO_H+GAP_ROW), PHOTO_W, PHOTO_H)
   })
 
-  // Barcode stripes in footer
   const fy = h - FOOTER_H
-  const bcX = W * 0.12, bcW = W * 0.76, bcH = 14, bcY = fy + 6
-  const barWidths = [1,2,1,3,1,1,2,1,2,1,1,3,2,1,1,2,1,3,1,2,1,1,2,1]
-  let bx = bcX
-  barWidths.forEach((bw, bi) => {
-    if (bi % 2 === 0) {
-      ctx.fillStyle = 'rgba(42,26,8,0.6)'
-      ctx.fillRect(bx, bcY, bw * (bcW / barWidths.reduce((a,b)=>a+b,0)), bcH)
-    }
-    bx += bw * (bcW / barWidths.reduce((a,b)=>a+b,0))
-  })
-
   drawLogo(ctx, W / 2, fy + 4, 26)
   if (label) {
     ctx.fillStyle = 'rgba(42,26,8,0.65)'
@@ -1472,6 +1460,19 @@ function drawFestival(ctx, images, label, layout = DEFAULT_LAYOUT) {
     ctx.textAlign = 'center'
     ctx.fillText(label, W / 2, fy + 47)
   }
+
+  // Barcode below label
+  const bcX = W * 0.18, bcW = W * 0.64, bcH = 7, bcY = fy + 56
+  const barWidths = [1,2,1,3,1,1,2,1,2,1,1,3,2,1,1,2,1,3,1,2,1,1,2,1]
+  const bcUnit = bcW / barWidths.reduce((a, b) => a + b, 0)
+  let bx = bcX
+  barWidths.forEach((bw, bi) => {
+    if (bi % 2 === 0) {
+      ctx.fillStyle = 'rgba(42,26,8,0.45)'
+      ctx.fillRect(bx, bcY, bw * bcUnit, bcH)
+    }
+    bx += bw * bcUnit
+  })
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────
