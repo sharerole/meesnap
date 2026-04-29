@@ -680,17 +680,431 @@ function drawLibraryCard(ctx, images, label, layout = DEFAULT_LAYOUT) {
   }
 }
 
+// ── Film Negative ─────────────────────────────────────────────────────────────
+// Near-black strip, film-border side strips with sprocket holes, yellow frame marks.
+
+function drawFilmNegative(ctx, images, label, layout = DEFAULT_LAYOUT) {
+  const m = getMetrics(layout)
+  const { W, h, PAD_X, PHOTO_W, PHOTO_H, GAP_ROW, GAP_COL, cols, rows } = m
+
+  ctx.fillStyle = '#0A0A0A'
+  ctx.fillRect(0, 0, W, h)
+
+  const fb = 18 // film border width
+  ctx.fillStyle = '#141414'
+  ctx.fillRect(0, 0, fb, h)
+  ctx.fillRect(W - fb, 0, fb, h)
+
+  // Sprocket holes
+  ctx.fillStyle = '#252525'
+  const hW = 9, hH = 12, hR = 2
+  for (let y = 16; y + hH < h - 10; y += 25) {
+    ctx.beginPath(); ctx.roundRect(fb / 2 - hW / 2, y, hW, hH, hR); ctx.fill()
+    ctx.beginPath(); ctx.roundRect(W - fb / 2 - hW / 2, y, hW, hH, hR); ctx.fill()
+  }
+
+  // Film edge text
+  ctx.fillStyle = 'rgba(255,215,80,0.5)'
+  ctx.font = '600 8px "Courier New",Courier,monospace'
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+  ctx.fillText('MEEOPP · 400TX · DEVELOPED', W / 2, PAD_TOP * 0.48)
+
+  // Frame numbers beside each photo
+  ctx.font = '700 7px "Courier New",Courier,monospace'
+  images.forEach((_, i) => {
+    const row = Math.floor(i / cols)
+    const py  = PAD_TOP + row * (PHOTO_H + GAP_ROW) + PHOTO_H / 2
+    ctx.fillText(`${String(i + 1).padStart(2, '0')}A`, fb / 2, py)
+    ctx.fillText(`${String(i + 1).padStart(2, '0')}A`, W - fb / 2, py)
+  })
+  ctx.textBaseline = 'alphabetic'
+
+  drawPhotos(ctx, images, m, { clipRadius: 0 })
+
+  // Film grain (seeded so it doesn't flicker on re-render)
+  for (let i = 0; i < 280; i++) {
+    ctx.globalAlpha = seededRand(i * 3 + 2) * 0.07
+    ctx.fillStyle = '#fff'
+    ctx.fillRect(seededRand(i * 3) * W, seededRand(i * 3 + 1) * h, 1.5, 1.5)
+  }
+  ctx.globalAlpha = 1
+
+  const fy = h - FOOTER_H
+  ctx.fillStyle = '#141414'
+  ctx.fillRect(fb, fy, W - fb * 2, FOOTER_H)
+  drawLogo(ctx, W / 2, fy + 10, 26)
+  if (label) {
+    ctx.fillStyle = 'rgba(255,215,80,0.65)'
+    ctx.font = '11px "DM Sans",Arial,sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.72)
+  }
+}
+
+// ── VHS ────────────────────────────────────────────────────────────────────────
+// Dark charcoal, cyan/magenta accents, scan lines, ● REC indicator.
+
+function drawVHS(ctx, images, label, layout = DEFAULT_LAYOUT) {
+  const m = getMetrics(layout)
+  const { W, h, PAD_X, PHOTO_W, PHOTO_H, GAP_ROW, GAP_COL, cols, rows } = m
+
+  ctx.fillStyle = '#111116'
+  ctx.fillRect(0, 0, W, h)
+
+  // VHS interference bands (seeded)
+  for (let i = 0; i < 5; i++) {
+    ctx.fillStyle = i % 2 === 0 ? 'rgba(0,240,255,0.07)' : 'rgba(255,0,200,0.06)'
+    ctx.fillRect(0, seededRand(i * 11) * h, W, seededRand(i * 11 + 1) * 3 + 1)
+  }
+
+  // Outer cyan border
+  ctx.strokeStyle = 'rgba(0,240,255,0.65)'
+  ctx.lineWidth = 2
+  ctx.strokeRect(5, 5, W - 10, h - 10)
+  ctx.strokeStyle = 'rgba(255,0,200,0.2)'
+  ctx.lineWidth = 1
+  ctx.strokeRect(9, 9, W - 18, h - 18)
+
+  // Header: ● REC | 00:00:01 | CH 01
+  const hY = PAD_TOP * 0.45
+  ctx.fillStyle = '#FF2525'
+  ctx.beginPath(); ctx.arc(PAD_X + 6, hY, 4, 0, Math.PI * 2); ctx.fill()
+  ctx.font = '700 8px "Courier New",Courier,monospace'
+  ctx.textBaseline = 'middle'
+  ctx.textAlign = 'left';   ctx.fillText('REC', PAD_X + 13, hY)
+  ctx.fillStyle = 'rgba(255,255,255,0.45)'
+  ctx.textAlign = 'center'; ctx.fillText('00:00:01', W / 2, hY)
+  ctx.fillStyle = 'rgba(0,240,255,0.7)'
+  ctx.textAlign = 'right';  ctx.fillText('CH 01', W - PAD_X, hY)
+  ctx.textBaseline = 'alphabetic'
+
+  drawWatermarks(ctx, images, m, 0.04)
+  drawPhotos(ctx, images, m, { clipRadius: 0 })
+
+  // Cyan tint + scan lines over photos
+  ctx.fillStyle = 'rgba(0,240,255,0.04)'
+  images.forEach((_, i) => {
+    const col = i % cols; const row = Math.floor(i / cols)
+    ctx.fillRect(PAD_X + col*(PHOTO_W+GAP_COL), PAD_TOP + row*(PHOTO_H+GAP_ROW), PHOTO_W, PHOTO_H)
+  })
+  ctx.fillStyle = 'rgba(0,0,0,0.18)'
+  for (let y = 0; y < h; y += 3) ctx.fillRect(0, y, W, 1)
+
+  // Between-row glitch bars
+  for (let row = 0; row < rows - 1; row++) {
+    const gy = PAD_TOP + (row+1)*PHOTO_H + row*GAP_ROW + GAP_ROW/2
+    ctx.fillStyle = 'rgba(0,240,255,0.15)'
+    ctx.fillRect(PAD_X, gy - 1, PHOTO_W*cols + GAP_COL*(cols-1), 2)
+  }
+
+  // Photo borders
+  ctx.strokeStyle = 'rgba(0,240,255,0.22)'
+  ctx.lineWidth = 1
+  images.forEach((_, i) => {
+    const col = i % cols; const row = Math.floor(i / cols)
+    ctx.strokeRect(PAD_X+col*(PHOTO_W+GAP_COL), PAD_TOP+row*(PHOTO_H+GAP_ROW), PHOTO_W, PHOTO_H)
+  })
+
+  const fy = h - FOOTER_H
+  drawLogo(ctx, W / 2, fy + 10, 26)
+  if (label) {
+    ctx.fillStyle = 'rgba(0,240,255,0.75)'
+    ctx.font = '11px "DM Sans",Arial,sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.72)
+  }
+}
+
+// ── Polaroid ──────────────────────────────────────────────────────────────────
+// Warm cream, white polaroid frames (thick bottom caption border) under each photo.
+
+function drawPolaroid(ctx, images, label, layout = DEFAULT_LAYOUT) {
+  const m = getMetrics(layout)
+  const { W, h, PAD_X, PHOTO_W, PHOTO_H, GAP_ROW, GAP_COL, cols, rows } = m
+
+  ctx.fillStyle = '#F8F3EB'
+  ctx.fillRect(0, 0, W, h)
+
+  // Subtle linen texture
+  ctx.strokeStyle = 'rgba(160,130,90,0.055)'
+  ctx.lineWidth = 1
+  for (let y = 0; y < h; y += 14) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke()
+  }
+
+  ctx.strokeStyle = 'rgba(120,100,70,0.22)'
+  ctx.lineWidth = 1.5
+  ctx.strokeRect(5, 5, W - 10, h - 10)
+
+  drawQuote(ctx, 'Just like the old days.', 'rgba(100,75,45,0.65)', W, true)
+
+  // White polaroid frames (drawn before photos so photos sit on top)
+  const bS = 3, bT = 2, bB = 10
+  images.forEach((_, i) => {
+    const col = i % cols; const row = Math.floor(i / cols)
+    const px = PAD_X + col * (PHOTO_W + GAP_COL)
+    const py = PAD_TOP + row * (PHOTO_H + GAP_ROW)
+    ctx.save()
+    ctx.shadowColor = 'rgba(0,0,0,0.15)'
+    ctx.shadowBlur = 6; ctx.shadowOffsetX = 2; ctx.shadowOffsetY = 2
+    ctx.fillStyle = '#FEFEFE'
+    ctx.fillRect(px - bS, py - bT, PHOTO_W + bS * 2, PHOTO_H + bT + bB)
+    ctx.restore()
+  })
+
+  drawPhotos(ctx, images, m, { clipRadius: 0 })
+
+  const fy = h - FOOTER_H
+  drawLogo(ctx, W / 2, fy + 10, 26)
+  if (label) {
+    ctx.fillStyle = 'rgba(100,75,45,0.6)'
+    ctx.font = '11px "DM Sans",Arial,sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.72)
+  }
+}
+
+// ── Retro Diner ───────────────────────────────────────────────────────────────
+// Cream background, red-and-cream checkerboard border, 12-point starburst header.
+
+function drawRetroDiner(ctx, images, label, layout = DEFAULT_LAYOUT) {
+  const m = getMetrics(layout)
+  const { W, h, PAD_X, PHOTO_W, PHOTO_H, GAP_ROW, GAP_COL, cols, rows } = m
+
+  ctx.fillStyle = '#FFF3DC'
+  ctx.fillRect(0, 0, W, h)
+
+  // Checkerboard top + bottom
+  const ck = 8, ckR = 2, RED = '#CC1020', CREAM = '#FFF3DC'
+  for (let cx = 0; cx < W; cx += ck) {
+    for (let cr = 0; cr < ckR; cr++) {
+      ctx.fillStyle = ((Math.floor(cx / ck) + cr) % 2 === 0) ? RED : CREAM
+      ctx.fillRect(cx, cr * ck, ck, ck)
+      ctx.fillRect(cx, h - ckR * ck + cr * ck, ck, ck)
+    }
+  }
+
+  // Red border just inside checkerboard
+  ctx.strokeStyle = RED
+  ctx.lineWidth = 1.5
+  ctx.strokeRect(ck * 0.5, ckR * ck + 2, W - ck, h - ckR * ck * 2 - 4)
+
+  // 12-point starburst in header
+  const hY = PAD_TOP * 0.5
+  ctx.save()
+  ctx.translate(W / 2, hY)
+  ctx.fillStyle = RED
+  ctx.beginPath()
+  for (let i = 0; i < 24; i++) {
+    const angle = (i * Math.PI) / 12 - Math.PI / 2
+    const r = i % 2 === 0 ? 16 : 8
+    if (i === 0) ctx.moveTo(r * Math.cos(angle), r * Math.sin(angle))
+    else ctx.lineTo(r * Math.cos(angle), r * Math.sin(angle))
+  }
+  ctx.closePath(); ctx.fill()
+  ctx.fillStyle = '#FFF3DC'
+  ctx.font = '800 7px "DM Sans",Arial,sans-serif'
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+  ctx.fillText('DINER', 0, 0)
+  ctx.restore()
+
+  // Small starbursts in corners
+  ;[[ck*2, ckR*ck+12], [W-ck*2, ckR*ck+12], [ck*2, h-ckR*ck-12], [W-ck*2, h-ckR*ck-12]].forEach(([cx, cy]) => {
+    ctx.save(); ctx.translate(cx, cy); ctx.fillStyle = RED
+    ctx.beginPath()
+    for (let i = 0; i < 16; i++) {
+      const angle = (i * Math.PI) / 8 - Math.PI / 2
+      const r = i % 2 === 0 ? 7 : 3.5
+      if (i === 0) ctx.moveTo(r * Math.cos(angle), r * Math.sin(angle))
+      else ctx.lineTo(r * Math.cos(angle), r * Math.sin(angle))
+    }
+    ctx.closePath(); ctx.fill(); ctx.restore()
+  })
+
+  // Between-row double-line dividers
+  for (let row = 0; row < rows - 1; row++) {
+    const gy = PAD_TOP + (row+1)*PHOTO_H + row*GAP_ROW + GAP_ROW/2
+    ctx.strokeStyle = RED; ctx.lineWidth = 1
+    ctx.beginPath(); ctx.moveTo(PAD_X+12, gy-2); ctx.lineTo(W-PAD_X-12, gy-2); ctx.stroke()
+    ctx.beginPath(); ctx.moveTo(PAD_X+12, gy+2); ctx.lineTo(W-PAD_X-12, gy+2); ctx.stroke()
+  }
+
+  drawWatermarks(ctx, images, m, 0.04)
+  drawPhotos(ctx, images, m, { clipRadius: 2 })
+
+  ctx.strokeStyle = 'rgba(204,16,32,0.25)'; ctx.lineWidth = 1
+  images.forEach((_, i) => {
+    const col = i % cols; const row = Math.floor(i / cols)
+    ctx.strokeRect(PAD_X+col*(PHOTO_W+GAP_COL), PAD_TOP+row*(PHOTO_H+GAP_ROW), PHOTO_W, PHOTO_H)
+  })
+
+  const fy = h - FOOTER_H
+  drawLogo(ctx, W / 2, fy + 10, 26)
+  if (label) {
+    ctx.fillStyle = 'rgba(204,16,32,0.7)'
+    ctx.font = '11px "DM Sans",Arial,sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.72)
+  }
+}
+
+// ── Arcade Cabinet ────────────────────────────────────────────────────────────
+// Near-black with stars, yellow/red pixel-block border, PLAYER 1 header.
+
+function drawArcade(ctx, images, label, layout = DEFAULT_LAYOUT) {
+  const m = getMetrics(layout)
+  const { W, h, PAD_X, PHOTO_W, PHOTO_H, GAP_ROW, GAP_COL, cols, rows } = m
+
+  ctx.fillStyle = '#080818'
+  ctx.fillRect(0, 0, W, h)
+
+  // Stars (seeded)
+  for (let i = 0; i < 60; i++) {
+    ctx.globalAlpha = 0.3 + seededRand(i) * 0.7
+    const ss = seededRand(i * 3 + 2) > 0.8 ? 2 : 1
+    ctx.fillStyle = '#fff'
+    ctx.fillRect(seededRand(i * 3) * W, seededRand(i * 3 + 1) * h, ss, ss)
+  }
+  ctx.globalAlpha = 1
+
+  // Pixel-block border: alternating yellow / red 6-px squares
+  const pix = 6
+  for (let x = 0; x < W; x += pix) {
+    ctx.fillStyle = (Math.floor(x / pix) % 2 === 0) ? '#FFD700' : '#FF2020'
+    ctx.fillRect(x, 0, pix, pix)
+    ctx.fillRect(x, h - pix, pix, pix)
+  }
+  for (let y = pix; y < h - pix; y += pix) {
+    ctx.fillStyle = (Math.floor(y / pix) % 2 === 0) ? '#FFD700' : '#FF2020'
+    ctx.fillRect(0, y, pix, pix)
+    ctx.fillRect(W - pix, y, pix, pix)
+  }
+
+  // Header
+  ctx.fillStyle = '#FFD700'
+  ctx.font = '700 10px "Courier New",Courier,monospace'
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+  ctx.fillText('— PLAYER 1 —', W / 2, PAD_TOP * 0.35)
+  ctx.fillStyle = '#FF2020'
+  ctx.font = '700 9px "Courier New",Courier,monospace'
+  ctx.fillText('♥  ♥  ♥', W / 2, PAD_TOP * 0.7)
+  ctx.textBaseline = 'alphabetic'
+
+  drawWatermarks(ctx, images, m, 0.04)
+  drawPhotos(ctx, images, m, { clipRadius: 0 })
+
+  // Between-row dashed dividers
+  for (let row = 0; row < rows - 1; row++) {
+    const gy = PAD_TOP + (row+1)*PHOTO_H + row*GAP_ROW + GAP_ROW/2
+    ctx.strokeStyle = 'rgba(255,215,0,0.4)'; ctx.lineWidth = 1
+    ctx.setLineDash([4, 4])
+    ctx.beginPath(); ctx.moveTo(PAD_X+pix, gy); ctx.lineTo(W-PAD_X-pix, gy); ctx.stroke()
+    ctx.setLineDash([])
+  }
+
+  ctx.strokeStyle = 'rgba(255,215,0,0.28)'; ctx.lineWidth = 1
+  images.forEach((_, i) => {
+    const col = i % cols; const row = Math.floor(i / cols)
+    ctx.strokeRect(PAD_X+col*(PHOTO_W+GAP_COL), PAD_TOP+row*(PHOTO_H+GAP_ROW), PHOTO_W, PHOTO_H)
+  })
+
+  const fy = h - FOOTER_H
+  drawLogo(ctx, W / 2, fy + 10, 26)
+  if (label) {
+    ctx.fillStyle = 'rgba(255,215,0,0.8)'
+    ctx.font = '11px "DM Sans",Arial,sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.72)
+  }
+}
+
+// ── Game Boy ──────────────────────────────────────────────────────────────────
+// Four-shade green palette, chunky bezel, dot-matrix LCD lines over photos.
+
+function drawGameBoy(ctx, images, label, layout = DEFAULT_LAYOUT) {
+  const m = getMetrics(layout)
+  const { W, h, PAD_X, PHOTO_W, PHOTO_H, GAP_ROW, GAP_COL, cols, rows } = m
+
+  const GB = { light: '#9BBC0F', mid1: '#8BAC0F', mid2: '#306230', dark: '#0F380F' }
+
+  ctx.fillStyle = GB.light
+  ctx.fillRect(0, 0, W, h)
+
+  // Dot-matrix background texture
+  ctx.fillStyle = 'rgba(15,56,15,0.04)'
+  for (let gx = 0; gx < W; gx += 3)
+    for (let gy = 0; gy < h; gy += 3)
+      ctx.fillRect(gx, gy, 1, 1)
+
+  // Chunky bezel
+  ctx.fillStyle = GB.mid1
+  ctx.fillRect(0, 0, W, 7); ctx.fillRect(0, h-7, W, 7)
+  ctx.fillRect(0, 0, 7, h); ctx.fillRect(W-7, 0, 7, h)
+  ctx.strokeStyle = GB.mid2; ctx.lineWidth = 3
+  ctx.strokeRect(9, 9, W - 18, h - 18)
+
+  // Header
+  ctx.fillStyle = GB.dark
+  ctx.font = '700 9px "Courier New",Courier,monospace'
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+  ctx.fillText('GAME BOY  ◆  PHOTO', W / 2, PAD_TOP * 0.45)
+  ctx.textBaseline = 'alphabetic'
+
+  drawPhotos(ctx, images, m, { clipRadius: 0 })
+
+  // LCD pixel-row lines over photos
+  images.forEach((_, i) => {
+    const col = i % cols; const row = Math.floor(i / cols)
+    const px = PAD_X + col * (PHOTO_W + GAP_COL)
+    const py = PAD_TOP + row * (PHOTO_H + GAP_ROW)
+    ctx.fillStyle = GB.light
+    for (let ly = py; ly < py + PHOTO_H; ly += 3) {
+      ctx.globalAlpha = 0.15
+      ctx.fillRect(px, ly, PHOTO_W, 1)
+    }
+    ctx.globalAlpha = 1
+  })
+
+  // Between-row separators
+  for (let row = 0; row < rows - 1; row++) {
+    const gy = PAD_TOP + (row+1)*PHOTO_H + row*GAP_ROW + GAP_ROW/2
+    ctx.strokeStyle = GB.mid2; ctx.lineWidth = 1.5
+    ctx.beginPath(); ctx.moveTo(PAD_X+4, gy); ctx.lineTo(W-PAD_X-4, gy); ctx.stroke()
+  }
+
+  ctx.strokeStyle = GB.mid2; ctx.lineWidth = 1.5
+  images.forEach((_, i) => {
+    const col = i % cols; const row = Math.floor(i / cols)
+    ctx.strokeRect(PAD_X+col*(PHOTO_W+GAP_COL), PAD_TOP+row*(PHOTO_H+GAP_ROW), PHOTO_W, PHOTO_H)
+  })
+
+  const fy = h - FOOTER_H
+  drawLogo(ctx, W / 2, fy + 10, 26)
+  if (label) {
+    ctx.fillStyle = GB.dark
+    ctx.font = '11px "DM Sans",Arial,sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.72)
+  }
+}
+
 // ── Public API ────────────────────────────────────────────────────────────────
 
 export const THEMES = [
-  { id: 'classic',     label: 'MeeOpp Classic', colors: ['#C1005A', '#FFFFFF'],  draw: drawClassic      },
-  { id: 'distinction', label: 'Distinction',    colors: ['#1A1A2E', '#C9920A'],  draw: drawDistinction  },
-  { id: 'yearbook',    label: 'Year Book',      colors: ['#F4EFE4', '#1C1C1C'],  draw: drawYearBook     },
-  { id: 'squad',       label: 'Squad Goals',    colors: ['#E8D5FF', '#7B2FBE'],  draw: drawSquadGoals   },
-  { id: 'crew',        label: 'The Crew',       colors: ['#0F1E30', '#1A6EF5'],  draw: drawCrew         },
-  { id: 'progress',    label: 'Progress Saved', colors: ['#050D05', '#00FF41'],  draw: drawProgressSaved },
-  { id: 'reportcard',  label: 'Report Card',    colors: ['#F7F2E8', '#1C2B5E'],  draw: drawReportCard    },
-  { id: 'librarycard', label: 'Library Card',   colors: ['#EDE0C0', '#5C3D1E'],  draw: drawLibraryCard   },
+  { id: 'classic',      label: 'MeeOpp Classic', colors: ['#C1005A', '#FFFFFF'],  draw: drawClassic       },
+  { id: 'distinction',  label: 'Distinction',    colors: ['#1A1A2E', '#C9920A'],  draw: drawDistinction   },
+  { id: 'yearbook',     label: 'Year Book',      colors: ['#F4EFE4', '#1C1C1C'],  draw: drawYearBook      },
+  { id: 'squad',        label: 'Squad Goals',    colors: ['#E8D5FF', '#7B2FBE'],  draw: drawSquadGoals    },
+  { id: 'crew',         label: 'The Crew',       colors: ['#0F1E30', '#1A6EF5'],  draw: drawCrew          },
+  { id: 'progress',     label: 'Progress Saved', colors: ['#050D05', '#00FF41'],  draw: drawProgressSaved },
+  { id: 'reportcard',   label: 'Report Card',    colors: ['#F7F2E8', '#1C2B5E'],  draw: drawReportCard    },
+  { id: 'librarycard',  label: 'Library Card',   colors: ['#EDE0C0', '#5C3D1E'],  draw: drawLibraryCard   },
+  { id: 'filmnegative', label: 'Film Negative',  colors: ['#0A0A0A', '#FFD750'],  draw: drawFilmNegative  },
+  { id: 'vhs',          label: 'VHS',            colors: ['#111116', '#00F0FF'],  draw: drawVHS           },
+  { id: 'polaroid',     label: 'Polaroid',       colors: ['#F8F3EB', '#FEFEFE'],  draw: drawPolaroid      },
+  { id: 'retrodiner',   label: 'Retro Diner',    colors: ['#FFF3DC', '#CC1020'],  draw: drawRetroDiner    },
+  { id: 'arcade',       label: 'Arcade Cabinet', colors: ['#080818', '#FFD700'],  draw: drawArcade        },
+  { id: 'gameboy',      label: 'Game Boy',       colors: ['#9BBC0F', '#0F380F'],  draw: drawGameBoy       },
 ]
 
 export { _logo as logoImg }

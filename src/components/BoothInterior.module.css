@@ -453,7 +453,7 @@
 /* ── Setup screen ─────────────────────────────────────────────────────────── */
 
 .setupScreen {
-  min-height: 100vh;
+  height: 100dvh;
   background: #06040C;
   display: flex;
   flex-direction: column;
@@ -461,7 +461,7 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
-  padding: 60px 24px 40px;
+  padding: 48px 24px 24px;
   animation: boothFadeIn 0.35s ease-out forwards;
 }
 
@@ -469,7 +469,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: 16px;
   width: 100%;
   max-width: 440px;
   z-index: 3;

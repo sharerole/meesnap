@@ -23,7 +23,7 @@ function makePlaceholders(count, pw, ph) {
 }
 
 // displayWidth and layout are optional — defaults give the original lobby preview size.
-export default function ThemePreview({ theme, displayWidth = 148, layout = DEFAULT_LAYOUT, showHeading = true }) {
+export default function ThemePreview({ theme, displayWidth = 148, layout = DEFAULT_LAYOUT, showHeading = true, compact = false }) {
   const canvasRef = useRef(null)
   const themeObj  = THEMES.find(t => t.id === theme) ?? THEMES[0]
 
@@ -63,7 +63,7 @@ export default function ThemePreview({ theme, displayWidth = 148, layout = DEFAU
   }, [renderCanvas])
 
   return (
-    <div className={styles.wrap}>
+    <div className={`${styles.wrap} ${compact ? styles.wrapCompact : ''}`}>
       {showHeading && <p className={styles.heading}>Frame Preview</p>}
       <div className={styles.window} style={{ width: displayWidth, height: displayH }}>
         <canvas
