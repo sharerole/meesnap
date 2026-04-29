@@ -890,7 +890,7 @@ function drawRetroDiner(ctx, images, label, layout = DEFAULT_LAYOUT) {
   })
 
   const fy = h - FOOTER_H
-  drawLogo(ctx, W / 2, fy + 2, 26)
+  drawLogo(ctx, W / 2, fy - 1, 26)
   if (label) {
     ctx.fillStyle = 'rgba(204,16,32,0.7)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
