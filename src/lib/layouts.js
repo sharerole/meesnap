@@ -10,7 +10,7 @@ export const DEFAULT_LAYOUT = LAYOUTS[2] // 1×4
 
 const PAD_TOP  = 56
 const PAD_BOT  = 22
-const FOOTER_H = 72
+const FOOTER_H = 84
 const GAP_ROW  = 14
 
 export function getMetrics(layout) {
