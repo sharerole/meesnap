@@ -895,7 +895,7 @@ function drawRetroDiner(ctx, images, label, layout = DEFAULT_LAYOUT) {
     ctx.fillStyle = 'rgba(204,16,32,0.7)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText(label, W / 2, fy + 34)
+    ctx.fillText(label, W / 2, fy + 38)
   }
 }
 
