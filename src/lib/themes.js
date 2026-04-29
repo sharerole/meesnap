@@ -815,55 +815,6 @@ function drawVHS(ctx, images, label, layout = DEFAULT_LAYOUT) {
   }
 }
 
-// ── Polaroid ──────────────────────────────────────────────────────────────────
-// Warm cream, white polaroid frames (thick bottom caption border) under each photo.
-
-function drawPolaroid(ctx, images, label, layout = DEFAULT_LAYOUT) {
-  const m = getMetrics(layout)
-  const { W, h, PAD_X, PHOTO_W, PHOTO_H, GAP_ROW, GAP_COL, cols, rows } = m
-
-  ctx.fillStyle = '#F8F3EB'
-  ctx.fillRect(0, 0, W, h)
-
-  // Subtle linen texture
-  ctx.strokeStyle = 'rgba(160,130,90,0.055)'
-  ctx.lineWidth = 1
-  for (let y = 0; y < h; y += 14) {
-    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke()
-  }
-
-  ctx.strokeStyle = 'rgba(120,100,70,0.22)'
-  ctx.lineWidth = 1.5
-  ctx.strokeRect(5, 5, W - 10, h - 10)
-
-  drawQuote(ctx, 'Just like the old days.', 'rgba(100,75,45,0.65)', W, true)
-
-  // White polaroid frames (drawn before photos so photos sit on top)
-  const bS = 3, bT = 2, bB = 10
-  images.forEach((_, i) => {
-    const col = i % cols; const row = Math.floor(i / cols)
-    const px = PAD_X + col * (PHOTO_W + GAP_COL)
-    const py = PAD_TOP + row * (PHOTO_H + GAP_ROW)
-    ctx.save()
-    ctx.shadowColor = 'rgba(0,0,0,0.15)'
-    ctx.shadowBlur = 6; ctx.shadowOffsetX = 2; ctx.shadowOffsetY = 2
-    ctx.fillStyle = '#FEFEFE'
-    ctx.fillRect(px - bS, py - bT, PHOTO_W + bS * 2, PHOTO_H + bT + bB)
-    ctx.restore()
-  })
-
-  drawPhotos(ctx, images, m, { clipRadius: 0 })
-
-  const fy = h - FOOTER_H
-  drawLogo(ctx, W / 2, fy + 4, 26)
-  if (label) {
-    ctx.fillStyle = 'rgba(100,75,45,0.6)'
-    ctx.font = '11px "DM Sans",Arial,sans-serif'
-    ctx.textAlign = 'center'
-    ctx.fillText(label, W / 2, fy + 47)
-  }
-}
-
 // ── Retro Diner ───────────────────────────────────────────────────────────────
 // Cream background, red-and-cream checkerboard border, 12-point starburst header.
 
@@ -1018,61 +969,80 @@ function drawArcade(ctx, images, label, layout = DEFAULT_LAYOUT) {
   }
 }
 
-// ── Game Boy ──────────────────────────────────────────────────────────────────
-// Four-shade green palette, chunky bezel, dot-matrix LCD lines over photos.
+// ── K-Pop Photocard ───────────────────────────────────────────────────────────
+// Soft pastel gradient, "MEEOPP ENT · LIMITED EDITION" header, sparkle stars.
 
-function drawGameBoy(ctx, images, label, layout = DEFAULT_LAYOUT) {
+function drawKpop(ctx, images, label, layout = DEFAULT_LAYOUT) {
   const m = getMetrics(layout)
   const { W, h, PAD_X, PHOTO_W, PHOTO_H, GAP_ROW, GAP_COL, cols, rows } = m
 
-  const GB = { light: '#9BBC0F', mid1: '#8BAC0F', mid2: '#306230', dark: '#0F380F' }
-
-  ctx.fillStyle = GB.light
+  // Soft lavender-pink gradient background
+  const bg = ctx.createLinearGradient(0, 0, W, h)
+  bg.addColorStop(0, '#F9E8FF')
+  bg.addColorStop(0.5, '#FFE8F5')
+  bg.addColorStop(1, '#E8F0FF')
+  ctx.fillStyle = bg
   ctx.fillRect(0, 0, W, h)
 
-  // Dot-matrix background texture
-  ctx.fillStyle = 'rgba(15,56,15,0.04)'
-  for (let gx = 0; gx < W; gx += 3)
-    for (let gy = 0; gy < h; gy += 3)
-      ctx.fillRect(gx, gy, 1, 1)
+  // Thin pastel outer border
+  ctx.strokeStyle = 'rgba(200,120,220,0.35)'
+  ctx.lineWidth = 2
+  ctx.strokeRect(4, 4, W - 8, h - 8)
+  ctx.strokeStyle = 'rgba(200,120,220,0.15)'
+  ctx.lineWidth = 1
+  ctx.strokeRect(7, 7, W - 14, h - 14)
 
-  // Chunky bezel
-  ctx.fillStyle = GB.mid1
-  ctx.fillRect(0, 0, W, 7); ctx.fillRect(0, h-7, W, 7)
-  ctx.fillRect(0, 0, 7, h); ctx.fillRect(W-7, 0, 7, h)
-  ctx.strokeStyle = GB.mid2; ctx.lineWidth = 3
-  ctx.strokeRect(9, 9, W - 18, h - 18)
+  // Rainbow accent bar at top
+  const rainbowBar = ctx.createLinearGradient(0, 0, W, 0)
+  rainbowBar.addColorStop(0,    '#FF9ECD')
+  rainbowBar.addColorStop(0.25, '#B8A4FF')
+  rainbowBar.addColorStop(0.5,  '#9BE8FF')
+  rainbowBar.addColorStop(0.75, '#A8F0C0')
+  rainbowBar.addColorStop(1,    '#FFD9A0')
+  ctx.fillStyle = rainbowBar
+  ctx.fillRect(0, 0, W, 4)
 
-  // Header
-  ctx.fillStyle = GB.dark
-  ctx.font = '700 9px "Courier New",Courier,monospace'
+  // Header text
+  ctx.fillStyle = 'rgba(160,80,200,0.85)'
+  ctx.font = '800 8px "DM Sans",Arial,sans-serif'
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-  ctx.fillText('GAME BOY  ◆  PHOTO', W / 2, PAD_TOP * 0.45)
+  ctx.fillText('MEEOPP ENT.  ·  LIMITED EDITION', W / 2, PAD_TOP * 0.35)
+  ctx.fillStyle = 'rgba(200,120,220,0.6)'
+  ctx.font = '600 7px "DM Sans",Arial,sans-serif'
+  ctx.fillText('✦  ✦  ✦', W / 2, PAD_TOP * 0.72)
   ctx.textBaseline = 'alphabetic'
 
-  drawPhotos(ctx, images, m, { clipRadius: 0 })
-
-  // LCD pixel-row lines over photos
-  images.forEach((_, i) => {
-    const col = i % cols; const row = Math.floor(i / cols)
-    const px = PAD_X + col * (PHOTO_W + GAP_COL)
-    const py = PAD_TOP + row * (PHOTO_H + GAP_ROW)
-    ctx.fillStyle = GB.light
-    for (let ly = py; ly < py + PHOTO_H; ly += 3) {
-      ctx.globalAlpha = 0.15
-      ctx.fillRect(px, ly, PHOTO_W, 1)
+  // Sparkle decorations (seeded)
+  const sparkleChars = ['✦', '✧', '⭑', '★']
+  for (let i = 0; i < 14; i++) {
+    const sx = seededRand(i * 5)     * W
+    const sy = PAD_TOP + seededRand(i * 5 + 1) * (h - PAD_TOP - FOOTER_H)
+    // Keep out of photo areas
+    let inPhoto = false
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const px = PAD_X + c * (PHOTO_W + GAP_COL)
+        const py = PAD_TOP + r * (PHOTO_H + GAP_ROW)
+        if (sx > px - 6 && sx < px + PHOTO_W + 6 && sy > py - 6 && sy < py + PHOTO_H + 6) inPhoto = true
+      }
     }
-    ctx.globalAlpha = 1
-  })
-
-  // Between-row separators
-  for (let row = 0; row < rows - 1; row++) {
-    const gy = PAD_TOP + (row+1)*PHOTO_H + row*GAP_ROW + GAP_ROW/2
-    ctx.strokeStyle = GB.mid2; ctx.lineWidth = 1.5
-    ctx.beginPath(); ctx.moveTo(PAD_X+4, gy); ctx.lineTo(W-PAD_X-4, gy); ctx.stroke()
+    if (!inPhoto) {
+      ctx.globalAlpha = 0.2 + seededRand(i * 5 + 2) * 0.3
+      ctx.fillStyle = seededRand(i * 5 + 3) > 0.5 ? '#C87DC8' : '#A08AE0'
+      ctx.font = `${6 + seededRand(i * 5 + 4) * 6}px sans-serif`
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+      ctx.fillText(sparkleChars[Math.floor(seededRand(i * 5 + 4) * 4)], sx, sy)
+    }
   }
+  ctx.globalAlpha = 1
+  ctx.textBaseline = 'alphabetic'
 
-  ctx.strokeStyle = GB.mid2; ctx.lineWidth = 1.5
+  drawWatermarks(ctx, images, m, 0.04)
+  drawPhotos(ctx, images, m, { clipRadius: 3 })
+
+  // Soft photo border
+  ctx.strokeStyle = 'rgba(180,100,210,0.3)'
+  ctx.lineWidth = 1.5
   images.forEach((_, i) => {
     const col = i % cols; const row = Math.floor(i / cols)
     ctx.strokeRect(PAD_X+col*(PHOTO_W+GAP_COL), PAD_TOP+row*(PHOTO_H+GAP_ROW), PHOTO_W, PHOTO_H)
@@ -1081,7 +1051,391 @@ function drawGameBoy(ctx, images, label, layout = DEFAULT_LAYOUT) {
   const fy = h - FOOTER_H
   drawLogo(ctx, W / 2, fy + 4, 26)
   if (label) {
-    ctx.fillStyle = GB.dark
+    ctx.fillStyle = 'rgba(160,80,200,0.75)'
+    ctx.font = '11px "DM Sans",Arial,sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText(label, W / 2, fy + 47)
+  }
+}
+
+// ── Holographic / Y2K ─────────────────────────────────────────────────────────
+// White/silver base, diagonal iridescent overlay, rainbow gradient border.
+
+function drawHolographic(ctx, images, label, layout = DEFAULT_LAYOUT) {
+  const m = getMetrics(layout)
+  const { W, h, PAD_X, PHOTO_W, PHOTO_H, GAP_ROW, GAP_COL, cols, rows } = m
+
+  // White base
+  ctx.fillStyle = '#FAFCFF'
+  ctx.fillRect(0, 0, W, h)
+
+  // Diagonal iridescent overlay bands
+  ctx.save()
+  for (let band = 0; band < 8; band++) {
+    const offset = (band / 8) * (W + h)
+    const holo = ctx.createLinearGradient(offset, 0, offset - 60, h)
+    holo.addColorStop(0,   'rgba(255,120,200,0.06)')
+    holo.addColorStop(0.2, 'rgba(120,200,255,0.06)')
+    holo.addColorStop(0.4, 'rgba(200,255,120,0.06)')
+    holo.addColorStop(0.6, 'rgba(255,200,120,0.06)')
+    holo.addColorStop(0.8, 'rgba(180,120,255,0.06)')
+    holo.addColorStop(1,   'rgba(255,120,200,0.06)')
+    ctx.fillStyle = holo
+    ctx.fillRect(0, 0, W, h)
+  }
+  ctx.restore()
+
+  // Rainbow border
+  const rainbowBorder = ctx.createLinearGradient(0, 0, W, h)
+  rainbowBorder.addColorStop(0,    '#FF6EC7')
+  rainbowBorder.addColorStop(0.2,  '#A78BFA')
+  rainbowBorder.addColorStop(0.4,  '#38BDF8')
+  rainbowBorder.addColorStop(0.6,  '#34D399')
+  rainbowBorder.addColorStop(0.8,  '#FBBF24')
+  rainbowBorder.addColorStop(1,    '#FF6EC7')
+  ctx.strokeStyle = rainbowBorder
+  ctx.lineWidth = 4
+  ctx.strokeRect(3, 3, W - 6, h - 6)
+  ctx.lineWidth = 1
+  ctx.strokeRect(8, 8, W - 16, h - 16)
+
+  // Gradient header text
+  const headerGrad = ctx.createLinearGradient(W * 0.2, 0, W * 0.8, 0)
+  headerGrad.addColorStop(0,   '#FF6EC7')
+  headerGrad.addColorStop(0.5, '#A78BFA')
+  headerGrad.addColorStop(1,   '#38BDF8')
+  ctx.fillStyle = headerGrad
+  ctx.font = '900 9px "DM Sans",Arial,sans-serif'
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+  ctx.fillText('✦ MEEOPP · HOLOGRAPHIC ✦', W / 2, PAD_TOP * 0.38)
+  ctx.textBaseline = 'alphabetic'
+
+  // Sparkle chars (seeded)
+  const sparks = ['✦', '✧', '◆', '◇']
+  for (let i = 0; i < 18; i++) {
+    const sx = seededRand(i * 7)     * W
+    const sy = PAD_TOP + seededRand(i * 7 + 1) * (h - PAD_TOP - FOOTER_H)
+    let inPhoto = false
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const px = PAD_X + c * (PHOTO_W + GAP_COL)
+        const py = PAD_TOP + r * (PHOTO_H + GAP_ROW)
+        if (sx > px - 4 && sx < px + PHOTO_W + 4 && sy > py - 4 && sy < py + PHOTO_H + 4) inPhoto = true
+      }
+    }
+    if (!inPhoto) {
+      ctx.globalAlpha = 0.15 + seededRand(i * 7 + 2) * 0.3
+      const hues = ['#FF6EC7', '#A78BFA', '#38BDF8', '#34D399', '#FBBF24']
+      ctx.fillStyle = hues[Math.floor(seededRand(i * 7 + 3) * 5)]
+      ctx.font = `${7 + seededRand(i * 7 + 4) * 7}px sans-serif`
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+      ctx.fillText(sparks[Math.floor(seededRand(i * 7 + 5) * 4)], sx, sy)
+    }
+  }
+  ctx.globalAlpha = 1
+  ctx.textBaseline = 'alphabetic'
+
+  drawWatermarks(ctx, images, m, 0.04)
+  drawPhotos(ctx, images, m, { clipRadius: 2 })
+
+  // Iridescent photo borders
+  images.forEach((_, i) => {
+    const col = i % cols; const row = Math.floor(i / cols)
+    const px = PAD_X + col * (PHOTO_W + GAP_COL)
+    const py = PAD_TOP + row * (PHOTO_H + GAP_ROW)
+    const pb = ctx.createLinearGradient(px, py, px + PHOTO_W, py + PHOTO_H)
+    pb.addColorStop(0,   '#FF6EC7'); pb.addColorStop(0.5, '#38BDF8'); pb.addColorStop(1, '#A78BFA')
+    ctx.strokeStyle = pb; ctx.lineWidth = 1.5
+    ctx.strokeRect(px, py, PHOTO_W, PHOTO_H)
+  })
+
+  const fy = h - FOOTER_H
+  drawLogo(ctx, W / 2, fy + 4, 26)
+  if (label) {
+    const lblGrad = ctx.createLinearGradient(W * 0.3, 0, W * 0.7, 0)
+    lblGrad.addColorStop(0, '#FF6EC7'); lblGrad.addColorStop(1, '#A78BFA')
+    ctx.fillStyle = lblGrad
+    ctx.font = '11px "DM Sans",Arial,sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText(label, W / 2, fy + 47)
+  }
+}
+
+// ── Manga / Anime ─────────────────────────────────────────────────────────────
+// White bg, screentone dot pattern, speed-line corners, bold action header.
+
+function drawManga(ctx, images, label, layout = DEFAULT_LAYOUT) {
+  const m = getMetrics(layout)
+  const { W, h, PAD_X, PHOTO_W, PHOTO_H, GAP_ROW, GAP_COL, cols, rows } = m
+
+  ctx.fillStyle = '#FFFFFF'
+  ctx.fillRect(0, 0, W, h)
+
+  // Screentone dot pattern (outside photo areas)
+  ctx.fillStyle = 'rgba(0,0,0,0.07)'
+  for (let dx = 0; dx < W; dx += 5) {
+    for (let dy = 0; dy < h; dy += 5) {
+      let inPhoto = false
+      for (let r = 0; r < rows && !inPhoto; r++) {
+        for (let c = 0; c < cols && !inPhoto; c++) {
+          const px = PAD_X + c * (PHOTO_W + GAP_COL)
+          const py = PAD_TOP + r * (PHOTO_H + GAP_ROW)
+          if (dx >= px && dx < px + PHOTO_W && dy >= py && dy < py + PHOTO_H) inPhoto = true
+        }
+      }
+      if (!inPhoto) ctx.fillRect(dx + 1, dy + 1, 2, 2)
+    }
+  }
+
+  // Speed lines from top corners into header
+  ctx.strokeStyle = 'rgba(0,0,0,0.12)'
+  ctx.lineWidth = 0.7
+  const lineCount = 16
+  for (let i = 0; i < lineCount; i++) {
+    const angle = (i / lineCount) * (Math.PI / 2.5) - 0.1
+    const len = 55
+    // Top-left
+    ctx.beginPath()
+    ctx.moveTo(0, 0)
+    ctx.lineTo(len * Math.cos(angle), len * Math.sin(angle))
+    ctx.stroke()
+    // Top-right
+    ctx.beginPath()
+    ctx.moveTo(W, 0)
+    ctx.lineTo(W - len * Math.cos(angle), len * Math.sin(angle))
+    ctx.stroke()
+  }
+
+  // Bold outer border
+  ctx.strokeStyle = '#000000'
+  ctx.lineWidth = 5
+  ctx.strokeRect(2.5, 2.5, W - 5, h - 5)
+  ctx.lineWidth = 1.5
+  ctx.strokeRect(8, 8, W - 16, h - 16)
+
+  // Header action box
+  const hbH = PAD_TOP * 0.65, hbY = (PAD_TOP - hbH) / 2
+  ctx.fillStyle = '#000000'
+  ctx.fillRect(W * 0.08, hbY, W * 0.84, hbH)
+  ctx.fillStyle = '#FFFFFF'
+  ctx.font = '900 10px "DM Sans",Arial,sans-serif'
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+  ctx.fillText('★  MEEOPP  PHOTO  ★', W / 2, hbY + hbH / 2)
+  ctx.textBaseline = 'alphabetic'
+
+  drawWatermarks(ctx, images, m, 0.04)
+  drawPhotos(ctx, images, m, { clipRadius: 0 })
+
+  // Bold photo borders with double-line effect
+  ctx.strokeStyle = '#000000'
+  images.forEach((_, i) => {
+    const col = i % cols; const row = Math.floor(i / cols)
+    const px = PAD_X + col * (PHOTO_W + GAP_COL)
+    const py = PAD_TOP + row * (PHOTO_H + GAP_ROW)
+    ctx.lineWidth = 2.5
+    ctx.strokeRect(px, py, PHOTO_W, PHOTO_H)
+    ctx.lineWidth = 0.8
+    ctx.strokeRect(px - 3, py - 3, PHOTO_W + 6, PHOTO_H + 6)
+  })
+
+  // Between-row jagged dividers
+  for (let row = 0; row < rows - 1; row++) {
+    const gy = PAD_TOP + (row+1)*PHOTO_H + row*GAP_ROW + GAP_ROW/2
+    ctx.strokeStyle = '#000000'; ctx.lineWidth = 1.5
+    ctx.beginPath(); ctx.moveTo(PAD_X, gy); ctx.lineTo(W - PAD_X, gy); ctx.stroke()
+  }
+
+  const fy = h - FOOTER_H
+  drawLogo(ctx, W / 2, fy + 4, 26)
+  if (label) {
+    ctx.fillStyle = '#111111'
+    ctx.font = 'bold 11px "DM Sans",Arial,sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText(label, W / 2, fy + 47)
+  }
+}
+
+// ── Neon Club ─────────────────────────────────────────────────────────────────
+// Near-black bg, hot-pink glow border, per-photo neon-colored frames.
+
+function drawNeonClub(ctx, images, label, layout = DEFAULT_LAYOUT) {
+  const m = getMetrics(layout)
+  const { W, h, PAD_X, PHOTO_W, PHOTO_H, GAP_ROW, GAP_COL, cols, rows } = m
+
+  ctx.fillStyle = '#080808'
+  ctx.fillRect(0, 0, W, h)
+
+  // Subtle grid lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.025)'
+  ctx.lineWidth = 0.5
+  for (let gx = 0; gx < W; gx += 20) {
+    ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, h); ctx.stroke()
+  }
+  for (let gy = 0; gy < h; gy += 20) {
+    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke()
+  }
+
+  // Outer hot-pink glow border
+  ctx.save()
+  ctx.shadowColor = '#FF2D78'
+  ctx.shadowBlur = 14
+  ctx.strokeStyle = '#FF2D78'
+  ctx.lineWidth = 2
+  ctx.strokeRect(3, 3, W - 6, h - 6)
+  ctx.restore()
+  ctx.strokeStyle = 'rgba(255,45,120,0.3)'
+  ctx.lineWidth = 1
+  ctx.strokeRect(7, 7, W - 14, h - 14)
+
+  // Header
+  ctx.save()
+  ctx.shadowColor = '#FF2D78'; ctx.shadowBlur = 10
+  ctx.fillStyle = '#FF2D78'
+  ctx.font = '900 9px "DM Sans",Arial,sans-serif'
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+  ctx.fillText('— MEEOPP CLUB —', W / 2, PAD_TOP * 0.35)
+  ctx.restore()
+  ctx.fillStyle = 'rgba(255,255,255,0.3)'
+  ctx.font = '600 7px "DM Sans",Arial,sans-serif'
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+  ctx.fillText('★  ★  ★', W / 2, PAD_TOP * 0.7)
+  ctx.textBaseline = 'alphabetic'
+
+  drawWatermarks(ctx, images, m, 0.04)
+  drawPhotos(ctx, images, m, { clipRadius: 1 })
+
+  // Per-photo neon colored borders
+  const neonColors = ['#FF2D78', '#00F5FF', '#B8FF3C', '#FF9900', '#C084FC']
+  images.forEach((_, i) => {
+    const col = i % cols; const row = Math.floor(i / cols)
+    const px = PAD_X + col * (PHOTO_W + GAP_COL)
+    const py = PAD_TOP + row * (PHOTO_H + GAP_ROW)
+    const clr = neonColors[i % neonColors.length]
+    ctx.save()
+    ctx.shadowColor = clr; ctx.shadowBlur = 8
+    ctx.strokeStyle = clr; ctx.lineWidth = 1.5
+    ctx.strokeRect(px, py, PHOTO_W, PHOTO_H)
+    ctx.restore()
+  })
+
+  // Between-row neon dividers
+  for (let row = 0; row < rows - 1; row++) {
+    const gy = PAD_TOP + (row+1)*PHOTO_H + row*GAP_ROW + GAP_ROW/2
+    ctx.save()
+    ctx.shadowColor = '#FF2D78'; ctx.shadowBlur = 6
+    ctx.strokeStyle = 'rgba(255,45,120,0.5)'; ctx.lineWidth = 1
+    ctx.beginPath(); ctx.moveTo(PAD_X, gy); ctx.lineTo(W - PAD_X, gy); ctx.stroke()
+    ctx.restore()
+  }
+
+  const fy = h - FOOTER_H
+  drawLogo(ctx, W / 2, fy + 4, 26)
+  if (label) {
+    ctx.save()
+    ctx.shadowColor = '#FF2D78'; ctx.shadowBlur = 6
+    ctx.fillStyle = '#FF2D78'
+    ctx.font = '11px "DM Sans",Arial,sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText(label, W / 2, fy + 47)
+    ctx.restore()
+  }
+}
+
+// ── Botanical ─────────────────────────────────────────────────────────────────
+// Cream background, leaf / branch bezier corners, warm brown border.
+
+function drawBotanical(ctx, images, label, layout = DEFAULT_LAYOUT) {
+  const m = getMetrics(layout)
+  const { W, h, PAD_X, PHOTO_W, PHOTO_H, GAP_ROW, GAP_COL, cols, rows } = m
+
+  ctx.fillStyle = '#F5F0E8'
+  ctx.fillRect(0, 0, W, h)
+
+  // Warm border
+  ctx.strokeStyle = 'rgba(100,72,40,0.35)'
+  ctx.lineWidth = 2.5
+  ctx.strokeRect(4, 4, W - 8, h - 8)
+  ctx.strokeStyle = 'rgba(100,72,40,0.15)'
+  ctx.lineWidth = 1
+  ctx.strokeRect(8, 8, W - 16, h - 16)
+
+  // Helper: draw a small leaf (bezier) at given position / rotation
+  function drawLeaf(cx, cy, angle, size, alpha) {
+    ctx.save()
+    ctx.translate(cx, cy)
+    ctx.rotate(angle)
+    ctx.globalAlpha = alpha
+    ctx.fillStyle = '#4A7C59'
+    ctx.strokeStyle = '#3A6048'
+    ctx.lineWidth = 0.7
+    ctx.beginPath()
+    ctx.moveTo(0, 0)
+    ctx.bezierCurveTo(size * 0.4, -size * 0.5, size * 0.9, -size * 0.3, size, 0)
+    ctx.bezierCurveTo(size * 0.9, size * 0.3, size * 0.4, size * 0.5, 0, 0)
+    ctx.fill()
+    ctx.stroke()
+    // midrib
+    ctx.strokeStyle = 'rgba(255,255,255,0.4)'
+    ctx.lineWidth = 0.5
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(size, 0); ctx.stroke()
+    ctx.restore()
+  }
+
+  // Helper: stem with small branch + leaves
+  function drawBranch(bx, by, bAngle, length) {
+    ctx.save()
+    ctx.translate(bx, by)
+    ctx.rotate(bAngle)
+    ctx.strokeStyle = 'rgba(100,72,40,0.55)'
+    ctx.lineWidth = 1.2
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(length, 0); ctx.stroke()
+    // leaves along the branch
+    for (let li = 0; li < 3; li++) {
+      const lt = (li + 1) / 4
+      drawLeaf(length * lt, 0, -Math.PI / 4 + li * 0.3, 8 + li * 2, 0.6 + li * 0.1)
+      drawLeaf(length * lt, 0,  Math.PI / 4 - li * 0.3, 8 + li * 2, 0.6 + li * 0.1)
+    }
+    ctx.restore()
+  }
+
+  // Corner branch decorations
+  drawBranch(12, 12,      0.4,         40)
+  drawBranch(W - 12, 12, Math.PI - 0.4, 40)
+  drawBranch(12, h - 12, -0.4,          40)
+  drawBranch(W - 12, h - 12, Math.PI + 0.4, 40)
+
+  // Header nature quote
+  ctx.fillStyle = 'rgba(100,72,40,0.7)'
+  ctx.font = 'italic 600 8.5px "DM Sans",Arial,sans-serif'
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+  ctx.fillText('In bloom. In frame. In memory.', W / 2, PAD_TOP * 0.45)
+  ctx.textBaseline = 'alphabetic'
+
+  // Subtle between-row botanical dividers
+  for (let row = 0; row < rows - 1; row++) {
+    const gy = PAD_TOP + (row+1)*PHOTO_H + row*GAP_ROW + GAP_ROW/2
+    ctx.strokeStyle = 'rgba(100,72,40,0.2)'; ctx.lineWidth = 1
+    ctx.setLineDash([3, 4])
+    ctx.beginPath(); ctx.moveTo(PAD_X + 12, gy); ctx.lineTo(W - PAD_X - 12, gy); ctx.stroke()
+    ctx.setLineDash([])
+    // Small leaf on each side
+    drawLeaf(PAD_X + 6, gy, 0, 7, 0.45)
+    drawLeaf(W - PAD_X - 6, gy, Math.PI, 7, 0.45)
+  }
+
+  drawWatermarks(ctx, images, m, 0.04)
+  drawPhotos(ctx, images, m, { clipRadius: 2 })
+
+  ctx.strokeStyle = 'rgba(100,72,40,0.25)'; ctx.lineWidth = 1
+  images.forEach((_, i) => {
+    const col = i % cols; const row = Math.floor(i / cols)
+    ctx.strokeRect(PAD_X+col*(PHOTO_W+GAP_COL), PAD_TOP+row*(PHOTO_H+GAP_ROW), PHOTO_W, PHOTO_H)
+  })
+
+  const fy = h - FOOTER_H
+  drawLogo(ctx, W / 2, fy + 4, 26)
+  if (label) {
+    ctx.fillStyle = 'rgba(100,72,40,0.7)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
     ctx.fillText(label, W / 2, fy + 47)
@@ -1099,12 +1453,15 @@ export const THEMES = [
   { id: 'progress',     label: 'Progress Saved', colors: ['#050D05', '#00FF41'],  draw: drawProgressSaved },
   { id: 'reportcard',   label: 'Report Card',    colors: ['#F7F2E8', '#1C2B5E'],  draw: drawReportCard    },
   { id: 'librarycard',  label: 'Library Card',   colors: ['#EDE0C0', '#5C3D1E'],  draw: drawLibraryCard   },
-  { id: 'filmnegative', label: 'Film Negative',  colors: ['#0A0A0A', '#FFD750'],  draw: drawFilmNegative  },
-  { id: 'vhs',          label: 'VHS',            colors: ['#111116', '#00F0FF'],  draw: drawVHS           },
-  { id: 'polaroid',     label: 'Polaroid',       colors: ['#F8F3EB', '#FEFEFE'],  draw: drawPolaroid      },
-  { id: 'retrodiner',   label: 'Retro Diner',    colors: ['#FFF3DC', '#CC1020'],  draw: drawRetroDiner    },
-  { id: 'arcade',       label: 'Arcade Cabinet', colors: ['#080818', '#FFD700'],  draw: drawArcade        },
-  { id: 'gameboy',      label: 'Game Boy',       colors: ['#9BBC0F', '#0F380F'],  draw: drawGameBoy       },
+  { id: 'filmnegative', label: 'Film Negative',   colors: ['#0A0A0A', '#FFD750'],  draw: drawFilmNegative  },
+  { id: 'vhs',          label: 'VHS',             colors: ['#111116', '#00F0FF'],  draw: drawVHS           },
+  { id: 'retrodiner',   label: 'Retro Diner',     colors: ['#FFF3DC', '#CC1020'],  draw: drawRetroDiner    },
+  { id: 'arcade',       label: 'Arcade Cabinet',  colors: ['#080818', '#FFD700'],  draw: drawArcade        },
+  { id: 'kpop',         label: 'K-Pop Photocard', colors: ['#F9E8FF', '#C87DC8'],  draw: drawKpop          },
+  { id: 'holographic',  label: 'Holographic',     colors: ['#FAFCFF', '#A78BFA'],  draw: drawHolographic   },
+  { id: 'manga',        label: 'Manga',           colors: ['#FFFFFF', '#000000'],  draw: drawManga         },
+  { id: 'neonclub',     label: 'Neon Club',       colors: ['#080808', '#FF2D78'],  draw: drawNeonClub      },
+  { id: 'botanical',    label: 'Botanical',       colors: ['#F5F0E8', '#4A7C59'],  draw: drawBotanical     },
 ]
 
 export { _logo as logoImg }
