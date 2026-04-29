@@ -46,23 +46,24 @@ function playShutter() {
 
 export default function BoothInterior({ theme, setTheme, layout, setLayout, filter, setFilter, onPhotosReady, onExit }) {
   const shotCount = layout.cols * layout.rows
-  const videoRef      = useRef(null)
-  const canvasRef     = useRef(null)
-  const streamRef     = useRef(null)
-  const touchStartX   = useRef(null)
+  const videoRef    = useRef(null)
+  const canvasRef   = useRef(null)
+  const streamRef   = useRef(null)
+  const touchStartX = useRef(null)
 
-  const [step, setStep]           = useState('style')
-  const [slideDir, setSlideDir]   = useState('right')
+  const [step, setStep]               = useState('style')
+  const [slideDir, setSlideDir]       = useState('right')
   const [carouselDir, setCarouselDir] = useState('right')
-  const [camStarted, setCamStarted] = useState(false)
-  const [camReady, setCamReady]   = useState(false)
-  const [camError, setCamError]   = useState(null)
-  const [running, setRunning]     = useState(false)
-  const [countdown, setCountdown] = useState(null)
-  const [shotIndex, setShotIndex] = useState(0)
-  const [captured, setCaptured]   = useState(0)
-  const [flash, setFlash]         = useState(false)
-  const [done, setDone]           = useState(false)
+  const [camStarted, setCamStarted]   = useState(false)
+  const [camReady, setCamReady]       = useState(false)
+  const [camError, setCamError]       = useState(null)
+  const [running, setRunning]         = useState(false)
+  const [getReady, setGetReady]       = useState(false)
+  const [countdown, setCountdown]     = useState(null)
+  const [shotIndex, setShotIndex]     = useState(0)
+  const [captured, setCaptured]       = useState(0)
+  const [flash, setFlash]             = useState(false)
+  const [done, setDone]               = useState(false)
 
   const themeIdx = THEMES.findIndex(t => t.id === theme)
   const prevTheme = () => { setCarouselDir('left');  setTheme(THEMES[(themeIdx - 1 + THEMES.length) % THEMES.length].id) }
@@ -76,7 +77,6 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
     touchStartX.current = null
   }
 
-  // Camera only initialises when camStarted becomes true
   useEffect(() => {
     if (!camStarted) return
     let active = true
@@ -96,13 +96,6 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
       streamRef.current?.getTracks().forEach(t => t.stop())
     }
   }, [camStarted])
-
-  // Re-attach stream to video after step changes
-  useEffect(() => {
-    if (streamRef.current && videoRef.current) {
-      videoRef.current.srcObject = streamRef.current
-    }
-  }, [step])
 
   const captureFrame = useCallback(() => {
     const video  = videoRef.current
@@ -125,6 +118,7 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
     if (running) return
     setRunning(true)
     setCaptured(0)
+    setGetReady(true)
     const imgs = []
     const doShot = (shotNum) => {
       setShotIndex(shotNum)
@@ -154,13 +148,11 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
         }
       }, 1000)
     }
-    setTimeout(() => doShot(0), 2000)
+    setTimeout(() => {
+      setGetReady(false)
+      doShot(0)
+    }, 2000)
   }, [running, captureFrame, onPhotosReady, shotCount])
-
-  // Auto-start session as soon as camera is ready in shooting step
-  useEffect(() => {
-    if (step === 'shooting' && camReady && !running && !done) runSession()
-  }, [step, camReady, running, done, runSession])
 
   function goToFilter() {
     setSlideDir('right')
@@ -185,7 +177,6 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
         <div className={`${styles.setupContent} ${slideDir === 'left' ? styles.slideInLeft : styles.slideInRight}`}>
           <p className={styles.setupHeading}>Choose your style</p>
 
-          {/* Frame carousel */}
           <div
             className={styles.carousel}
             onTouchStart={handleTouchStart}
@@ -212,7 +203,6 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
             <button className={styles.carouselArrow} onClick={nextTheme} aria-label="Next frame">›</button>
           </div>
 
-          {/* Layout picker */}
           <div className={`${styles.optGroup} ${styles.layoutOptGroup}`}>
             <div className={styles.layoutRow}>
               {LAYOUTS.map(l => (
@@ -239,7 +229,7 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
           </div>
 
           <div className={styles.startWrap}>
-            <button className={styles.startBtn} onClick={goToFilter}>Ready? Go! →</button>
+            <button className={styles.startBtn} onClick={goToFilter}>Ready? Go!</button>
             <p className={styles.startNote}>{shotCount} shots · {COUNTDOWN_SEC} sec each</p>
           </div>
         </div>
@@ -247,72 +237,25 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
     )
   }
 
-  // ── Filter step ───────────────────────────────────────────────────────────────
-  if (step === 'filter') {
-    return (
-      <div className={styles.setupScreen}>
-        <div className={styles.curtainEdgeLeft} />
-        <div className={styles.curtainEdgeRight} />
-
-        <button className={styles.exitBtn} onClick={goBackToStyle}>← Back</button>
-
-        <div className={`${styles.setupContent} ${slideDir === 'right' ? styles.slideInRight : styles.slideInLeft}`}>
-          <p className={styles.setupHeading}>Choose your filter</p>
-
-          <div className={styles.filterCamWrap}>
-            {camError ? (
-              <div className={styles.errorState}>
-                <p className={styles.errorIcon}>📷</p>
-                <p>Camera unavailable</p>
-                <p className={styles.errorSub}>{camError}</p>
-              </div>
-            ) : (
-              <>
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className={styles.filterVideo}
-                  style={{ transform: 'scaleX(-1)', filter: FILTERS.find(f => f.id === filter)?.css ?? 'none' }}
-                />
-                {!camReady && <div className={styles.loadingOverlay}><p>Setting up camera…</p></div>}
-              </>
-            )}
-          </div>
-
-          <div className={styles.optGroup}>
-            <p className={styles.optSection}>Filter</p>
-            <div className={styles.filterGrid}>
-              {FILTERS.map(f => (
-                <button
-                  key={f.id}
-                  className={`${styles.filterChip} ${filter === f.id ? styles.filterChipActive : ''}`}
-                  onClick={() => setFilter(f.id)}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className={styles.startWrap}>
-            <button className={styles.startBtn} onClick={() => setStep('shooting')}>Smile! 📸</button>
-            <p className={styles.startNote}>{shotCount} shots · {COUNTDOWN_SEC} sec each</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // ── Shooting step ─────────────────────────────────────────────────────────────
+  // ── Filter + Shooting (combined) ──────────────────────────────────────────────
+  const activeFilterCss = FILTERS.find(f => f.id === filter)?.css ?? 'none'
   return (
-    <div className={`${styles.interior} ${styles.slideInRight}`}>
+    <div className={styles.filterShootScreen}>
       {flash && <div className={styles.flash} />}
       <div className={styles.curtainEdgeLeft} />
       <div className={styles.curtainEdgeRight} />
 
-      <div className={styles.cameraWrap}>
+      {/* Top bar */}
+      <div className={styles.topBar}>
+        {!running && (
+          <button className={styles.exitBtn2} onClick={goBackToStyle}>← Back</button>
+        )}
+        <p className={styles.topHeading}>Choose your filter</p>
+        {!running && <div className={styles.topBarSpacer} />}
+      </div>
+
+      {/* Camera — fills remaining space */}
+      <div className={styles.camArea}>
         {camError ? (
           <div className={styles.errorState}>
             <p className={styles.errorIcon}>📷</p>
@@ -325,11 +268,8 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
             autoPlay
             playsInline
             muted
-            className={styles.video}
-            style={{
-              transform: 'scaleX(-1)',
-              filter: FILTERS.find(f => f.id === filter)?.css ?? 'none',
-            }}
+            className={styles.camVideo}
+            style={{ filter: activeFilterCss }}
           />
         )}
 
@@ -338,13 +278,15 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
             {[...Array(shotCount)].map((_, i) => (
               <span
                 key={i}
-                className={`
-                  ${styles.dot}
-                  ${i < captured ? styles.dotDone : ''}
-                  ${i === shotIndex && countdown !== null ? styles.dotActive : ''}
-                `}
+                className={`${styles.dot} ${i < captured ? styles.dotDone : ''} ${i === shotIndex && countdown !== null ? styles.dotActive : ''}`}
               />
             ))}
+          </div>
+        )}
+
+        {getReady && (
+          <div className={styles.getReadyOverlay}>
+            <span className={styles.getReadyText}>Strike a pose!</span>
           </div>
         )}
 
@@ -390,6 +332,36 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
           </div>
         )}
       </div>
+
+      {/* Bottom panel — filter chips + start button */}
+      {!done && (
+        <div className={styles.bottomPanel}>
+          <div className={styles.filterRow}>
+            {FILTERS.map(f => (
+              <button
+                key={f.id}
+                className={`${styles.filterChip} ${filter === f.id ? styles.filterChipActive : ''} ${running ? styles.filterChipDisabled : ''}`}
+                onClick={() => { if (!running) setFilter(f.id) }}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+
+          {!running && (
+            <div className={styles.startWrap}>
+              <button
+                className={styles.startBtn}
+                onClick={runSession}
+                disabled={!camReady}
+              >
+                {camReady ? 'Smile!' : 'Camera loading…'}
+              </button>
+              <p className={styles.startNote}>{shotCount} shots · {COUNTDOWN_SEC} sec each</p>
+            </div>
+          )}
+        </div>
+      )}
 
       <canvas ref={canvasRef} style={{ display: 'none' }} />
     </div>
