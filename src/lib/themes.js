@@ -154,13 +154,13 @@ function drawClassic(ctx, images, label, layout = DEFAULT_LAYOUT) {
   drawPhotos(ctx, images, m, { clipRadius: 2 })
 
   const fy = h - FOOTER_H
-  drawLogo(ctx, W / 2, fy + 10, 26)
+  drawLogo(ctx, W / 2, fy + 4, 26)
 
   if (label) {
     ctx.fillStyle = 'rgba(193,0,90,0.7)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.74)
+    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.70)
   }
 }
 
@@ -224,13 +224,13 @@ function drawDistinction(ctx, images, label, layout = DEFAULT_LAYOUT) {
   })
 
   const fy = h - FOOTER_H
-  drawLogo(ctx, W / 2, fy + 10, 26)
+  drawLogo(ctx, W / 2, fy + 4, 26)
 
   if (label) {
     ctx.fillStyle = 'rgba(201,146,10,0.8)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.74)
+    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.70)
   }
 }
 
@@ -286,13 +286,13 @@ function drawYearBook(ctx, images, label, layout = DEFAULT_LAYOUT) {
   })
 
   const fy = h - FOOTER_H
-  drawLogo(ctx, W / 2, fy + 10, 26)
+  drawLogo(ctx, W / 2, fy + 4, 26)
 
   if (label) {
     ctx.fillStyle = 'rgba(28,28,28,0.5)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.74)
+    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.70)
   }
 
   drawSprocketHoles(ctx, W, h, '#F4EFE4')
@@ -352,13 +352,13 @@ function drawSquadGoals(ctx, images, label, layout = DEFAULT_LAYOUT) {
   })
 
   const fy = h - FOOTER_H
-  drawLogo(ctx, W / 2, fy + 10, 26)
+  drawLogo(ctx, W / 2, fy + 4, 26)
 
   if (label) {
     ctx.fillStyle = 'rgba(123,47,190,0.7)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.74)
+    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.70)
   }
 
   ctx.restore()
@@ -417,13 +417,13 @@ function drawCrew(ctx, images, label, layout = DEFAULT_LAYOUT) {
   })
 
   const fy = h - FOOTER_H
-  drawLogo(ctx, W / 2, fy + 10, 26)
+  drawLogo(ctx, W / 2, fy + 4, 26)
 
   if (label) {
     ctx.fillStyle = 'rgba(74,159,255,0.8)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.74)
+    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.70)
   }
 }
 
@@ -499,13 +499,13 @@ function drawProgressSaved(ctx, images, label, layout = DEFAULT_LAYOUT) {
   })
 
   const fy = h - FOOTER_H
-  drawLogo(ctx, W / 2, fy + 10, 26)
+  drawLogo(ctx, W / 2, fy + 4, 26)
 
   if (label) {
     ctx.fillStyle = 'rgba(0,255,65,0.7)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.74)
+    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.70)
   }
 }
 
@@ -586,13 +586,13 @@ function drawReportCard(ctx, images, label, layout = DEFAULT_LAYOUT) {
   })
 
   const fy = h - FOOTER_H
-  drawLogo(ctx, W / 2, fy + 10, 26)
+  drawLogo(ctx, W / 2, fy + 4, 26)
 
   if (label) {
     ctx.fillStyle = 'rgba(28,43,94,0.6)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.74)
+    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.70)
   }
 }
 
@@ -670,13 +670,13 @@ function drawLibraryCard(ctx, images, label, layout = DEFAULT_LAYOUT) {
   })
 
   const fy = h - FOOTER_H
-  drawLogo(ctx, W / 2, fy + 10, 26)
+  drawLogo(ctx, W / 2, fy + 4, 26)
 
   if (label) {
     ctx.fillStyle = 'rgba(92,61,30,0.6)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.74)
+    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.70)
   }
 }
 
@@ -732,12 +732,12 @@ function drawFilmNegative(ctx, images, label, layout = DEFAULT_LAYOUT) {
   const fy = h - FOOTER_H
   ctx.fillStyle = '#141414'
   ctx.fillRect(fb, fy, W - fb * 2, FOOTER_H)
-  drawLogo(ctx, W / 2, fy + 10, 26)
+  drawLogo(ctx, W / 2, fy + 4, 26)
   if (label) {
     ctx.fillStyle = 'rgba(255,215,80,0.65)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.74)
+    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.70)
   }
 }
 
@@ -806,12 +806,12 @@ function drawVHS(ctx, images, label, layout = DEFAULT_LAYOUT) {
   })
 
   const fy = h - FOOTER_H
-  drawLogo(ctx, W / 2, fy + 10, 26)
+  drawLogo(ctx, W / 2, fy + 4, 26)
   if (label) {
     ctx.fillStyle = 'rgba(0,240,255,0.75)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.74)
+    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.70)
   }
 }
 
@@ -855,12 +855,12 @@ function drawPolaroid(ctx, images, label, layout = DEFAULT_LAYOUT) {
   drawPhotos(ctx, images, m, { clipRadius: 0 })
 
   const fy = h - FOOTER_H
-  drawLogo(ctx, W / 2, fy + 10, 26)
+  drawLogo(ctx, W / 2, fy + 4, 26)
   if (label) {
     ctx.fillStyle = 'rgba(100,75,45,0.6)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.74)
+    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.70)
   }
 }
 
@@ -939,12 +939,12 @@ function drawRetroDiner(ctx, images, label, layout = DEFAULT_LAYOUT) {
   })
 
   const fy = h - FOOTER_H
-  drawLogo(ctx, W / 2, fy + 10, 26)
+  drawLogo(ctx, W / 2, fy + 4, 26)
   if (label) {
     ctx.fillStyle = 'rgba(204,16,32,0.7)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.74)
+    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.70)
   }
 }
 
@@ -1009,12 +1009,12 @@ function drawArcade(ctx, images, label, layout = DEFAULT_LAYOUT) {
   })
 
   const fy = h - FOOTER_H
-  drawLogo(ctx, W / 2, fy + 10, 26)
+  drawLogo(ctx, W / 2, fy + 4, 26)
   if (label) {
     ctx.fillStyle = 'rgba(255,215,0,0.8)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.74)
+    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.70)
   }
 }
 
@@ -1079,12 +1079,12 @@ function drawGameBoy(ctx, images, label, layout = DEFAULT_LAYOUT) {
   })
 
   const fy = h - FOOTER_H
-  drawLogo(ctx, W / 2, fy + 10, 26)
+  drawLogo(ctx, W / 2, fy + 4, 26)
   if (label) {
     ctx.fillStyle = GB.dark
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.74)
+    ctx.fillText(label, W / 2, fy + FOOTER_H * 0.70)
   }
 }
 
