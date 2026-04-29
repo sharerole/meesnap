@@ -85,7 +85,9 @@
   display: block;
   border-radius: 3px;
   max-width: 480px;
-  width: 100%;
+  max-height: calc(100dvh - 200px);
+  width: auto;
+  height: auto;
 }
 
 /* Controls */
