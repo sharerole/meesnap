@@ -85,15 +85,20 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
       .then(stream => {
         if (!active) { stream.getTracks().forEach(t => t.stop()); return }
         streamRef.current = stream
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream
-          videoRef.current.onloadedmetadata = () => { if (active) setCamReady(true) }
+        const video = videoRef.current
+        if (video) {
+          video.srcObject = stream
+          const onReady = () => { if (active) setCamReady(true) }
+          video.addEventListener('loadedmetadata', onReady, { once: true })
+          if (video.readyState >= 2) onReady()
+          video.play().catch(() => {})
         }
       })
       .catch(err => { if (active) setCamError(err.message) })
     return () => {
       active = false
       streamRef.current?.getTracks().forEach(t => t.stop())
+      streamRef.current = null
     }
   }, [camStarted])
 
