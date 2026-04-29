@@ -1107,7 +1107,7 @@ function drawHolographic(ctx, images, label, layout = DEFAULT_LAYOUT) {
   ctx.fillStyle = headerGrad
   ctx.font = '900 9px "DM Sans",Arial,sans-serif'
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-  ctx.fillText('✦ MEEOPP · HOLOGRAPHIC ✦', W / 2, PAD_TOP * 0.38)
+  ctx.fillText('✧ IRIDESCENT ✧', W / 2, PAD_TOP * 0.38)
   ctx.textBaseline = 'alphabetic'
 
   // Sparkle chars (seeded)
@@ -1161,97 +1161,126 @@ function drawHolographic(ctx, images, label, layout = DEFAULT_LAYOUT) {
   }
 }
 
-// ── Manga / Anime ─────────────────────────────────────────────────────────────
-// White bg, screentone dot pattern, speed-line corners, bold action header.
+// ── Cyberpunk ─────────────────────────────────────────────────────────────────
+// Near-black with circuit traces, cyan/purple glow borders, glitch scanlines.
 
-function drawManga(ctx, images, label, layout = DEFAULT_LAYOUT) {
+function drawCyberpunk(ctx, images, label, layout = DEFAULT_LAYOUT) {
   const m = getMetrics(layout)
   const { W, h, PAD_X, PHOTO_W, PHOTO_H, GAP_ROW, GAP_COL, cols, rows } = m
 
-  ctx.fillStyle = '#FFFFFF'
+  ctx.fillStyle = '#080A14'
   ctx.fillRect(0, 0, W, h)
 
-  // Screentone dot pattern (outside photo areas)
-  ctx.fillStyle = 'rgba(0,0,0,0.07)'
-  for (let dx = 0; dx < W; dx += 5) {
-    for (let dy = 0; dy < h; dy += 5) {
-      let inPhoto = false
-      for (let r = 0; r < rows && !inPhoto; r++) {
-        for (let c = 0; c < cols && !inPhoto; c++) {
-          const px = PAD_X + c * (PHOTO_W + GAP_COL)
-          const py = PAD_TOP + r * (PHOTO_H + GAP_ROW)
-          if (dx >= px && dx < px + PHOTO_W && dy >= py && dy < py + PHOTO_H) inPhoto = true
-        }
-      }
-      if (!inPhoto) ctx.fillRect(dx + 1, dy + 1, 2, 2)
-    }
+  // Fine grid
+  ctx.strokeStyle = 'rgba(0,245,255,0.05)'
+  ctx.lineWidth = 0.5
+  for (let gx = 0; gx < W; gx += 16) {
+    ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, h); ctx.stroke()
+  }
+  for (let gy = 0; gy < h; gy += 16) {
+    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke()
   }
 
-  // Speed lines from top corners into header
-  ctx.strokeStyle = 'rgba(0,0,0,0.12)'
-  ctx.lineWidth = 0.7
-  const lineCount = 16
-  for (let i = 0; i < lineCount; i++) {
-    const angle = (i / lineCount) * (Math.PI / 2.5) - 0.1
-    const len = 55
-    // Top-left
+  // Circuit traces (seeded H/V runs with junction nodes)
+  const traceColor = 'rgba(0,245,255,0.18)'
+  const nodeColor  = 'rgba(0,245,255,0.35)'
+  const traces = [
+    { x: 14,     y1: 0,         y2: h * 0.38, horiz: false },
+    { x: W - 14, y1: h * 0.55,  y2: h,        horiz: false },
+    { x: 22,     y1: 0,         y2: h * 0.22, horiz: false },
+    { y: 14,     x1: 0,         x2: W * 0.42, horiz: true  },
+    { y: h - 14, x1: W * 0.55,  x2: W,        horiz: true  },
+    { y: 22,     x1: W * 0.65,  x2: W,        horiz: true  },
+  ]
+  ctx.lineWidth = 1
+  traces.forEach(t => {
+    ctx.strokeStyle = traceColor
     ctx.beginPath()
-    ctx.moveTo(0, 0)
-    ctx.lineTo(len * Math.cos(angle), len * Math.sin(angle))
+    if (t.horiz) { ctx.moveTo(t.x1, t.y); ctx.lineTo(t.x2, t.y) }
+    else          { ctx.moveTo(t.x, t.y1); ctx.lineTo(t.x, t.y2) }
     ctx.stroke()
-    // Top-right
-    ctx.beginPath()
-    ctx.moveTo(W, 0)
-    ctx.lineTo(W - len * Math.cos(angle), len * Math.sin(angle))
-    ctx.stroke()
-  }
+    // node at end
+    ctx.fillStyle = nodeColor
+    const nx = t.horiz ? t.x2 : t.x
+    const ny = t.horiz ? t.y  : t.y2
+    ctx.fillRect(nx - 2, ny - 2, 4, 4)
+  })
 
-  // Bold outer border
-  ctx.strokeStyle = '#000000'
-  ctx.lineWidth = 5
-  ctx.strokeRect(2.5, 2.5, W - 5, h - 5)
-  ctx.lineWidth = 1.5
-  ctx.strokeRect(8, 8, W - 16, h - 16)
+  // Outer cyan glow border
+  ctx.save()
+  ctx.shadowColor = '#00F5FF'; ctx.shadowBlur = 12
+  ctx.strokeStyle = '#00F5FF'; ctx.lineWidth = 1.5
+  ctx.strokeRect(3, 3, W - 6, h - 6)
+  ctx.restore()
+  ctx.strokeStyle = 'rgba(191,0,255,0.4)'; ctx.lineWidth = 1
+  ctx.strokeRect(7, 7, W - 14, h - 14)
 
-  // Header action box
-  const hbH = PAD_TOP * 0.65, hbY = (PAD_TOP - hbH) / 2
-  ctx.fillStyle = '#000000'
-  ctx.fillRect(W * 0.08, hbY, W * 0.84, hbH)
-  ctx.fillStyle = '#FFFFFF'
-  ctx.font = '900 10px "DM Sans",Arial,sans-serif'
+  // Header
+  ctx.save()
+  ctx.shadowColor = '#00F5FF'; ctx.shadowBlur = 8
+  ctx.fillStyle = '#00F5FF'
+  ctx.font = '700 9px "Courier New",Courier,monospace'
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-  ctx.fillText('★  MEEOPP  PHOTO  ★', W / 2, hbY + hbH / 2)
+  ctx.fillText('[ MEEOPP // CYBER ]', W / 2, PAD_TOP * 0.35)
+  ctx.restore()
+  ctx.fillStyle = 'rgba(191,0,255,0.7)'
+  ctx.font = '600 7px "Courier New",Courier,monospace'
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+  ctx.fillText('SYS_ONLINE  ■■■■■', W / 2, PAD_TOP * 0.72)
   ctx.textBaseline = 'alphabetic'
 
   drawWatermarks(ctx, images, m, 0.04)
   drawPhotos(ctx, images, m, { clipRadius: 0 })
 
-  // Bold photo borders with double-line effect
-  ctx.strokeStyle = '#000000'
+  // Glitch scanlines over photos
   images.forEach((_, i) => {
     const col = i % cols; const row = Math.floor(i / cols)
     const px = PAD_X + col * (PHOTO_W + GAP_COL)
     const py = PAD_TOP + row * (PHOTO_H + GAP_ROW)
-    ctx.lineWidth = 2.5
-    ctx.strokeRect(px, py, PHOTO_W, PHOTO_H)
-    ctx.lineWidth = 0.8
-    ctx.strokeRect(px - 3, py - 3, PHOTO_W + 6, PHOTO_H + 6)
+    ctx.fillStyle = 'rgba(0,0,0,0.12)'
+    for (let ly = py; ly < py + PHOTO_H; ly += 4) {
+      ctx.fillRect(px, ly, PHOTO_W, 1)
+    }
   })
 
-  // Between-row jagged dividers
+  // Per-photo alternating cyan/purple glow borders
+  images.forEach((_, i) => {
+    const col = i % cols; const row = Math.floor(i / cols)
+    const px = PAD_X + col * (PHOTO_W + GAP_COL)
+    const py = PAD_TOP + row * (PHOTO_H + GAP_ROW)
+    const clr = i % 2 === 0 ? '#00F5FF' : '#BF00FF'
+    ctx.save()
+    ctx.shadowColor = clr; ctx.shadowBlur = 7
+    ctx.strokeStyle = clr; ctx.lineWidth = 1.5
+    ctx.strokeRect(px, py, PHOTO_W, PHOTO_H)
+    ctx.restore()
+  })
+
+  // Between-row circuit dividers
   for (let row = 0; row < rows - 1; row++) {
     const gy = PAD_TOP + (row+1)*PHOTO_H + row*GAP_ROW + GAP_ROW/2
-    ctx.strokeStyle = '#000000'; ctx.lineWidth = 1.5
+    ctx.save()
+    ctx.shadowColor = '#00F5FF'; ctx.shadowBlur = 4
+    ctx.strokeStyle = 'rgba(0,245,255,0.4)'; ctx.lineWidth = 1
+    ctx.setLineDash([6, 3])
     ctx.beginPath(); ctx.moveTo(PAD_X, gy); ctx.lineTo(W - PAD_X, gy); ctx.stroke()
+    ctx.setLineDash([])
+    ctx.restore()
+    // Junction node in centre
+    ctx.fillStyle = 'rgba(0,245,255,0.5)'
+    ctx.fillRect(W / 2 - 2, gy - 2, 4, 4)
   }
 
   const fy = h - FOOTER_H
   drawLogo(ctx, W / 2, fy + 4, 26)
   if (label) {
-    ctx.fillStyle = '#111111'
-    ctx.font = 'bold 11px "DM Sans",Arial,sans-serif'
+    ctx.save()
+    ctx.shadowColor = '#00F5FF'; ctx.shadowBlur = 5
+    ctx.fillStyle = '#00F5FF'
+    ctx.font = '11px "Courier New",Courier,monospace'
     ctx.textAlign = 'center'
     ctx.fillText(label, W / 2, fy + 47)
+    ctx.restore()
   }
 }
 
@@ -1293,7 +1322,7 @@ function drawNeonClub(ctx, images, label, layout = DEFAULT_LAYOUT) {
   ctx.fillStyle = '#FF2D78'
   ctx.font = '900 9px "DM Sans",Arial,sans-serif'
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-  ctx.fillText('— MEEOPP CLUB —', W / 2, PAD_TOP * 0.35)
+  ctx.fillText('[ VIP ACCESS ]', W / 2, PAD_TOP * 0.35)
   ctx.restore()
   ctx.fillStyle = 'rgba(255,255,255,0.3)'
   ctx.font = '600 7px "DM Sans",Arial,sans-serif'
@@ -1341,101 +1370,104 @@ function drawNeonClub(ctx, images, label, layout = DEFAULT_LAYOUT) {
   }
 }
 
-// ── Botanical ─────────────────────────────────────────────────────────────────
-// Cream background, leaf / branch bezier corners, warm brown border.
+// ── Festival / Ticket Stub ────────────────────────────────────────────────────
+// Aged cream paper, torn-edge perforations, ADMIT ONE header, barcode footer.
 
-function drawBotanical(ctx, images, label, layout = DEFAULT_LAYOUT) {
+function drawFestival(ctx, images, label, layout = DEFAULT_LAYOUT) {
   const m = getMetrics(layout)
   const { W, h, PAD_X, PHOTO_W, PHOTO_H, GAP_ROW, GAP_COL, cols, rows } = m
 
-  ctx.fillStyle = '#F5F0E8'
+  // Aged paper background
+  ctx.fillStyle = '#FBF6EC'
   ctx.fillRect(0, 0, W, h)
 
-  // Warm border
-  ctx.strokeStyle = 'rgba(100,72,40,0.35)'
-  ctx.lineWidth = 2.5
+  // Subtle paper grain (seeded noise)
+  for (let i = 0; i < 200; i++) {
+    ctx.globalAlpha = 0.03 + seededRand(i * 3) * 0.04
+    ctx.fillStyle = seededRand(i * 3 + 1) > 0.5 ? '#8B6914' : '#3A2A10'
+    const gx = seededRand(i * 3 + 2) * W
+    const gy = seededRand(i * 3 + 3) * h
+    ctx.fillRect(gx, gy, 1 + seededRand(i * 3 + 4) * 2, 1)
+  }
+  ctx.globalAlpha = 1
+
+  // Outer border
+  ctx.strokeStyle = '#2A1A08'
+  ctx.lineWidth = 2
   ctx.strokeRect(4, 4, W - 8, h - 8)
-  ctx.strokeStyle = 'rgba(100,72,40,0.15)'
-  ctx.lineWidth = 1
-  ctx.strokeRect(8, 8, W - 16, h - 16)
 
-  // Helper: draw a small leaf (bezier) at given position / rotation
-  function drawLeaf(cx, cy, angle, size, alpha) {
-    ctx.save()
-    ctx.translate(cx, cy)
-    ctx.rotate(angle)
-    ctx.globalAlpha = alpha
-    ctx.fillStyle = '#4A7C59'
-    ctx.strokeStyle = '#3A6048'
-    ctx.lineWidth = 0.7
-    ctx.beginPath()
-    ctx.moveTo(0, 0)
-    ctx.bezierCurveTo(size * 0.4, -size * 0.5, size * 0.9, -size * 0.3, size, 0)
-    ctx.bezierCurveTo(size * 0.9, size * 0.3, size * 0.4, size * 0.5, 0, 0)
-    ctx.fill()
-    ctx.stroke()
-    // midrib
-    ctx.strokeStyle = 'rgba(255,255,255,0.4)'
-    ctx.lineWidth = 0.5
-    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(size, 0); ctx.stroke()
-    ctx.restore()
+  // Perforation dots down both sides
+  const perfY0 = 20, perfDotR = 2.5, perfGap = 10
+  for (let py = perfY0; py < h - 20; py += perfGap) {
+    ctx.fillStyle = '#FBF6EC'
+    ctx.beginPath(); ctx.arc(4, py, perfDotR, 0, Math.PI * 2); ctx.fill()
+    ctx.beginPath(); ctx.arc(W - 4, py, perfDotR, 0, Math.PI * 2); ctx.fill()
+    ctx.strokeStyle = '#2A1A08'; ctx.lineWidth = 0.5
+    ctx.beginPath(); ctx.arc(4, py, perfDotR, 0, Math.PI * 2); ctx.stroke()
+    ctx.beginPath(); ctx.arc(W - 4, py, perfDotR, 0, Math.PI * 2); ctx.stroke()
   }
 
-  // Helper: stem with small branch + leaves
-  function drawBranch(bx, by, bAngle, length) {
-    ctx.save()
-    ctx.translate(bx, by)
-    ctx.rotate(bAngle)
-    ctx.strokeStyle = 'rgba(100,72,40,0.55)'
-    ctx.lineWidth = 1.2
-    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(length, 0); ctx.stroke()
-    // leaves along the branch
-    for (let li = 0; li < 3; li++) {
-      const lt = (li + 1) / 4
-      drawLeaf(length * lt, 0, -Math.PI / 4 + li * 0.3, 8 + li * 2, 0.6 + li * 0.1)
-      drawLeaf(length * lt, 0,  Math.PI / 4 - li * 0.3, 8 + li * 2, 0.6 + li * 0.1)
-    }
-    ctx.restore()
-  }
+  // Header band
+  const hBandH = PAD_TOP - 8
+  ctx.fillStyle = '#1C0F04'
+  ctx.fillRect(4, 4, W - 8, hBandH)
 
-  // Corner branch decorations
-  drawBranch(12, 12,      0.4,         40)
-  drawBranch(W - 12, 12, Math.PI - 0.4, 40)
-  drawBranch(12, h - 12, -0.4,          40)
-  drawBranch(W - 12, h - 12, Math.PI + 0.4, 40)
-
-  // Header nature quote
-  ctx.fillStyle = 'rgba(100,72,40,0.7)'
-  ctx.font = 'italic 600 8.5px "DM Sans",Arial,sans-serif'
+  // ADMIT ONE
+  ctx.fillStyle = '#F5C842'
+  ctx.font = '900 13px "DM Sans",Arial,sans-serif'
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-  ctx.fillText('In bloom. In frame. In memory.', W / 2, PAD_TOP * 0.45)
+  ctx.fillText('ADMIT ONE', W / 2, 4 + hBandH * 0.38)
+
+  ctx.fillStyle = 'rgba(245,200,66,0.5)'
+  ctx.font = '600 7px "DM Sans",Arial,sans-serif'
+  ctx.fillText('MEEOPP PHOTO BOOTH  ·  OFFICIAL', W / 2, 4 + hBandH * 0.76)
   ctx.textBaseline = 'alphabetic'
 
-  // Subtle between-row botanical dividers
+  // Horizontal rule below header
+  ctx.strokeStyle = '#2A1A08'; ctx.lineWidth = 1
+  ctx.beginPath(); ctx.moveTo(12, PAD_TOP); ctx.lineTo(W - 12, PAD_TOP); ctx.stroke()
+  ctx.strokeStyle = 'rgba(42,26,8,0.3)'; ctx.lineWidth = 0.5
+  ctx.beginPath(); ctx.moveTo(12, PAD_TOP + 2); ctx.lineTo(W - 12, PAD_TOP + 2); ctx.stroke()
+
+  // Between-row ticket dividers
   for (let row = 0; row < rows - 1; row++) {
     const gy = PAD_TOP + (row+1)*PHOTO_H + row*GAP_ROW + GAP_ROW/2
-    ctx.strokeStyle = 'rgba(100,72,40,0.2)'; ctx.lineWidth = 1
-    ctx.setLineDash([3, 4])
-    ctx.beginPath(); ctx.moveTo(PAD_X + 12, gy); ctx.lineTo(W - PAD_X - 12, gy); ctx.stroke()
+    ctx.strokeStyle = 'rgba(42,26,8,0.35)'; ctx.lineWidth = 1
+    ctx.setLineDash([4, 4])
+    ctx.beginPath(); ctx.moveTo(14, gy); ctx.lineTo(W - 14, gy); ctx.stroke()
     ctx.setLineDash([])
-    // Small leaf on each side
-    drawLeaf(PAD_X + 6, gy, 0, 7, 0.45)
-    drawLeaf(W - PAD_X - 6, gy, Math.PI, 7, 0.45)
+    // Scissor icon in centre
+    ctx.fillStyle = 'rgba(42,26,8,0.4)'
+    ctx.font = '9px sans-serif'
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+    ctx.fillText('✂', W / 2, gy)
   }
 
   drawWatermarks(ctx, images, m, 0.04)
-  drawPhotos(ctx, images, m, { clipRadius: 2 })
+  drawPhotos(ctx, images, m, { clipRadius: 1 })
 
-  ctx.strokeStyle = 'rgba(100,72,40,0.25)'; ctx.lineWidth = 1
+  ctx.strokeStyle = 'rgba(42,26,8,0.3)'; ctx.lineWidth = 1
   images.forEach((_, i) => {
     const col = i % cols; const row = Math.floor(i / cols)
     ctx.strokeRect(PAD_X+col*(PHOTO_W+GAP_COL), PAD_TOP+row*(PHOTO_H+GAP_ROW), PHOTO_W, PHOTO_H)
   })
 
+  // Barcode stripes in footer
   const fy = h - FOOTER_H
+  const bcX = W * 0.12, bcW = W * 0.76, bcH = 14, bcY = fy + 6
+  const barWidths = [1,2,1,3,1,1,2,1,2,1,1,3,2,1,1,2,1,3,1,2,1,1,2,1]
+  let bx = bcX
+  barWidths.forEach((bw, bi) => {
+    if (bi % 2 === 0) {
+      ctx.fillStyle = 'rgba(42,26,8,0.6)'
+      ctx.fillRect(bx, bcY, bw * (bcW / barWidths.reduce((a,b)=>a+b,0)), bcH)
+    }
+    bx += bw * (bcW / barWidths.reduce((a,b)=>a+b,0))
+  })
+
   drawLogo(ctx, W / 2, fy + 4, 26)
   if (label) {
-    ctx.fillStyle = 'rgba(100,72,40,0.7)'
+    ctx.fillStyle = 'rgba(42,26,8,0.65)'
     ctx.font = '11px "DM Sans",Arial,sans-serif'
     ctx.textAlign = 'center'
     ctx.fillText(label, W / 2, fy + 47)
@@ -1459,9 +1491,9 @@ export const THEMES = [
   { id: 'arcade',       label: 'Arcade Cabinet',  colors: ['#080818', '#FFD700'],  draw: drawArcade        },
   { id: 'kpop',         label: 'K-Pop Photocard', colors: ['#F9E8FF', '#C87DC8'],  draw: drawKpop          },
   { id: 'holographic',  label: 'Holographic',     colors: ['#FAFCFF', '#A78BFA'],  draw: drawHolographic   },
-  { id: 'manga',        label: 'Manga',           colors: ['#FFFFFF', '#000000'],  draw: drawManga         },
+  { id: 'cyberpunk',    label: 'Cyberpunk',       colors: ['#080A14', '#00F5FF'],  draw: drawCyberpunk     },
   { id: 'neonclub',     label: 'Neon Club',       colors: ['#080808', '#FF2D78'],  draw: drawNeonClub      },
-  { id: 'botanical',    label: 'Botanical',       colors: ['#F5F0E8', '#4A7C59'],  draw: drawBotanical     },
+  { id: 'festival',     label: 'Festival',        colors: ['#FBF6EC', '#1C0F04'],  draw: drawFestival      },
 ]
 
 export { _logo as logoImg }
