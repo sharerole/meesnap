@@ -6,6 +6,10 @@
   padding-bottom: 36px; /* aligns bottom with booth legs */
 }
 
+.wrapCompact {
+  padding-bottom: 0;
+}
+
 .heading {
   font-size: 0.6rem;
   font-weight: 800;

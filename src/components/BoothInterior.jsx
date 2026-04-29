@@ -188,7 +188,7 @@ export default function BoothInterior({ theme, setTheme, layout, setLayout, filt
                 key={theme}
                 className={carouselDir === 'right' ? styles.carouselSlideRight : styles.carouselSlideLeft}
               >
-                <ThemePreview theme={theme} displayWidth={140} layout={layout} showHeading={false} />
+                <ThemePreview theme={theme} displayWidth={140} layout={layout} showHeading={false} compact />
               </div>
               <div className={styles.carouselDots}>
                 {THEMES.map((t, i) => (

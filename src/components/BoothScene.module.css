@@ -872,26 +872,20 @@
   font-weight: 800;
   letter-spacing: 2.5px;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255,255,255,0.55);
   opacity: 0;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.4s ease;
   pointer-events: none;
   margin: 0;
 }
 
-.trayUnitReady:hover .pickupLabel {
+.trayUnitReady .pickupLabel {
   opacity: 1;
-}
-
-@media (hover: none) {
-  .pickupLabel {
-    opacity: 1;
-    animation: pickupPulse 1.8s ease-in-out infinite;
-  }
+  animation: pickupPulse 1.8s ease-in-out infinite;
 }
 
 @keyframes pickupPulse {
-  0%, 100% { opacity: 0.45; }
+  0%, 100% { opacity: 0.5; }
   50%       { opacity: 1; }
 }
 
