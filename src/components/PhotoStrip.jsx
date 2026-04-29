@@ -316,33 +316,35 @@ export default function PhotoStrip({ photos, theme, layout, onRetake, onRestart 
   function undoSticker()  { setStickers(prev => prev.slice(0, -1)) }
   function clearStickers() { setStickers([]) }
 
-  async function handleDownload() {
+  function handleDownload() {
     const canvas = canvasRef.current
     if (!canvas) return
-
     const filename = `meeopp-${Date.now()}.png`
-
-    // On iOS, <a download> saves to Files — use Web Share API instead so the
-    // native share sheet appears and the user can tap "Save Image" → Photos.
-    if (typeof navigator.share === 'function' && typeof navigator.canShare === 'function') {
-      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'))
-      const file = new File([blob], filename, { type: 'image/png' })
-      if (navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({ files: [file] })
-          return
-        } catch (err) {
-          if (err.name === 'AbortError') return  // user dismissed sheet
-          // any other error falls through to the standard download
-        }
-      }
-    }
-
-    const a = document.createElement('a')
-    a.download = filename
-    a.href = canvas.toDataURL('image/png')
-    a.click()
+    // Blob URL avoids Safari intercepting <a download> with its share sheet
+    canvas.toBlob(blob => {
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.download = filename
+      a.href = url
+      a.click()
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
+    }, 'image/png')
   }
+
+  async function handleShare() {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const filename = `meeopp-${Date.now()}.png`
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'))
+    const file = new File([blob], filename, { type: 'image/png' })
+    try {
+      await navigator.share({ files: [file], title: 'My photo strip' })
+    } catch (err) {
+      if (err.name !== 'AbortError') console.error('Share failed:', err)
+    }
+  }
+
+  const canShare = typeof navigator.share === 'function' && typeof navigator.canShare === 'function'
 
   return (
     <div className={styles.page}>
@@ -407,13 +409,20 @@ export default function PhotoStrip({ photos, theme, layout, onRetake, onRestart 
             <StickerPicker onSelect={addSticker} />
           </div>
 
-          {/* Download */}
-          <button className={styles.downloadBtn} onClick={handleDownload}>
-            ↓ Download Strip
-          </button>
+          {/* Download + Share */}
+          <div className={styles.actionRow}>
+            <button className={styles.downloadBtn} onClick={handleDownload}>
+              ↓ Download
+            </button>
+            {canShare && (
+              <button className={styles.shareBtn} onClick={handleShare}>
+                ↑ Share
+              </button>
+            )}
+          </div>
 
           <p className={styles.tip}>
-            PNG saved at full resolution — ready to share.
+            PNG saved at full resolution.
           </p>
         </div>
       </div>
